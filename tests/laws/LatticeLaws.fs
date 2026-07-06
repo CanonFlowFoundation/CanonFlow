@@ -88,3 +88,31 @@ let ``NNF shape invariant`` (l: Lattice<int>) =
         | Not _ -> false
         | And(a, b) | Or(a, b) -> isNNFShape a && isNNFShape b
     isNNFShape (Lattice.toNNF l)
+
+[<Property>]
+let ``Complement-Bottom`` (a: Lattice<int>) (evalFn: int -> bool) =
+    Lattice.equivalent (Lattice.and' a (Lattice.not a)) False evalFn
+
+[<Property>]
+let ``Complement-Top`` (a: Lattice<int>) (evalFn: int -> bool) =
+    Lattice.equivalent (Lattice.or' a (Lattice.not a)) True evalFn
+
+[<Property>]
+let ``Absorption AND over OR`` (a: Lattice<int>) (b: Lattice<int>) (evalFn: int -> bool) =
+    Lattice.equivalent (Lattice.and' a (Lattice.or' a b)) a evalFn
+
+[<Property>]
+let ``Absorption OR over AND`` (a: Lattice<int>) (b: Lattice<int>) (evalFn: int -> bool) =
+    Lattice.equivalent (Lattice.or' a (Lattice.and' a b)) a evalFn
+
+[<Property>]
+let ``Distributivity AND over OR`` (a: Lattice<int>) (b: Lattice<int>) (c: Lattice<int>) (evalFn: int -> bool) =
+    let left = Lattice.and' a (Lattice.or' b c)
+    let right = Lattice.or' (Lattice.and' a b) (Lattice.and' a c)
+    Lattice.equivalent left right evalFn
+
+[<Property>]
+let ``Distributivity OR over AND`` (a: Lattice<int>) (b: Lattice<int>) (c: Lattice<int>) (evalFn: int -> bool) =
+    let left = Lattice.or' a (Lattice.and' b c)
+    let right = Lattice.and' (Lattice.or' a b) (Lattice.or' a c)
+    Lattice.equivalent left right evalFn
