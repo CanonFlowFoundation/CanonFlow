@@ -17,7 +17,7 @@ This document consolidates the remaining high-level tasks required to elevate Ca
 - [x] **OpenAPI Transpiler & Drift:** Write a second transpiler for OpenAPI/Swagger. Run the Drift Engine across both TypeScript AND OpenAPI simultaneously to catch three-way drift.
 - [x] **Agent-Native OKF Catalog:** Ensure the generated OpenMetadata / OKF JSON includes the mathematically verified constraints, Lineage paths, and suggested "Safe Queries" so agents can read it.
 - [x] **Mutation Audit on Laws:** Implement mutation testing to prove our FsCheck laws aren't vacuous. If `Lattice.fs` is mutated, the laws must fail.
-- [ ] **Diátaxis Documentation:** Write the 4-part docs structure: Tutorial (30-min demo), How-To (Write a Driver), Reference (XML docs), and Explanation (VISION.md).
+- [x] **Diátaxis Documentation:** Write the 4-part docs structure: Tutorial (30-min demo), How-To (Write a Driver), Reference (XML docs), and Explanation (VISION.md).
 
 ## 🔴 Phase 3: Community & Scale
 *Tasks for the public launch and ecosystem scale.*
