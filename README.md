@@ -34,7 +34,7 @@ To run the "30-Minute Stranger Demo" and view the extraction loop:
 cd src/Canon.Cli
 dotnet run -- --pg "Host=localhost;Database=mydb;Username=user;Password=pass" --contracts --demo
 ```
-Check the `output/` folder for the generated `openmetadata` JSON and `catalog.md` files!
+Check the `output/` folder for the generated `openmetadata` JSON and `catalog.md` files, and `client/src/validators.ts` for your native TypeScript validation logic!
 
 ## License
 CanonFlow is steward-led Open Source under the [Apache 2.0 License](LICENSE).

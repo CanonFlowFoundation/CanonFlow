@@ -1,5 +1,7 @@
 namespace Canon.Flow
 
+// post-v1 sequencing — do not extend until Phase 5 gate
+
 open System
 open System.Text.Json
 open FsCodec.SystemTextJson
