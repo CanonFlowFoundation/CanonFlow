@@ -23,6 +23,7 @@ type Constraint =
     | InList of string list
     | NonEmpty
     | PrimaryKey
+    | Opaque of string
 
 /// A closed six-constructor bounded complemented lattice for query formulation.
 type Lattice<'Leaf> =

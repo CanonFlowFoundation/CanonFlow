@@ -19,6 +19,7 @@ type ColumnDef = {
     MaxLength: int option
     // Extracted constraints which will translate to Refined<'T,'P>
     CheckConstraints: string list
+    ParsedConstraints: Canon.Core.Lattice<Canon.Core.Constraint> list
     // Helios semantic catalog data
     Semantics: SemanticMetadata option
 }

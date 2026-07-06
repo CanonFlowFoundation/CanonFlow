@@ -6,16 +6,7 @@ open Canon.Introspect
 open Canon.Core
 open Npgsql
 
-/// Parses raw SQL constraint strings into our Lattice algebra.
-module ConstraintParser =
-    let parseCheck (checkClause: string) =
-        // Extremely naive parser for demonstration (e.g. "price > 0")
-        if checkClause.Contains("> 0") then
-            Lattice.Leaf (Range(Some (Exclusive 0m), None))
-        else if checkClause.Contains("length") then
-            Lattice.Leaf (MaxLength 255)
-        else
-            Lattice.True
+
 
 /// Postgres implementation of the ISchemaProvider.
 type PostgresSchemaProvider(connectionString: string) =
@@ -59,12 +50,20 @@ type PostgresSchemaProvider(connectionString: string) =
                     
                     let checkConstraintStr = if reader.IsDBNull(6) then "" else reader.GetString(6)
                     
+                    let parsedConstraints =
+                        if String.IsNullOrEmpty(checkConstraintStr) then []
+                        else 
+                            match SqlParser.parseConstraint checkConstraintStr with
+                            | Some lattice -> [lattice]
+                            | None -> [Lattice.Leaf (Opaque checkConstraintStr)]
+                    
                     yield (tSchema, tName, { 
                         Name = cName
                         DataType = dType
                         IsNullable = isNull
                         MaxLength = maxLen
                         CheckConstraints = if String.IsNullOrEmpty(checkConstraintStr) then [] else [checkConstraintStr]
+                        ParsedConstraints = parsedConstraints
                         Semantics = None // Seeded as None, to be enriched by human or OKF
                     })
                 ]

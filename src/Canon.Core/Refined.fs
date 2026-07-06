@@ -1,20 +1,17 @@
 namespace Canon.Core
 
-/// Represents a phantom-typed predicate.
-type IPredicate<'T> =
-    abstract member Validate: 'T -> bool
-    abstract member Name: string
-
-/// A refined type containing a value that has been proven to satisfy the predicate 'P.
-type Refined<'T, 'P when 'P :> IPredicate<'T>> = 
-    private { Value: 'T }
+/// A refined type containing a value that has been proven to satisfy the Lattice<Constraint>.
+/// Replaces OO IPredicate shell with pure functional data.
+type Refined<'T> = 
+    private { Value: 'T; Predicate: Lattice<Constraint> }
     member this.Get() = this.Value
+    member this.Schema = this.Predicate
 
 [<RequireQualifiedAccess>]
 module Refined =
-    let create<'T, 'P when 'P :> IPredicate<'T> and 'P : (new : unit -> 'P)> (value: 'T) : Result<Refined<'T, 'P>, string> =
-        let pred = new 'P()
-        if pred.Validate(value) then
-            Ok { Value = value }
+    /// Attempts to lift a value into a Refined type given a predicate and an evaluation function.
+    let create (eval: 'T -> Lattice<Constraint> -> bool) (predicate: Lattice<Constraint>) (value: 'T) : Result<Refined<'T>, string> =
+        if eval value predicate then
+            Ok { Value = value; Predicate = predicate }
         else
-            Error $"Validation failed for {pred.Name}"
+            Error "Validation failed for structural constraints"
