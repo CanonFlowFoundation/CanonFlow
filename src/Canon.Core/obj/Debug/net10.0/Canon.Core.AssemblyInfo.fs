@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("Canon.Core")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d88a1b595b16624fcb000275060a4b7993670da5")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fad336243c9a66aa367929637715010fa72513cd")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("Canon.Core")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("Canon.Core")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]

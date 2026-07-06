@@ -54,6 +54,18 @@ module Lattice =
         | False, x | x, False -> x
         | _ -> Or(left, right)
 
+    let rec eval (evalLeaf: 'Leaf -> bool) (l: Lattice<'Leaf>) =
+        match l with
+        | True -> true
+        | False -> false
+        | Leaf x -> evalLeaf x
+        | Not x -> Operators.not (eval evalLeaf x)
+        | And(a, b) -> (eval evalLeaf a) && (eval evalLeaf b)
+        | Or(a, b) -> (eval evalLeaf a) || (eval evalLeaf b)
+
+    let equivalent (a: Lattice<'Leaf>) (b: Lattice<'Leaf>) (evalLeaf: 'Leaf -> bool) =
+        eval evalLeaf a = eval evalLeaf b
+
 /// Phantom-typed query shell.
 type Query<'doc, 'Leaf> = {
     Predicate: Lattice<'Leaf>

@@ -115,3 +115,4 @@
 /root/repos/github/fsharp/CanonFlow/tests/laws/obj/Debug/net10.0/Canon.Core.Tests.pdb
 /root/repos/github/fsharp/CanonFlow/tests/laws/obj/Debug/net10.0/Canon.Core.Tests.genruntimeconfig.cache
 /root/repos/github/fsharp/CanonFlow/tests/laws/obj/Debug/net10.0/ref/Canon.Core.Tests.dll
+/root/repos/github/fsharp/CanonFlow/tests/laws/obj/Debug/net10.0/Canon.Core.Tests.sourcelink.json

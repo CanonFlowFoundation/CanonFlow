@@ -1,0 +1,8 @@
+# .NET
+bin/
+obj/
+[Tt]est[Rr]esult*/
+
+# Output
+output/
+client/dist/

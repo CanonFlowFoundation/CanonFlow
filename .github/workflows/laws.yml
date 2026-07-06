@@ -1,0 +1,23 @@
+name: Laws
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 10.0.x
+    - name: Run Constitution (Lattice Laws)
+      run: dotnet test tests/laws
+    - name: Run Integration Tests
+      run: dotnet test tests/integration
