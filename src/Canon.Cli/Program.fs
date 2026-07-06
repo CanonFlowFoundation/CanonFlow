@@ -61,7 +61,8 @@ module Program =
                             if not c.CheckConstraints.IsEmpty then
                                 // Example AST resolution mapping directly to the TypeScript transpiler
                                 let lattice = Lattice.Leaf (Range(Some(Exclusive 0m), None)) // Mock parsing for demo
-                                let tsCode = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                let tsCode, fidelity = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                tsSb.AppendLine($"// Fidelity: {fidelity}") |> ignore
                                 tsSb.AppendLine(tsCode) |> ignore
                     
                     System.IO.File.WriteAllText("client/src/validators.ts", tsSb.ToString())
@@ -71,7 +72,8 @@ module Program =
                 if results.Contains(Demo) then
                     printfn "\n[Transpilation Demo]"
                     let exampleLattice = Lattice.Leaf (Range(Some(Exclusive 0m), None))
-                    let tsCode = Transpiler.emitValidator "price" exampleLattice
+                    let tsCode, fidelity = Transpiler.emitValidator "price" exampleLattice
+                    printfn "Fidelity: %A" fidelity
                     printfn "%s" tsCode
                 
                 0

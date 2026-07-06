@@ -1,6 +1,8 @@
 # CanonFlow
 
-**CanonFlow** is a formal, mathematics-first bridge between relational database constraints, strongly-typed domain models (F#), and downstream clients (TypeScript/OpenAPI/OpenMetadata). 
+> CanonFlow is a formal schema compiler that proves database rules, backend types, frontend validators, API contracts, and AI metadata are the same truth.
+
+Before AI agents change code, CanonFlow gives them a verified contract of database truth. It extracts constraints from live systems (Postgres, DuckDB) into a mathematical lattice, transpiles them across the stack (Fable/TypeScript, OpenSearch), and proves constitutional symmetry. 
 
 Built as an agent-assisted "Second Secret Sauce" to [SqlHydra](https://github.com/ArunNotFound/SqlHydra) and NoSqlHydra, CanonFlow proves that you can extract a database schema, represent it as a formal bounded lattice, and deterministically project it across boundaries without loss of fidelity.
 
