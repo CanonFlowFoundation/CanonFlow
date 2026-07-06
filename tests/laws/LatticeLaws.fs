@@ -69,3 +69,22 @@ let ``De Morgan: not (a OR b) ≡ (not a) AND (not b)`` (a: Lattice<int>) (b: La
 let ``Double negation is elimination semantically`` (l: Lattice<int>) (evalFn: int -> bool) =
     let nn = Lattice.not(Lattice.not(l))
     Lattice.equivalent nn l evalFn
+
+[<Property>]
+let ``NNF preserves semantics`` (l: Lattice<int>) (evalFn: int -> bool) =
+    Lattice.equivalent (Lattice.toNNF l) l evalFn
+
+[<Property>]
+let ``NNF is idempotent`` (l: Lattice<int>) =
+    let n = Lattice.toNNF l
+    Lattice.toNNF n = n
+
+[<Property>]
+let ``NNF shape invariant`` (l: Lattice<int>) =
+    let rec isNNFShape (ast: Lattice<int>) =
+        match ast with
+        | True | False | Leaf _ -> true
+        | Not (Leaf _) -> true
+        | Not _ -> false
+        | And(a, b) | Or(a, b) -> isNNFShape a && isNNFShape b
+    isNNFShape (Lattice.toNNF l)
