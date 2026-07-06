@@ -74,11 +74,19 @@ let runDemo () = task {
         )
     let finalTsCode = String.Join("\n\n", tsDocs)
     File.WriteAllText("validators.ts", finalTsCode)
+
+    // 6. Generate Agent-Readable Semantic Catalog
+    Console.WriteLine("[6/6] Emitting Agent-Readable Semantic Catalog (OKF)...")
+    let catalogDocs =
+        optimizedTables
+        |> List.map (fun t -> OkfEmitter.emitAgentCatalog t)
+    let finalCatalog = String.Join("\n", catalogDocs)
+    File.WriteAllText("AgentCatalog.yaml", finalCatalog)
     
     // Clean up
     do! container.StopAsync()
     
-    Console.WriteLine("\nDemo complete! Check OpenApi.json and validators.ts")
+    Console.WriteLine("\nDemo complete! Check OpenApi.json, validators.ts, and AgentCatalog.yaml")
 }
 
 [<EntryPoint>]

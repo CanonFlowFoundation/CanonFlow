@@ -1,0 +1,96 @@
+---
+kind: SemanticModel
+version: 1.0
+metadata:
+  name: customers
+  schema: public
+  type: Table
+columns:
+  - name: id
+    type: integer
+    nullable: false
+    isPrimaryKey: true
+  - name: email
+    type: character varying
+    nullable: false
+    isPrimaryKey: false
+  - name: age
+    type: integer
+    nullable: true
+    isPrimaryKey: false
+    semanticBounds:
+      - "ComplexBound"
+    agentDirectives:
+      - "Always ensure frontend validators restrict age to these semantic bounds to avoid 500s."
+  - name: status
+    type: character varying
+    nullable: true
+    isPrimaryKey: false
+relationships:
+
+---
+kind: SemanticModel
+version: 1.0
+metadata:
+  name: orders
+  schema: public
+  type: Table
+columns:
+  - name: id
+    type: integer
+    nullable: false
+    isPrimaryKey: true
+  - name: customer_id
+    type: integer
+    nullable: false
+    isPrimaryKey: false
+  - name: total_amount
+    type: numeric
+    nullable: false
+    isPrimaryKey: false
+    semanticBounds:
+      - "((total_amount >= (0)))"
+    agentDirectives:
+      - "Always ensure frontend validators restrict total_amount to these semantic bounds to avoid 500s."
+  - name: created_at
+    type: timestamp without time zone
+    nullable: true
+    isPrimaryKey: false
+relationships:
+  - column: customer_id
+    referencesTable: customers
+    referencesColumn: id
+
+---
+kind: SemanticModel
+version: 1.0
+metadata:
+  name: products
+  schema: public
+  type: Table
+columns:
+  - name: id
+    type: integer
+    nullable: false
+    isPrimaryKey: true
+  - name: sku
+    type: character varying
+    nullable: false
+    isPrimaryKey: false
+  - name: price
+    type: numeric
+    nullable: false
+    isPrimaryKey: false
+    semanticBounds:
+      - "((price > (0)))"
+    agentDirectives:
+      - "Always ensure frontend validators restrict price to these semantic bounds to avoid 500s."
+  - name: stock
+    type: integer
+    nullable: false
+    isPrimaryKey: false
+    semanticBounds:
+      - "stock >= 0"
+    agentDirectives:
+      - "Always ensure frontend validators restrict stock to these semantic bounds to avoid 500s."
+relationships:
