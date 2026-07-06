@@ -27,11 +27,12 @@ type OpenSearchEmitter() =
                     )
                     |> String.concat ",\n"
                 
-                $"""{{
+                let mapping = $"""{{
   "mappings": {{
     "properties": {{
 {props}
     }}
   }}
 }}"""
+                mapping, Canon.Core.Fidelity.Approximate "OpenSearch drops foreign keys, constraints, and defaults"
             )

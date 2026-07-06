@@ -62,17 +62,23 @@ type PostgresIntrospectionTests() =
             let domainSchema = {
                 Schema = "public"
                 Name = "products"
+                Type = Canon.Introspect.TableType.Table
+                Description = None
+                PrimaryKeys = []
+                ForeignKeys = []
+                Indexes = []
+                TableConstraints = []
                 Columns = [
-                    { Name = "id"; DataType = "integer"; IsNullable = false; MaxLength = None; CheckConstraints = []; Semantics = None }
-                    { Name = "sku"; DataType = "character varying"; IsNullable = false; MaxLength = Some 20; CheckConstraints = []; Semantics = None }
-                    { Name = "price"; DataType = "integer"; IsNullable = false; MaxLength = None; CheckConstraints = ["price > 0"]; Semantics = None }
+                    { Name = "id"; DataType = "integer"; IsNullable = false; IsPrimaryKey = true; DefaultValue = None; IsGenerated = false; Description = None; MaxLength = None; CheckConstraints = []; ParsedConstraints = []; Semantics = None }
+                    { Name = "sku"; DataType = "character varying"; IsNullable = false; IsPrimaryKey = false; DefaultValue = None; IsGenerated = false; Description = None; MaxLength = Some 20; CheckConstraints = []; ParsedConstraints = []; Semantics = None }
+                    { Name = "price"; DataType = "integer"; IsNullable = false; IsPrimaryKey = false; DefaultValue = None; IsGenerated = false; Description = None; MaxLength = None; CheckConstraints = ["price > 0"]; ParsedConstraints = []; Semantics = None }
                 ]
             }
 
             // 2. Emit DDL
             let emitter = Canon.Emit.Postgres.PostgresEmitter() :> Canon.Emit.IEmitter
             let ddlList = emitter.Emit([domainSchema])
-            let ddl = ddlList.Head
+            let ddl, _ = ddlList.Head
 
             // 3. Apply DDL to live DB
             use container = PostgreSqlBuilder().WithImage("postgres:15-alpine").Build()

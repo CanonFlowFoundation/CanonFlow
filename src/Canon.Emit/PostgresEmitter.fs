@@ -36,4 +36,4 @@ type PostgresEmitter() =
                 sb.AppendLine(");") |> ignore
                 sb.AppendLine() |> ignore
                 
-            [ sb.ToString() ] // Return single DDL string for all tables
+            [ sb.ToString(), Canon.Core.Fidelity.Exact ] // Return single DDL string for all tables, Postgres is exact to the TableDef
