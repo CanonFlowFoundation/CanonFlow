@@ -26,12 +26,18 @@ let runInNode (jsCode: string) =
     out
 
 /// F# native evaluator for a subset of constraints.
-let evalConstraint (c: Constraint) (value: int) : bool =
+let rec evalConstraint (c: Constraint) (value: int) : bool =
     match c with
     | Constraint.Range (Some(Exclusive lo), None) -> decimal value > lo
     | Constraint.Range (None, Some(Exclusive hi)) -> decimal value < hi
     | Constraint.Range (Some(Inclusive lo), None) -> decimal value >= lo
     | Constraint.Range (None, Some(Inclusive hi)) -> decimal value <= hi
+    | Constraint.Range (Some(lo), Some(hi)) ->
+        let loOk = match lo with Exclusive v -> decimal value > v | Inclusive v -> decimal value >= v
+        let hiOk = match hi with Exclusive v -> decimal value < v | Inclusive v -> decimal value <= v
+        loOk && hiOk
+    | Constraint.Range (None, None) -> true
+    | Constraint.FieldBound("age", inner) -> evalConstraint inner value
     | _ -> true
 
 let evalLattice (l: Lattice<Constraint>) (value: int) : bool =
@@ -44,6 +50,17 @@ type ConstraintGen =
             Arb.generate<int> |> Gen.map (fun v -> Constraint.Range(None, Some(Exclusive(decimal v))))
             Arb.generate<int> |> Gen.map (fun v -> Constraint.Range(Some(Inclusive(decimal v)), None))
             Arb.generate<int> |> Gen.map (fun v -> Constraint.Range(None, Some(Inclusive(decimal v))))
+            Gen.map2 (fun v1 v2 -> 
+                let min = min v1 v2 |> decimal
+                let max = max v1 v2 |> decimal
+                Constraint.Range(Some(Inclusive min), Some(Exclusive max))
+            ) Arb.generate<int> Arb.generate<int>
+            Arb.generate<int> |> Gen.map (fun v -> Constraint.FieldBound("age", Constraint.Range(Some(Inclusive(decimal v)), None)))
+            Gen.map2 (fun v1 v2 -> 
+                let min = min v1 v2 |> decimal
+                let max = max v1 v2 |> decimal
+                Constraint.FieldBound("age", Constraint.Range(Some(Inclusive min), Some(Exclusive max)))
+            ) Arb.generate<int> Arb.generate<int>
         ]
 
     static member Lattice() =
@@ -101,7 +118,7 @@ module AgreementProperties =
                     .Replace(": boolean", "")
             
             // Append execution and print result
-            let executionCode = sprintf "%s\nconsole.log(validate_test(%d));" jsScript value
+            let executionCode = sprintf "%s\nlet obj = new Number(%d); obj.age = %d; console.log(validate_test(obj));" jsScript value value
             
             // 3. Execute in Node.js
             let nodeOutput = runInNode executionCode
