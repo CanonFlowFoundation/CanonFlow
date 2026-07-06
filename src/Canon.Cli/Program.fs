@@ -67,6 +67,27 @@ module Program =
                     
                     System.IO.File.WriteAllText("client/src/validators.ts", tsSb.ToString())
                     printfn "Artifacts saved to 'output/' and TypeScript generated in 'client/src/validators.ts'."
+
+                    // Generate Drift Report
+                    let driftViolations = 
+                        [ for t in tables do
+                            for c in t.Columns do
+                                if not c.CheckConstraints.IsEmpty then
+                                    // Mock lattice for demo
+                                    let lattice = Lattice.Leaf (Range(Some(Exclusive 0m), None))
+                                    let _, fidelity = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                    let rawConstraint = String.Join(" AND ", c.CheckConstraints)
+                                    yield! DriftEngine.analyzeFidelity c.Name "TypeScript" fidelity rawConstraint |> Option.toList ]
+                    
+                    if not driftViolations.IsEmpty then
+                        printfn "\n[Drift Detection Report - HIGH SEVERITY]"
+                        for v in driftViolations do
+                            printfn $"- Field: {v.Field} ({v.TargetSystem})"
+                            printfn $"  DB Truth: {v.DatabaseTruth}"
+                            printfn $"  Severity: %A{v.Severity}"
+                            printfn $"  Action: {v.FixAction}"
+                    else
+                        printfn "\n[Drift Detection Report] No drift detected! 100%% Fidelity."
                 
                 // Demo transpilation of a constraint
                 if results.Contains(Demo) then

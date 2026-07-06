@@ -9,6 +9,7 @@
     <Compile Include="FieldClass.fs" />
     <Compile Include="Lattice.fs" />
     <Compile Include="Lineage.fs" />
+    <Compile Include="Drift.fs" />
     <Compile Include="Refined.fs" />
   </ItemGroup>
 

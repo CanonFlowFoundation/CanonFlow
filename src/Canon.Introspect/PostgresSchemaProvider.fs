@@ -58,6 +58,10 @@ type PostgresSchemaProvider(connectionString: string) =
                         Name = cName
                         DataType = dType
                         IsNullable = isNull
+                        IsPrimaryKey = false
+                        DefaultValue = None
+                        IsGenerated = false
+                        Description = None
                         MaxLength = maxLen
                         CheckConstraints = if String.IsNullOrEmpty(checkConstraintStr) then [] else [checkConstraintStr]
                         ParsedConstraints = parsedConstraints
@@ -71,6 +75,12 @@ type PostgresSchemaProvider(connectionString: string) =
                 {
                     Schema = schema
                     Name = name
+                    Type = TableType.Table
+                    Description = None
                     Columns = cols |> List.map (fun (_, _, c) -> c)
+                    PrimaryKeys = []
+                    ForeignKeys = []
+                    Indexes = []
+                    TableConstraints = []
                 }
             )

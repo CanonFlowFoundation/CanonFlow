@@ -11,11 +11,27 @@ type SemanticMetadata = {
     FieldKind: Canon.Core.FieldKind option
 }
 
+type ForeignKeyDef = {
+    ColumnName: string
+    RefTable: string
+    RefColumn: string
+}
+
+type IndexDef = {
+    Name: string
+    Columns: string list
+    IsUnique: bool
+}
+
 /// Represents a column in the database schema.
 type ColumnDef = {
     Name: string
     DataType: string
     IsNullable: bool
+    IsPrimaryKey: bool
+    DefaultValue: string option
+    IsGenerated: bool
+    Description: string option
     MaxLength: int option
     // Extracted constraints which will translate to Refined<'T,'P>
     CheckConstraints: string list
@@ -24,11 +40,22 @@ type ColumnDef = {
     Semantics: SemanticMetadata option
 }
 
-/// Represents a table in the database schema.
+type TableType = 
+    | Table
+    | View
+    | MaterializedView
+
+/// Represents a table or view in the database schema.
 type TableDef = {
     Schema: string
     Name: string
+    Type: TableType
+    Description: string option
     Columns: ColumnDef list
+    PrimaryKeys: string list
+    ForeignKeys: ForeignKeyDef list
+    Indexes: IndexDef list
+    TableConstraints: string list
 }
 
 /// Abstraction for database drivers to provide their schema and constraints.
