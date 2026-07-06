@@ -29,7 +29,26 @@ type LatticeGenerators =
                     Gen.map2 (fun a b -> And(a, b)) (latticeGen (size / 2)) (latticeGen (size / 2))
                     Gen.map2 (fun a b -> Or(a, b)) (latticeGen (size / 2)) (latticeGen (size / 2))
                 ]
-        Arb.fromGen (Gen.sized latticeGen)
+        let rec shrinkLattice l =
+            match l with
+            | True | False | Leaf _ -> seq []
+            | Not x -> seq { yield x; yield! shrinkLattice x |> Seq.map Not }
+            | And(a, b) -> 
+                seq {
+                    yield a
+                    yield b
+                    yield! shrinkLattice a |> Seq.map (fun a' -> And(a', b))
+                    yield! shrinkLattice b |> Seq.map (fun b' -> And(a, b'))
+                }
+            | Or(a, b) -> 
+                seq {
+                    yield a
+                    yield b
+                    yield! shrinkLattice a |> Seq.map (fun a' -> Or(a', b))
+                    yield! shrinkLattice b |> Seq.map (fun b' -> Or(a, b'))
+                }
+
+        Arb.fromGenShrink (Gen.sized latticeGen, shrinkLattice)
 
 [<assembly: Properties(Arbitrary = [| typeof<LatticeGenerators> |])>]
 do()

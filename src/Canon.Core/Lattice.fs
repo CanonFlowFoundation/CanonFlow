@@ -24,6 +24,7 @@ type Constraint =
     | NonEmpty
     | PrimaryKey
     | Opaque of string
+    | FieldBound of string * Constraint
 
 /// A closed six-constructor bounded complemented lattice for query formulation.
 type Lattice<'Leaf> =

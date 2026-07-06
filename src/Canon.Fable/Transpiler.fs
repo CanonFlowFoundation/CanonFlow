@@ -29,7 +29,10 @@ module Transpiler =
                 $"[{arr}].includes(value)"
             | PrimaryKey -> "true"
             | NonEmpty -> $"value.length > 0"
-
+            | Opaque _ -> "true /* opaque sql */"
+            | FieldBound(field, inner) -> 
+                let innerExpr = toTypeScript (Lattice.Leaf inner)
+                innerExpr.Replace("value", $"value.{field}")
     /// Emits a full TypeScript validation function for a given named field and predicate.
     let emitValidator (name: string) (predicate: Lattice<Constraint>) : string =
         let expr = toTypeScript predicate

@@ -52,10 +52,7 @@ type PostgresSchemaProvider(connectionString: string) =
                     
                     let parsedConstraints =
                         if String.IsNullOrEmpty(checkConstraintStr) then []
-                        else 
-                            match SqlParser.parseConstraint checkConstraintStr with
-                            | Some lattice -> [lattice]
-                            | None -> [Lattice.Leaf (Opaque checkConstraintStr)]
+                        else [SqlParser.parseConstraint checkConstraintStr]
                     
                     yield (tSchema, tName, { 
                         Name = cName
