@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Cli">
+    <resource name="FSharpSignatureData.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Cli" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Cli" action="remove"></resource>
+  </assembly>
+</linker>

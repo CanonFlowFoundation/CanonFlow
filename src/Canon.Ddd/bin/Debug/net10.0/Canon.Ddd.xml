@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Ddd</name></assembly>
+<members>
+<member name="T:Canon.Ddd.IValueObject">
+<summary>
+ Marker interface for a Value Object
+</summary>
+</member>
+<member name="T:Canon.Ddd.IEntity">
+<summary>
+ Marker interface for an Entity
+</summary>
+</member>
+<member name="T:Canon.Ddd.IAggregateRoot">
+<summary>
+ Marker interface for an Aggregate Root
+</summary>
+</member>
+</members>
+</doc>

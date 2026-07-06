@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Core.Tests">
+    <resource name="FSharpSignatureData.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Core.Tests" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Core.Tests" action="remove"></resource>
+  </assembly>
+</linker>

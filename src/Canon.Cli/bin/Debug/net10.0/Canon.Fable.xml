@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Fable</name></assembly>
+<members>
+<member name="M:Canon.Fable.Transpiler.emitValidator(System.String,Canon.Core.Lattice{Canon.Core.Constraint})">
+<summary>
+ Emits a full TypeScript validation function for a given named field and predicate.
+</summary>
+</member>
+<member name="T:Canon.Fable.Transpiler">
+<summary>
+ Transpiles the Lattice of constraints into TypeScript validation logic.
+</summary>
+</member>
+</members>
+</doc>

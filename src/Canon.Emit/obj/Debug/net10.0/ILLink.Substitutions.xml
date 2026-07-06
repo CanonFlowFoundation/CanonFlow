@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Emit">
+    <resource name="FSharpSignatureData.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Emit" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Emit" action="remove"></resource>
+  </assembly>
+</linker>

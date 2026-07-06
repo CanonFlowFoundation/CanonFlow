@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Core</name></assembly>
+<members>
+<member name="T:Canon.Core.FieldClass.Unrepresentable">
+<summary>
+ The storage representation cannot hold the domain concept.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Narrowed">
+<summary>
+ The storage representation is narrower than the domain representation, risking data loss.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Widened">
+<summary>
+ The storage representation is wider than the domain representation (e.g. string vs varchar).
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Lossless">
+<summary>
+ The storage representation perfectly matches the domain representation.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass">
+<summary>
+ Classifies the fidelity of mapping a domain field to/from a storage field.
+</summary>
+</member>
+<member name="T:Canon.Core.LineageGrade.Opaque">
+<summary>
+ Intentionally unknown or untracked. (Blocked for governed serving fields).
+</summary>
+</member>
+<member name="T:Canon.Core.LineageGrade.Declared">
+<summary>
+ Asserted by the author or driver, but lacking structural F# proof.
+</summary>
+</member>
+<member name="T:Canon.Core.LineageGrade.Exact">
+<summary>
+ Computed directly and verifiably from the expression structure / database constraints.
+</summary>
+</member>
+<member name="T:Canon.Core.LineageGrade">
+<summary>
+ Lineage grade indicates the degree of trust/verification for a field or constraint.
+ Inspired by Symphony&apos;s Lineage concepts.
+</summary>
+</member>
+<member name="T:Canon.Core.Refined`2">
+<summary>
+ A refined type containing a value that has been proven to satisfy the predicate &apos;P.
+</summary>
+</member>
+<member name="T:Canon.Core.IPredicate`1">
+<summary>
+ Represents a phantom-typed predicate.
+</summary>
+</member>
+<member name="T:Canon.Core.Query`2">
+<summary>
+ Phantom-typed query shell.
+</summary>
+</member>
+<member name="T:Canon.Core.Lattice`1">
+<summary>
+ A closed six-constructor bounded complemented lattice for query formulation.
+</summary>
+</member>
+<member name="T:Canon.Core.Constraint">
+<summary>
+ Defines common validation constraints that can be used as Leaves in our Lattice (Symphony model).
+</summary>
+</member>
+<member name="T:Canon.Core.Bound`1">
+<summary>
+ Represents boundary definitions for Symphony constraints.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldKind">
+<summary>
+ Represents Helios capability-typed field kinds for semantic indexing.
+</summary>
+</member>
+</members>
+</doc>

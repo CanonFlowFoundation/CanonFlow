@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "PfmYS7KyPtw=",
+  "success": true,
+  "projectFilePath": "/root/repos/github/fsharp/CanonFlow/src/Canon.Cli/Canon.Cli.fsproj",
+  "expectedPackageFiles": [
+    "/root/.nuget/packages/argu/6.2.5/argu.6.2.5.nupkg.sha512",
+    "/root/.nuget/packages/fsharp.core/10.1.301/fsharp.core.10.1.301.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/10.0.0/microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.extensions.logging.abstractions/10.0.0/microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512",
+    "/root/.nuget/packages/npgsql/10.0.3/npgsql.10.0.3.nupkg.sha512",
+    "/root/.nuget/packages/system.configuration.configurationmanager/4.4.0/system.configuration.configurationmanager.4.4.0.nupkg.sha512",
+    "/root/.nuget/packages/system.security.cryptography.protecteddata/4.4.0/system.security.cryptography.protecteddata.4.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Canon.Cli/Canon.Cli.fsproj" />
+    <Project Path="src/Canon.Contracts/Canon.Contracts.fsproj" />
+    <Project Path="src/Canon.Core/Canon.Core.fsproj" />
+    <Project Path="src/Canon.Ddd/Canon.Ddd.fsproj" />
+    <Project Path="src/Canon.Emit/Canon.Emit.fsproj" />
+    <Project Path="src/Canon.Fable/Canon.Fable.fsproj" />
+    <Project Path="src/Canon.Introspect/Canon.Introspect.fsproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/laws/">
+    <Project Path="tests/laws/Canon.Core.Tests.fsproj" />
+  </Folder>
+</Solution>

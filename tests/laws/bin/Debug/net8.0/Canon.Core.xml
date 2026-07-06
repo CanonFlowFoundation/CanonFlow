@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Core</name></assembly>
+<members>
+<member name="T:Canon.Core.FieldClass.Unrepresentable">
+<summary>
+ The storage representation cannot hold the domain concept.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Narrowed">
+<summary>
+ The storage representation is narrower than the domain representation, risking data loss.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Widened">
+<summary>
+ The storage representation is wider than the domain representation (e.g. string vs varchar).
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass.Lossless">
+<summary>
+ The storage representation perfectly matches the domain representation.
+</summary>
+</member>
+<member name="T:Canon.Core.FieldClass">
+<summary>
+ Classifies the fidelity of mapping a domain field to/from a storage field.
+</summary>
+</member>
+<member name="T:Canon.Core.Refined`2">
+<summary>
+ A refined type containing a value that has been proven to satisfy the predicate &apos;P.
+</summary>
+</member>
+<member name="T:Canon.Core.IPredicate`1">
+<summary>
+ Represents a phantom-typed predicate.
+</summary>
+</member>
+<member name="T:Canon.Core.Query`2">
+<summary>
+ Phantom-typed query shell.
+</summary>
+</member>
+<member name="T:Canon.Core.Lattice`1">
+<summary>
+ A closed six-constructor bounded complemented lattice for query formulation.
+</summary>
+</member>
+</members>
+</doc>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "4E9mAXjSysw=",
+  "success": true,
+  "projectFilePath": "/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/Canon.Fable.fsproj",
+  "expectedPackageFiles": [
+    "/root/.nuget/packages/fsharp.core/10.1.301/fsharp.core.10.1.301.nupkg.sha512"
+  ],
+  "logs": []
+}

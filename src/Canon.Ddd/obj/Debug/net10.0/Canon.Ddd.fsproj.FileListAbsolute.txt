@@ -1,0 +1,17 @@
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.fsproj.AssemblyReference.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.AssemblyInfoInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.AssemblyInfo.fs
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.fsproj.CoreCompileInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Ddd.deps.json
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Ddd.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Ddd.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Ddd.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Core.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Core.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/bin/Debug/net10.0/Canon.Core.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.fsproj.Up2Date
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/refint/Canon.Ddd.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/Canon.Ddd.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Ddd/obj/Debug/net10.0/ref/Canon.Ddd.dll

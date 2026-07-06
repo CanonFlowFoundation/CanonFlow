@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Argu" Version="6.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Canon.Introspect\Canon.Introspect.fsproj" />
+    <ProjectReference Include="..\Canon.Emit\Canon.Emit.fsproj" />
+    <ProjectReference Include="..\Canon.Fable\Canon.Fable.fsproj" />
+    <ProjectReference Include="..\Canon.Core\Canon.Core.fsproj" />
+    <ProjectReference Include="..\Canon.Contracts\Canon.Contracts.fsproj" />
+  </ItemGroup>
+
+</Project>

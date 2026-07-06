@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Fable">
+    <resource name="FSharpSignatureData.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Fable" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Fable" action="remove"></resource>
+  </assembly>
+</linker>

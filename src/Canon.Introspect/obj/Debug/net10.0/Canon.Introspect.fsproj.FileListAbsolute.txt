@@ -1,0 +1,17 @@
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Introspect.deps.json
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Introspect.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Introspect.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Introspect.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Core.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Core.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/bin/Debug/net10.0/Canon.Core.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.fsproj.AssemblyReference.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.AssemblyInfoInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.AssemblyInfo.fs
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.fsproj.CoreCompileInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.In.093C441D.Up2Date
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/refint/Canon.Introspect.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/Canon.Introspect.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/obj/Debug/net10.0/ref/Canon.Introspect.dll

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Contracts</name></assembly>
+<members>
+<member name="T:Canon.Contracts.OpenMetadata.OpenMetadataEmitter">
+<summary>
+ Extracts the table structures and formats them into OpenMetadata compliant JSON entities.
+ Allows CanonFlow to act as a semantic catalog bridge.
+</summary>
+</member>
+<member name="T:Canon.Contracts.Okf.OkfCatalog">
+<summary>
+ Emits OKF-style Markdown catalogs for human-readable lineage tracking.
+ Borrowed directly from Symphony concepts.
+</summary>
+</member>
+</members>
+</doc>

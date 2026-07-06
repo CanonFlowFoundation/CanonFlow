@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Introspect</name></assembly>
+<members>
+<member name="M:Canon.Introspect.ISchemaProvider.Harvest">
+<summary>
+ Harvests the schema from the live database.
+</summary>
+</member>
+<member name="T:Canon.Introspect.ISchemaProvider">
+<summary>
+ Abstraction for database drivers to provide their schema and constraints.
+ SqlHydra will implement this for Postgres/DuckDB/SQLite.
+</summary>
+</member>
+<member name="T:Canon.Introspect.TableDef">
+<summary>
+ Represents a table in the database schema.
+</summary>
+</member>
+<member name="T:Canon.Introspect.ColumnDef">
+<summary>
+ Represents a column in the database schema.
+</summary>
+</member>
+<member name="T:Canon.Introspect.SemanticMetadata">
+<summary>
+ Represents semantic metadata attached to a field (from Helios concepts)
+</summary>
+</member>
+<member name="T:Canon.Introspect.Postgres.PostgresSchemaProvider">
+<summary>
+ Postgres implementation of the ISchemaProvider.
+</summary>
+</member>
+<member name="T:Canon.Introspect.Postgres.ConstraintParser">
+<summary>
+ Parses raw SQL constraint strings into our Lattice algebra.
+</summary>
+</member>
+</members>
+</doc>

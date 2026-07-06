@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>Canon.Emit</name></assembly>
+<members>
+<member name="M:Canon.Emit.IEmitter.Emit(Microsoft.FSharp.Collections.FSharpList{Canon.Introspect.TableDef})">
+<summary>
+ Generates DDL strings for the given Table definitions.
+</summary>
+</member>
+<member name="T:Canon.Emit.IEmitter">
+<summary>
+ Abstraction for database drivers to emit DDL from a TableDef schema.
+ Converts the domain representation back to storage structures.
+</summary>
+</member>
+<member name="T:Canon.Emit.OpenSearch.OpenSearchEmitter">
+<summary>
+ Emits an OpenSearch/Elasticsearch index mapping derived from the domain schema.
+ Converts typed fields into strict OpenSearch field types.
+</summary>
+</member>
+</members>
+</doc>

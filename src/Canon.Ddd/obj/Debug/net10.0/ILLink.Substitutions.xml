@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Ddd">
+    <resource name="FSharpSignatureData.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Ddd" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Ddd" action="remove"></resource>
+  </assembly>
+</linker>

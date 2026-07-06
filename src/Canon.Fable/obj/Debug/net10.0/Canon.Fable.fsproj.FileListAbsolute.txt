@@ -1,0 +1,17 @@
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Fable.deps.json
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Fable.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Fable.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Fable.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.fsproj.AssemblyReference.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.AssemblyInfoInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.AssemblyInfo.fs
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.fsproj.CoreCompileInputs.cache
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/refint/Canon.Fable.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fable.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/ref/Canon.Fable.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Core.dll
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Core.pdb
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/bin/Debug/net10.0/Canon.Core.xml
+/root/repos/github/fsharp/CanonFlow/src/Canon.Fable/obj/Debug/net10.0/Canon.Fa.8DDF02EC.Up2Date

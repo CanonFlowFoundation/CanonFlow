@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="Canon.Introspect">
+    <resource name="FSharpSignatureData.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpOptimizationData.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.Canon.Introspect" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.Canon.Introspect" action="remove"></resource>
+  </assembly>
+</linker>

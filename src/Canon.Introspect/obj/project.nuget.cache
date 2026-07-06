@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "fyhBOxD6YJU=",
+  "success": true,
+  "projectFilePath": "/root/repos/github/fsharp/CanonFlow/src/Canon.Introspect/Canon.Introspect.fsproj",
+  "expectedPackageFiles": [
+    "/root/.nuget/packages/fsharp.core/10.1.301/fsharp.core.10.1.301.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/10.0.0/microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.extensions.logging.abstractions/10.0.0/microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512",
+    "/root/.nuget/packages/npgsql/10.0.3/npgsql.10.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
