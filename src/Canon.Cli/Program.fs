@@ -106,6 +106,20 @@ module Program =
                     
                     if not foundRedundancy then
                         printfn "No redundancies found in the schema."
+                    
+                    printfn "\n[Golden Rule Heuristics] Analyzing DDD vs DB-First boundaries..."
+                    for t in tables do
+                        if t.Columns |> List.forall (fun c -> c.CheckConstraints.IsEmpty) then
+                            printfn $"  [HEURISTIC WARNING] Table '{t.Name}' has ZERO check constraints."
+                            printfn $"    -> If this table models structural Nouns (e.g. Accounts, Limits), you MUST enforce boundaries in DB-First."
+                            printfn $"    -> If this table models transient Verbs/Events, proceed with DDD Code-First."
+                        
+                        for c in t.Columns do
+                            for constraintStr in c.CheckConstraints do
+                                if constraintStr.ToUpper().Contains("CASE") && constraintStr.ToUpper().Contains("WHEN") then
+                                    printfn $"  [HEURISTIC WARNING] Table '{t.Name}', Column '{c.Name}': Complex CASE/WHEN constraint detected."
+                                    printfn $"    -> '{constraintStr}'"
+                                    printfn $"    -> If this represents workflow or state-transition logic, it is a Verb. It is best done in DDD Code-First."
                 if results.Contains(Contracts) then
                     printfn "\n[Emitting OKF Catalog, OpenMetadata, and TypeScript]"
                     System.IO.Directory.CreateDirectory("output/openmetadata") |> ignore
