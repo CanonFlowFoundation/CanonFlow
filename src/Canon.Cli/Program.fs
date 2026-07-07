@@ -12,6 +12,7 @@ type CliArguments =
     | [<CliPrefix(CliPrefix.DoubleDash)>] Demo
     | [<CliPrefix(CliPrefix.DoubleDash)>] Verify
     | [<CliPrefix(CliPrefix.DoubleDash)>] ScaffoldForms
+    | [<CliPrefix(CliPrefix.DoubleDash)>] MigrateTo of string
     
     interface IArgParserTemplate with
         member s.Usage =
@@ -21,6 +22,7 @@ type CliArguments =
             | Demo -> "Run the 30-minute stranger demo."
             | Verify -> "Run in strict mode for CI/CD. Fails if any constraints are unsupported or approximate."
             | ScaffoldForms -> "Generate AI-assisted React Hook Form components from DB constraints."
+            | MigrateTo _ -> "Compare with a target database and generate migration SQL scripts."
 
 module Program =
     [<EntryPoint>]
@@ -104,6 +106,22 @@ module Program =
                     let tsCode, fidelity = Transpiler.emitValidator "price" exampleLattice
                     printfn "Fidelity: %A" fidelity
                     printfn "%s" tsCode
+                
+                // Diff and Migration Output
+                if results.Contains(MigrateTo) then
+                    printfn "\n[Schema Migration Engine]"
+                    let newConnStr = results.GetResult(MigrateTo)
+                    let newProvider = PostgresSchemaProvider(newConnStr) :> Canon.Introspect.ISchemaProvider
+                    let newTables = newProvider.Harvest()
+                    
+                    let migrationSql = Canon.Emit.MigrationEmitter.generateMigration tables newTables
+                    System.IO.Directory.CreateDirectory("output/migrations") |> ignore
+                    let path = $"output/migrations/{DateTime.UtcNow:yyyyMMddHHmmss}_migration.sql"
+                    System.IO.File.WriteAllText(path, migrationSql)
+                    printfn $"Migration script generated: {path}"
+                    printfn "\n=== MIGRATION PREVIEW ==="
+                    printfn "%s" migrationSql
+                
                 
                 0
             with
