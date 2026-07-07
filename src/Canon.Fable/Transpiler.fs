@@ -46,9 +46,10 @@ module Transpiler =
                 innerExpr.Replace("value", $"value.{field}"), innerF
 
     /// Emits a full TypeScript validation function and its Fidelity grade.
-    let emitValidator (name: string) (predicate: Lattice<Constraint>) : string * Fidelity =
+    let emitValidator (name: string) (predicate: Lattice<Constraint>) (isNullable: bool) : string * Fidelity =
         let expr, fidelity = toTypeScript predicate
-        let code = $"""export function validate_{name}(value: any): boolean {{
+        let guard = if isNullable then "\n    if (value === null || value === undefined) return true;" else ""
+        let code = $"""export function validate_{name}(value: any): boolean {{{guard}
     return {expr};
 }}"""
         code, fidelity

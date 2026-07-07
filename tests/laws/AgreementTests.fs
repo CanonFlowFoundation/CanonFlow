@@ -104,7 +104,7 @@ module AgreementProperties =
         let fsResult = evalLattice l value
 
         // 2. Transpile to TS/JS
-        let tsCode, fidelity = Transpiler.emitValidator "test" l
+        let tsCode, fidelity = Transpiler.emitValidator "test" l false
         
         // Skip if not exact (e.g., unsupported constraints)
         if fidelity <> Fidelity.Exact then

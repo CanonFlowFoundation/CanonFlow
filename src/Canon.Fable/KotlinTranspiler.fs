@@ -45,9 +45,10 @@ module KotlinTranspiler =
                 innerExpr.Replace("value", $"value.{field}"), innerF
 
     /// Emits a full Kotlin validation function and its Fidelity grade.
-    let emitValidator (name: string) (predicate: Lattice<Constraint>) : string * Fidelity =
+    let emitValidator (name: string) (predicate: Lattice<Constraint>) (isNullable: bool) : string * Fidelity =
         let expr, fidelity = toKotlin predicate
-        let code = $"""fun validate_{name}(value: dynamic): Boolean {{
+        let guard = if isNullable then "\n    if (value == null) return true" else ""
+        let code = $"""fun validate_{name}(value: dynamic): Boolean {{{guard}
     return {expr}
 }}"""
         code, fidelity

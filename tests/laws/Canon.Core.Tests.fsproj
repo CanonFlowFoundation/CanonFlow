@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="LatticeLaws.fs" />
     <Compile Include="AgreementTests.fs" />
+    <Compile Include="SoundnessLaws.fs" />
     <Compile Include="SemanticOptimizerTests.fs" />
     <Compile Include="DriftEngineTests.fs" />
     <Compile Include="Program.fs" />

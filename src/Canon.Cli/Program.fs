@@ -98,7 +98,7 @@ module Program =
                                     |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
                                     |> List.map Canon.Introspect.SqlParser.parseConstraint 
                                     |> List.reduce (fun a b -> Lattice.And(a, b))
-                                let tsCode, fidelity = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                let tsCode, fidelity = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
                                 tsSb.AppendLine($"// Fidelity: {fidelity}") |> ignore
                                 tsSb.AppendLine(tsCode) |> ignore
                     
@@ -119,7 +119,7 @@ module Program =
                                     |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
                                     |> List.map Canon.Introspect.SqlParser.parseConstraint 
                                     |> List.reduce (fun a b -> Lattice.And(a, b))
-                                let ktCode, fidelity = KotlinTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                let ktCode, fidelity = KotlinTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
                                 ktSb.AppendLine($"// Fidelity: {fidelity}") |> ignore
                                 ktSb.AppendLine(ktCode) |> ignore
                     System.IO.File.WriteAllText("client/android/validators/Validators.kt", ktSb.ToString())
@@ -139,7 +139,7 @@ module Program =
                                     |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
                                     |> List.map Canon.Introspect.SqlParser.parseConstraint 
                                     |> List.reduce (fun a b -> Lattice.And(a, b))
-                                let swCode, fidelity = SwiftTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice
+                                let swCode, fidelity = SwiftTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
                                 swSb.AppendLine($"// Fidelity: {fidelity}") |> ignore
                                 swSb.AppendLine(swCode) |> ignore
                     System.IO.File.WriteAllText("client/ios/validators/Validators.swift", swSb.ToString())
@@ -189,7 +189,7 @@ module Program =
                 if results.Contains(Demo) then
                     printfn "\n[Transpilation Demo]"
                     let exampleLattice = Lattice.Leaf (Range(Some(Exclusive 0m), None))
-                    let tsCode, fidelity = Transpiler.emitValidator "price" exampleLattice
+                    let tsCode, fidelity = Transpiler.emitValidator "price" exampleLattice false
                     printfn "Fidelity: %A" fidelity
                     printfn "%s" tsCode
                 
