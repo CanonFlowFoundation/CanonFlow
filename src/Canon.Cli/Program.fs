@@ -15,6 +15,7 @@ type CliArguments =
     | [<CliPrefix(CliPrefix.DoubleDash)>] Verify
     | [<CliPrefix(CliPrefix.DoubleDash)>] ScaffoldForms
     | [<CliPrefix(CliPrefix.DoubleDash)>] ScaffoldCompose
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Diagnose
     | [<CliPrefix(CliPrefix.DoubleDash)>] MigrateTo of string
     
     interface IArgParserTemplate with
@@ -28,6 +29,7 @@ type CliArguments =
             | Verify -> "Run in strict mode for CI/CD. Fails if any constraints are unsupported or approximate."
             | ScaffoldForms -> "Generate AI-assisted React Hook Form components from DB constraints."
             | ScaffoldCompose -> "Generate Jetpack Compose components from DB constraints."
+            | Diagnose -> "Run semantic optimizer to find contradictory constraints (e.g. constraints that collapse to False)."
             | MigrateTo _ -> "Compare with a target database and generate migration SQL scripts."
 
 module Program =
@@ -54,6 +56,26 @@ module Program =
                         printfn $"  - {c.Name} ({c.DataType}) -> {constraints}"
                 
                 // Emitting the Semantic Catalog and Contracts
+                if results.Contains(Diagnose) then
+                    printfn "\n[Diagnostic Engine] Scanning for logical contradictions..."
+                    let mutable foundContradiction = false
+                    for t in tables do
+                        for c in t.Columns do
+                            if c.CheckConstraints.Length > 1 then
+                                let lattice = 
+                                    c.CheckConstraints 
+                                    |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
+                                    |> List.map Canon.Introspect.SqlParser.parseConstraint
+                                    |> List.reduce (fun a b -> Lattice.And(a, b))
+                                
+                                let simplified = Canon.Core.SemanticOptimizer.simplify lattice
+                                if simplified = Lattice.False then
+                                    let constraintsStr = String.Join(" AND ", c.CheckConstraints)
+                                    printfn $"[DIAGNOSTIC CONTRADICTION] Table: {t.Name}, Column: {c.Name} has contradictory constraints that collapse to False: {constraintsStr}"
+                                    foundContradiction <- true
+                    
+                    if not foundContradiction then
+                        printfn "No logical contradictions found in the schema."
                 if results.Contains(Contracts) then
                     printfn "\n[Emitting OKF Catalog, OpenMetadata, and TypeScript]"
                     System.IO.Directory.CreateDirectory("output/openmetadata") |> ignore
