@@ -27,6 +27,7 @@ type PostgresSchemaProvider(connectionString: string) =
             let pks = 
                 [ while pkReader.Read() do
                     yield (pkReader.GetString(0), pkReader.GetString(1), pkReader.GetString(2)) ]
+                |> List.sort
             pkReader.Close()
             let isPk schema table col = pks |> List.contains (schema, table, col)
 
@@ -43,6 +44,7 @@ type PostgresSchemaProvider(connectionString: string) =
             let fks = 
                 [ while fkReader.Read() do
                     yield (fkReader.GetString(0), fkReader.GetString(1), fkReader.GetString(2), fkReader.GetString(3), fkReader.GetString(4)) ]
+                |> List.sort
             fkReader.Close()
 
             // 3. Fetch Columns and Check Constraints
@@ -71,9 +73,14 @@ type PostgresSchemaProvider(connectionString: string) =
             
             let columnsData = 
                 [ while colReader.Read() do
-                    let tSchema = colReader.GetString(0)
-                    let tName = colReader.GetString(1)
-                    let cName = colReader.GetString(2)
+                    let rawSchema = colReader.GetString(0)
+                    let rawTable = colReader.GetString(1)
+                    let rawColumn = colReader.GetString(2)
+                    let tSchema = Sanitizer.sanitizeIdentifier rawSchema
+                    let tName = Sanitizer.sanitizeIdentifier rawTable
+                    let cName = Sanitizer.sanitizeIdentifier rawColumn
+                    if rawSchema <> tSchema || rawTable <> tName || rawColumn <> cName then
+                        printfn "[WARNING] Sanitized hostile identifier: %s.%s.%s -> %s.%s.%s" rawSchema rawTable rawColumn tSchema tName cName
                     let dType = colReader.GetString(3)
                     let isNull = colReader.GetString(4) = "YES"
                     let maxLen = if colReader.IsDBNull(5) then None else Some(colReader.GetInt32(5))
@@ -83,7 +90,7 @@ type PostgresSchemaProvider(connectionString: string) =
                     
                     let checkConstraintStrs = 
                         if String.IsNullOrEmpty(checkConstraintsStr) then []
-                        else checkConstraintsStr.Split("|||", StringSplitOptions.RemoveEmptyEntries) |> Array.toList
+                        else checkConstraintsStr.Split("|||", StringSplitOptions.RemoveEmptyEntries) |> Array.toList |> List.sort
 
                     let cleanCheckStrs = 
                         checkConstraintStrs
@@ -112,6 +119,7 @@ type PostgresSchemaProvider(connectionString: string) =
             // Group into TableDefs
             columnsData
             |> List.groupBy (fun (s, t, _) -> (s, t))
+            |> List.sortBy fst
             |> List.map (fun ((schema, name), cols) ->
                 let tableFks = fks |> List.choose (fun (s, t, c, rt, rc) -> 
                     if s = schema && t = name then Some { ColumnName = c; RefTable = rt; RefColumn = rc } else None)

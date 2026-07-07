@@ -5,8 +5,8 @@ type FieldClass =
     /// The storage representation perfectly matches the domain representation.
     | Lossless
     /// The storage representation is wider than the domain representation (e.g. string vs varchar).
-    | Widened
+    | Widened of reason: string
     /// The storage representation is narrower than the domain representation, risking data loss.
-    | Narrowed
+    | Narrowed of reason: string
     /// The storage representation cannot hold the domain concept.
-    | Unrepresentable
+    | Unrepresentable of reason: string

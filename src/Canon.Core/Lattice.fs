@@ -19,6 +19,7 @@ type Bound<'T> =
 type Constraint =
     | Range of lo: Bound<decimal> option * hi: Bound<decimal> option
     | IntRange of lo: Bound<int64> option * hi: Bound<int64> option
+    | StringRange of lo: Bound<string> option * hi: Bound<string> option
     | MaxLength of int
     | InList of string list
     | InSet of string list // represents IN or ANY(ARRAY[...])

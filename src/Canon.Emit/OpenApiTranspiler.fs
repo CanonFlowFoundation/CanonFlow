@@ -27,6 +27,7 @@ module OpenApiTranspiler =
             | Range (None, Some (Inclusive v)) -> $"""{{"maximum": {v}}}""", Fidelity.Exact
             | Range _ -> "{}", Fidelity.Approximate "Complex range bounds not fully implemented in OpenAPI schema"
             | IntRange _ -> """{"type": "integer"}""", Fidelity.Approximate "Int range requires precision bounds"
+            | StringRange _ -> "{}", Fidelity.Approximate "String range collation may differ and cannot be represented in OpenAPI"
             | MaxLength len -> $"""{{"maxLength": {len}}}""", Fidelity.Exact
             | InList items -> 
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "

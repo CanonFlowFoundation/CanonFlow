@@ -27,7 +27,12 @@ module KotlinTranspiler =
             | Range (Some (Inclusive v), None) -> $"value >= java.math.BigDecimal(\"{v}\")", Fidelity.Exact
             | Range (None, Some (Inclusive v)) -> $"value <= java.math.BigDecimal(\"{v}\")", Fidelity.Exact
             | Range _ -> "true", Fidelity.Approximate "Complex range bounds not fully implemented in Kotlin"
-            | IntRange _ -> "value.scale() <= 0", Fidelity.Approximate "Int range check"
+            | IntRange _ -> "true", Fidelity.Approximate "Int range requires precision bounds"
+            | StringRange (Some (Exclusive v), None) -> $"value > \"{v}\"", Fidelity.Approximate "String range collation may differ"
+            | StringRange (None, Some (Exclusive v)) -> $"value < \"{v}\"", Fidelity.Approximate "String range collation may differ"
+            | StringRange (Some (Inclusive v), None) -> $"value >= \"{v}\"", Fidelity.Approximate "String range collation may differ"
+            | StringRange (None, Some (Inclusive v)) -> $"value <= \"{v}\"", Fidelity.Approximate "String range collation may differ"
+            | StringRange _ -> "true", Fidelity.Approximate "Complex string range bounds not fully implemented in Kotlin"
             | MaxLength len -> $"value.length <= {len}", Fidelity.Exact
             | InList items -> 
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "
@@ -36,7 +41,10 @@ module KotlinTranspiler =
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "
                 $"setOf({arr}).contains(value)", Fidelity.Exact
             | RelativeBound(colA, op, colB) ->
-                $"value.{colA} {op} value.{colB}", Fidelity.Exact
+                let isLiteral (s: string) = s.StartsWith("\"") || s.StartsWith("'") || System.Char.IsDigit(s.[0]) || s.StartsWith("-")
+                let a = if isLiteral colA then colA else $"value.{colA}"
+                let b = if isLiteral colB then colB else $"value.{colB}"
+                $"{a} {op} {b}", Fidelity.Exact
             | PrimaryKey -> "true", Fidelity.Unsupported "PrimaryKey concept does not exist in Kotlin validators"
             | NonEmpty -> $"value.isNotEmpty()", Fidelity.Exact
             | Opaque raw -> "true /* opaque sql */", Fidelity.Unsupported $"Cannot transpile raw SQL: {raw}"

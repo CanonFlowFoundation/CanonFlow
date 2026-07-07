@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="FieldClass.fs" />
+    <Compile Include="Sanitizer.fs" />
     <Compile Include="Lattice.fs" />
     <Compile Include="Lineage.fs" />
     <Compile Include="Drift.fs" />

@@ -8,7 +8,9 @@ module SqlParser =
     let ws = spaces
 
     let pIdentifier = 
-        pipe2 (asciiLetter <|> pchar '_') (manyChars (asciiLetter <|> digit <|> pchar '_')) (fun c s -> string c + s)
+        let unquoted = pipe2 (asciiLetter <|> pchar '_') (manyChars (asciiLetter <|> digit <|> pchar '_')) (fun c s -> string c + s)
+        let quoted = between (pchar '"') (pchar '"') (many1Chars (noneOf "\"")) |>> sprintf "\"%s\""
+        quoted <|> unquoted
 
     let pDecimal = 
         let pNum = many1Chars (digit)
@@ -22,22 +24,38 @@ module SqlParser =
 
     let pCast = opt (pstring "::" >>. manyChars (asciiLetter <|> pchar ' ') .>> opt (pstring "[]")) |>> ignore
 
+    let pStringLiteral = 
+        between (pstring "'") (pstring "'") (manyChars (noneOf "'"))
+
     let pField, pFieldRef = createParserForwardedToRef()
     pFieldRef.Value <- 
-        (attempt (between (pchar '(' >>. ws) (ws .>> pchar ')') pField) <|> pIdentifier) .>> pCast
+        (attempt (between (pchar '(' >>. ws) (ws .>> pchar ')') pField) 
+         <|> (pStringLiteral |>> sprintf "'%s'") 
+         <|> pIdentifier) .>> pCast
 
-    let pNumberValue =
-        (attempt (between (pchar '(' >>. ws) (ws .>> pchar ')') pDecimal) <|> pDecimal) .>> pCast
+    let pNumberValue, pNumberValueRef = createParserForwardedToRef()
+    pNumberValueRef.Value <-
+        (attempt (between (pchar '(' >>. ws) (ws .>> pchar ')') pNumberValue) 
+         <|> (pStringLiteral >>= fun s -> 
+             match System.Decimal.TryParse(s) with
+             | true, d -> preturn d
+             | _ -> pzero) 
+         <|> pDecimal) .>> pCast
 
     let pGreaterThan = pstring ">" >>. ws >>. pNumberValue |>> fun num -> Range(Some(Exclusive num), None)
     let pGreaterThanOrEqual = pstring ">=" >>. ws >>. pNumberValue |>> fun num -> Range(Some(Inclusive num), None)
     let pLessThan = pstring "<" >>. ws >>. pNumberValue |>> fun num -> Range(None, Some(Exclusive num))
     let pLessThanOrEqual = pstring "<=" >>. ws >>. pNumberValue |>> fun num -> Range(None, Some(Inclusive num))
 
-    let pOp = choice [ attempt pGreaterThanOrEqual; pGreaterThan; attempt pLessThanOrEqual; pLessThan ]
+    let pStrGreaterThan = pstring ">" >>. ws >>. pStringLiteral |>> fun str -> StringRange(Some(Exclusive str), None)
+    let pStrGreaterThanOrEqual = pstring ">=" >>. ws >>. pStringLiteral |>> fun str -> StringRange(Some(Inclusive str), None)
+    let pStrLessThan = pstring "<" >>. ws >>. pStringLiteral |>> fun str -> StringRange(None, Some(Exclusive str))
+    let pStrLessThanOrEqual = pstring "<=" >>. ws >>. pStringLiteral |>> fun str -> StringRange(None, Some(Inclusive str))
 
-    let pStringLiteral = 
-        between (pstring "'") (pstring "'") (manyChars (noneOf "'"))
+    let pOp = choice [ 
+        attempt pGreaterThanOrEqual; attempt pGreaterThan; attempt pLessThanOrEqual; attempt pLessThan
+        attempt pStrGreaterThanOrEqual; attempt pStrGreaterThan; attempt pStrLessThanOrEqual; attempt pStrLessThan 
+    ]
 
     let pAnyArray = 
         pstring "=" >>. ws >>. pstring "ANY" >>. ws >>. 
@@ -51,10 +69,18 @@ module SqlParser =
         pipe3 (pField .>> ws) (choice [attempt (pstring ">="); pstring ">"; attempt (pstring "<="); pstring "<"] .>> ws) pField
             (fun colA op colB -> Lattice.Leaf (RelativeBound(colA, op, colB)))
 
+    let pIsNull = 
+        pipe2 (pField .>> ws) (pstring "IS NULL") (fun f _ -> Lattice.Leaf (Constraint.Opaque(sprintf "%s IS NULL" f)))
+
+    let pIsNotNull = 
+        pipe2 (pField .>> ws) (pstring "IS NOT NULL") (fun f _ -> Lattice.Leaf (Constraint.Opaque(sprintf "%s IS NOT NULL" f)))
+
     let pCondition = 
-        attempt pRelative <|>
         attempt (pipe2 (pField .>> ws) pAnyArray (fun ident inset -> Lattice.Leaf (FieldBound(ident, inset)))) <|>
-        pipe2 (pField .>> ws) pOp (fun ident op -> Lattice.Leaf (FieldBound(ident, op)))
+        attempt (pipe2 (pField .>> ws) pOp (fun ident op -> Lattice.Leaf (FieldBound(ident, op)))) <|>
+        attempt pRelative <|>
+        attempt pIsNotNull <|>
+        pIsNull
 
     let opp = new OperatorPrecedenceParser<Lattice<Constraint>, unit, unit>()
     let pExpr = opp.ExpressionParser
@@ -85,4 +111,4 @@ module SqlParser =
         let cleanSql = stripOuter sql
         match run (ws >>. pExpr .>> eof) cleanSql with
         | Success(result, _, _) -> result
-        | Failure(_, _, _) -> Lattice.Leaf(Opaque sql)
+        | Failure(_, _, _) -> Lattice.Leaf(Constraint.Opaque sql)

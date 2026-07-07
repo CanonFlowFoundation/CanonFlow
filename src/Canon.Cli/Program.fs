@@ -76,6 +76,36 @@ module Program =
                     
                     if not foundContradiction then
                         printfn "No logical contradictions found in the schema."
+
+                    let mutable foundRedundancy = false
+                    for t in tables do
+                        for c in t.Columns do
+                            if c.CheckConstraints.Length > 1 then
+                                let parsed = 
+                                    c.CheckConstraints 
+                                    |> List.map (fun s -> s, if s.StartsWith("CHECK ") then s.Substring(6) else s)
+                                    |> List.map (fun (orig, s) -> orig, Canon.Introspect.SqlParser.parseConstraint s)
+                                    
+                                for i in 0 .. parsed.Length - 1 do
+                                    for j in i + 1 .. parsed.Length - 1 do
+                                        let s1_str, c1 = parsed.[i]
+                                        let s2_str, c2 = parsed.[j]
+                                        let combined = Canon.Core.SemanticOptimizer.simplify (Lattice.And(c1, c2))
+                                        if combined <> Lattice.False then
+                                            let sim1 = Canon.Core.SemanticOptimizer.simplify c1
+                                            let sim2 = Canon.Core.SemanticOptimizer.simplify c2
+                                            if combined = sim1 && sim1 <> sim2 then
+                                                printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has redundant constraint '{s2_str}' which is subsumed by '{s1_str}'"
+                                                foundRedundancy <- true
+                                            elif combined = sim2 && sim1 <> sim2 then
+                                                printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has redundant constraint '{s1_str}' which is subsumed by '{s2_str}'"
+                                                foundRedundancy <- true
+                                            elif combined = sim1 && combined = sim2 then
+                                                printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has duplicate constraints '{s1_str}' and '{s2_str}'"
+                                                foundRedundancy <- true
+                    
+                    if not foundRedundancy then
+                        printfn "No redundancies found in the schema."
                 if results.Contains(Contracts) then
                     printfn "\n[Emitting OKF Catalog, OpenMetadata, and TypeScript]"
                     System.IO.Directory.CreateDirectory("output/openmetadata") |> ignore

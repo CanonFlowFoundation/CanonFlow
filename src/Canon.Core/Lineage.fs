@@ -6,6 +6,11 @@ type Fidelity =
     | Exact
     | Approximate of reason: string
     | Unsupported of reason: string
+    override this.ToString() =
+        match this with
+        | Exact -> "Exact"
+        | Approximate r -> $"Approximate: {Sanitizer.sanitizeComment r}"
+        | Unsupported r -> $"Unsupported: {Sanitizer.sanitizeComment r}"
 
 type ConstraintFidelity = {
     Constraint: Lattice<Constraint>
