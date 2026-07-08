@@ -1,10 +1,11 @@
 namespace Canon.Contracts
 
 open Canon.Core
+open Canon.Introspect
 open System.Text
 
 module LayerMapEmitter =
-    let generateMap (tables: Table list) =
+    let generateMap (tables: TableDef list) =
         let sb = StringBuilder()
         sb.AppendLine("# CanonFlow Layer Map") |> ignore
         sb.AppendLine("") |> ignore

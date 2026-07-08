@@ -1,6 +1,7 @@
 namespace Canon.Contracts
 
 open Canon.Core
+open Canon.Introspect
 open System.Text.Json
 
 module AgentContextEmitter =
@@ -25,7 +26,7 @@ module AgentContextEmitter =
         tables: AgentTable list
     }
 
-    let emitContext (tables: Table list) =
+    let emitContext (tables: TableDef list) =
         let agentTables = 
             tables |> List.map (fun t -> 
                 let hasDbChecks = t.Columns |> List.exists (fun c -> not c.CheckConstraints.IsEmpty)

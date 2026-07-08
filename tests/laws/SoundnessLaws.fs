@@ -12,7 +12,7 @@ module SoundnessLaws =
         // Database admits NULL.
         // We ensure Transpiler generates a guard that returns true for null.
         let lattice = Lattice.Leaf (Range(Some(Inclusive 10m), None))
-        let tsCode, fidelity = Transpiler.emitValidator "guarantor_share_pct" lattice true
+        let tsCode, fidelity = Transpiler.emitValidator "guarantor_share_pct" lattice true None
         
         // Assert the code has the null guard
         Assert.Contains(".nullable()", tsCode)
@@ -20,11 +20,11 @@ module SoundnessLaws =
     [<Fact>]
     let ``Soundness Law: if database admits NULL, Kotlin validator admits NULL`` () =
         let lattice = Lattice.Leaf (Range(Some(Inclusive 10m), None))
-        let ktCode, fidelity = KotlinTranspiler.emitValidator "guarantor_share_pct" lattice true
+        let ktCode, fidelity = KotlinTranspiler.emitValidator "guarantor_share_pct" lattice true None
         Assert.Contains("if (value == null) return true", ktCode)
 
     [<Fact>]
     let ``Soundness Law: if database admits NULL, Swift validator admits NULL`` () =
         let lattice = Lattice.Leaf (Range(Some(Inclusive 10m), None))
-        let swCode, fidelity = SwiftTranspiler.emitValidator "guarantor_share_pct" lattice true
+        let swCode, fidelity = SwiftTranspiler.emitValidator "guarantor_share_pct" lattice true None
         Assert.Contains("if value == nil { return true }", swCode)
