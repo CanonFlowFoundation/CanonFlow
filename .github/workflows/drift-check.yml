@@ -1,0 +1,52 @@
+name: CanonFlow Drift Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: canonflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Load Sample Database Schema (ECommerce)
+      run: |
+        PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+        PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -f samples/Canon.Demo.ECommerce/schema.sql
+        
+    - name: Run CanonFlow Strict Mode (ECommerce)
+      run: |
+        dotnet run --project src/Canon.Cli/Canon.Cli.fsproj -- --pg "Host=localhost;Username=postgres;Password=password;Database=canonflow_test" --contracts --verify
+
+    - name: Load Sample Database Schema (Sangam Credit)
+      run: |
+        PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+        PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -f samples/sangam-credit.sql
+        
+    - name: Run CanonFlow Strict Mode (Sangam Credit)
+      run: |
+        dotnet run --project src/Canon.Cli/Canon.Cli.fsproj -- --pg "Host=localhost;Username=postgres;Password=password;Database=canonflow_test" --contracts --verify
