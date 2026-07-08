@@ -61,7 +61,7 @@ module ProofEmitter =
                     let dbAst = c.ParsedConstraints |> List.reduce (fun a b -> And(a, b))
                     let dbStr = formatLattice (SemanticOptimizer.simplify dbAst)
                     
-                    let _, tsFid = Canon.Fable.Transpiler.emitValidator $"{t.Name}_{c.Name}" dbAst c.IsNullable
+                    let tsCode, tsFid = Canon.Fable.Transpiler.emitValidator $"{t.Name}_{c.Name}" dbAst c.IsNullable None
                     let _, openApiFid = OpenApiTranspiler.emitSchema $"{t.Name}_{c.Name}" dbAst
                     
                     let tsFidStr = 
