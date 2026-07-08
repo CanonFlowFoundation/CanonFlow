@@ -36,7 +36,7 @@ module OpenApiTranspiler =
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "
                 $"""{{"enum": [{arr}]}}""", Fidelity.Exact
             | RelativeBound(colA, op, colB) ->
-                "{}", Fidelity.Unsupported $"OpenAPI does not support cross-field validation ({colA} {op} {colB})"
+                $"""{{"description": "Requires {colA} {op} {colB}"}}""", Fidelity.Approximate "OpenAPI maps cross-field validation to description strings"
             | PrimaryKey -> "{}", Fidelity.Unsupported "PrimaryKey concept does not exist in OpenAPI validators"
             | NonEmpty -> """{"minLength": 1}""", Fidelity.Exact
             | Constraint.Opaque raw -> "{}", Fidelity.Unsupported $"Cannot transpile raw SQL to OpenAPI: {raw}"
