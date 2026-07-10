@@ -1,5 +1,30 @@
 namespace Canon.Core
 
+/// Three-valued logic for autonomous evaluation
+type LatticeOutcome =
+    | Satisfied
+    | Violated
+    | Unknown
+
+    member this.Not() =
+        match this with
+        | Satisfied -> Violated
+        | Violated -> Satisfied
+        | Unknown -> Unknown
+        
+    member this.And(other) =
+        match this, other with
+        | Satisfied, Satisfied -> Satisfied
+        | Violated, _ | _, Violated -> Violated
+        | _ -> Unknown
+        
+    member this.Or(other) =
+        match this, other with
+        | Violated, Violated -> Violated
+        | Satisfied, _ | _, Satisfied -> Satisfied
+        | _ -> Unknown
+
+
 /// Represents Helios capability-typed field kinds for semantic indexing.
 type FieldKind =
     | Keyword
@@ -75,6 +100,16 @@ module Lattice =
             | And(a, b) -> Or(toNNF (Not a), toNNF (Not b))
             | Or(a, b) -> And(toNNF (Not a), toNNF (Not b))
 
+    let rec eval3 (evalLeaf: 'Leaf -> LatticeOutcome) (l: Lattice<'Leaf>) : LatticeOutcome =
+        match l with
+        | True -> Satisfied
+        | False -> Violated
+        | Leaf x -> evalLeaf x
+        | Not x -> (eval3 evalLeaf x).Not()
+        | And(a, b) -> (eval3 evalLeaf a).And(eval3 evalLeaf b)
+        | Or(a, b) -> (eval3 evalLeaf a).Or(eval3 evalLeaf b)
+
+    // Legacy binary evaluation
     let rec eval (evalLeaf: 'Leaf -> bool) (l: Lattice<'Leaf>) =
         match l with
         | True -> true

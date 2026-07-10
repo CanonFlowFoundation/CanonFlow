@@ -6,11 +6,13 @@ type Fidelity =
     | Exact
     | Approximate of reason: string
     | Unsupported of reason: string
+    | Unknown
     override this.ToString() =
         match this with
         | Exact -> "Exact"
         | Approximate r -> $"Approximate: {Sanitizer.sanitizeComment r}"
         | Unsupported r -> $"Unsupported: {Sanitizer.sanitizeComment r}"
+        | Unknown -> "Unknown"
 
 type ConstraintFidelity = {
     Constraint: Lattice<Constraint>
@@ -23,6 +25,7 @@ module Fidelity =
         match f1, f2 with
         | Fidelity.Unsupported r1, Fidelity.Unsupported r2 -> Fidelity.Unsupported $"{r1}; {r2}"
         | Fidelity.Unsupported r, _ | _, Fidelity.Unsupported r -> Fidelity.Unsupported r
+        | Fidelity.Unknown, _ | _, Fidelity.Unknown -> Fidelity.Unknown
         | Fidelity.Approximate r1, Fidelity.Approximate r2 -> Fidelity.Approximate $"{r1}; {r2}"
         | Fidelity.Approximate r, _ | _, Fidelity.Approximate r -> Fidelity.Approximate r
         | Fidelity.Exact, Fidelity.Exact -> Fidelity.Exact

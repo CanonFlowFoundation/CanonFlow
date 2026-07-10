@@ -40,6 +40,15 @@ module DriftEngine =
                 Severity = High
                 FixAction = $"Implement custom backend middleware guard. Reason: {reason}"
             }
+        | Fidelity.Unknown ->
+            Some {
+                Field = field
+                TargetSystem = targetSystem
+                DatabaseTruth = dbConstraintStr
+                TargetReality = "Unknown"
+                Severity = Medium
+                FixAction = "Review target system mapping or wait for HITL intervention."
+            }
 
     /// Generates a full drift report for a table based on generated fidelities.
     let detectDrift (table: string) (fidelities: (string * string * Fidelity * string) list) =
@@ -54,6 +63,7 @@ module DriftEngine =
         | StrictTarget
         | LooseTarget
         | Disjoint
+        | Unknown
 
     /// Compares two normalized ASTs for structural equivalence.
     /// This is safe because SemanticOptimizer produces canonical bounds.
@@ -79,4 +89,4 @@ module DriftEngine =
         | _ when structuralEquals optSource optTarget -> Aligned
         | _ when structuralEquals intersection optTarget -> StrictTarget
         | _ when structuralEquals intersection optSource -> LooseTarget
-        | _ -> Disjoint // Complex partial overlaps
+        | _ -> Unknown // Complex partial overlaps or unresolved nodes
