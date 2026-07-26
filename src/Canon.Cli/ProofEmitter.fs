@@ -68,15 +68,19 @@ module ProofEmitter =
                         match tsFid with
                         | Fidelity.Exact -> totalExact <- totalExact + 1; "✅ Exact"
                         | Fidelity.Approximate r -> totalApproximate <- totalApproximate + 1; $"⚠️ Approx ({r})"
+                        | Fidelity.Conditional _ -> "⚠️ Conditional"
+                        | Fidelity.DatabaseOwned _ -> "✅ DB Owned"
+                        | Fidelity.Manual _ -> "⚠️ Manual"
                         | Fidelity.Unsupported r -> totalUnsupported <- totalUnsupported + 1; $"❌ Unsupported"
-                        | Fidelity.Unknown -> "❓ Unknown"
                         
                     let openApiFidStr = 
                         match openApiFid with
                         | Fidelity.Exact -> totalExact <- totalExact + 1; "✅ Exact"
                         | Fidelity.Approximate r -> totalApproximate <- totalApproximate + 1; $"⚠️ Approx ({r})"
+                        | Fidelity.Conditional _ -> "⚠️ Conditional"
+                        | Fidelity.DatabaseOwned _ -> "✅ DB Owned"
+                        | Fidelity.Manual _ -> "⚠️ Manual"
                         | Fidelity.Unsupported r -> totalUnsupported <- totalUnsupported + 1; $"❌ Unsupported"
-                        | Fidelity.Unknown -> "❓ Unknown"
                         
                     add $"| `{c.Name}` | `{dbStr}` | {tsFidStr} | {openApiFidStr} |"
             add ""

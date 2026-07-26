@@ -11,7 +11,7 @@ module Transpiler =
         | Lattice.False -> "z.never()", Fidelity.Exact
         | Lattice.Not inner -> 
             let expr, f = toTypeScript inner
-            $"z.any().refine(val => !({expr}.safeParse(val).success))", Fidelity.Approximate "Zod does not support generic NOT"
+            $"z.any().refine(val => !({expr}.safeParse(val).success))", Fidelity.Approximate (Weaker "Zod does not support generic NOT")
         | Lattice.And(left, right) -> 
             let lExpr, lF = toTypeScript left
             let rExpr, rF = toTypeScript right
@@ -22,13 +22,15 @@ module Transpiler =
             $"{lExpr}.or({rExpr})", Fidelity.combine lF rF
         | Lattice.Leaf c ->
             match c with
+            | IsNull -> "z.null()", Fidelity.Exact
+            | IsNotNull -> "z.any().refine(val => val !== null && val !== undefined)", Fidelity.Exact
             | Range (Some (Exclusive v), None) -> $"z.number().gt({v})", Fidelity.Exact
             | Range (None, Some (Exclusive v)) -> $"z.number().lt({v})", Fidelity.Exact
             | Range (Some (Inclusive v), None) -> $"z.number().gte({v})", Fidelity.Exact
             | Range (None, Some (Inclusive v)) -> $"z.number().lte({v})", Fidelity.Exact
-            | Range _ -> "z.number()", Fidelity.Approximate "Complex range bounds not fully implemented in TS Zod"
-            | IntRange _ -> "z.number().int()", Fidelity.Approximate "Int range requires precision bounds"
-            | StringRange _ -> "z.string()", Fidelity.Approximate "String range collation may differ"
+            | Range _ -> "z.number()", Fidelity.Approximate (Weaker "Complex range bounds not fully implemented in TS Zod")
+            | IntRange _ -> "z.number().int()", Fidelity.Approximate (Weaker "Int range requires precision bounds")
+            | StringRange _ -> "z.string()", Fidelity.Approximate (Weaker "String range collation may differ")
             | MaxLength len -> $"z.string().max({len})", Fidelity.Exact
             | InList items -> 
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "

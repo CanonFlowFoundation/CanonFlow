@@ -22,17 +22,19 @@ module KotlinTranspiler =
             $"(%s{lExpr} || %s{rExpr})", Fidelity.combine lF rF
         | Lattice.Leaf c ->
             match c with
+            | IsNull -> "value == null", Fidelity.Exact
+            | IsNotNull -> "value != null", Fidelity.Exact
             | Range (Some (Exclusive v), None) -> $"value > java.math.BigDecimal(\"{v}\")", Fidelity.Exact
             | Range (None, Some (Exclusive v)) -> $"value < java.math.BigDecimal(\"{v}\")", Fidelity.Exact
             | Range (Some (Inclusive v), None) -> $"value >= java.math.BigDecimal(\"{v}\")", Fidelity.Exact
             | Range (None, Some (Inclusive v)) -> $"value <= java.math.BigDecimal(\"{v}\")", Fidelity.Exact
-            | Range _ -> "true", Fidelity.Approximate "Complex range bounds not fully implemented in Kotlin"
-            | IntRange _ -> "true", Fidelity.Approximate "Int range requires precision bounds"
-            | StringRange (Some (Exclusive v), None) -> $"value > \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (None, Some (Exclusive v)) -> $"value < \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (Some (Inclusive v), None) -> $"value >= \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (None, Some (Inclusive v)) -> $"value <= \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange _ -> "true", Fidelity.Approximate "Complex string range bounds not fully implemented in Kotlin"
+            | Range _ -> "true", Fidelity.Approximate (Weaker "Complex range bounds not fully implemented in Kotlin")
+            | IntRange _ -> "true", Fidelity.Approximate (Weaker "Int range requires precision bounds")
+            | StringRange (Some (Exclusive v), None) -> $"value > \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (None, Some (Exclusive v)) -> $"value < \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (Some (Inclusive v), None) -> $"value >= \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (None, Some (Inclusive v)) -> $"value <= \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange _ -> "true", Fidelity.Approximate (Weaker "Complex string range bounds not fully implemented in Kotlin")
             | MaxLength len -> $"value.length <= {len}", Fidelity.Exact
             | InList items -> 
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "

@@ -22,17 +22,19 @@ module SwiftTranspiler =
             $"(%s{lExpr} || %s{rExpr})", Fidelity.combine lF rF
         | Lattice.Leaf c ->
             match c with
+            | IsNull -> "value == nil", Fidelity.Exact
+            | IsNotNull -> "value != nil", Fidelity.Exact
             | Range (Some (Exclusive v), None) -> $"value > Decimal(string: \"{v}\")!", Fidelity.Exact
             | Range (None, Some (Exclusive v)) -> $"value < Decimal(string: \"{v}\")!", Fidelity.Exact
             | Range (Some (Inclusive v), None) -> $"value >= Decimal(string: \"{v}\")!", Fidelity.Exact
             | Range (None, Some (Inclusive v)) -> $"value <= Decimal(string: \"{v}\")!", Fidelity.Exact
-            | Range _ -> "true", Fidelity.Approximate "Complex range bounds not fully implemented in Swift"
-            | IntRange _ -> "value.isSignalingNaN == false", Fidelity.Approximate "Int range check"
-            | StringRange (Some (Exclusive v), None) -> $"value > \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (None, Some (Exclusive v)) -> $"value < \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (Some (Inclusive v), None) -> $"value >= \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange (None, Some (Inclusive v)) -> $"value <= \"{v}\"", Fidelity.Approximate "String range collation may differ"
-            | StringRange _ -> "true", Fidelity.Approximate "Complex string range bounds not fully implemented in Swift"
+            | Range _ -> "true", Fidelity.Approximate (Weaker "Complex range bounds not fully implemented in Swift")
+            | IntRange _ -> "value.isSignalingNaN == false", Fidelity.Approximate (Weaker "Int range check")
+            | StringRange (Some (Exclusive v), None) -> $"value > \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (None, Some (Exclusive v)) -> $"value < \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (Some (Inclusive v), None) -> $"value >= \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange (None, Some (Inclusive v)) -> $"value <= \"{v}\"", Fidelity.Approximate (Weaker "String range collation may differ")
+            | StringRange _ -> "true", Fidelity.Approximate (Weaker "Complex string range bounds not fully implemented in Swift")
             | MaxLength len -> $"value.count <= {len}", Fidelity.Exact
             | InList items -> 
                 let arr = items |> List.map (sprintf "\"%s\"") |> String.concat ", "

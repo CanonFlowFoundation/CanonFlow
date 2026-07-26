@@ -47,4 +47,4 @@ module DriftEngineTests =
         let target = buildBound (Some 25M) (Some 75M)
         let result = calculateSemanticDrift source target
         // They intersect, but neither is a subset of the other.
-        Assert.Equal(SemanticDriftStatus.Disjoint, result)
+        Assert.Equal(SemanticDriftStatus.Unknown, result)

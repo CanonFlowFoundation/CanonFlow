@@ -34,5 +34,5 @@ type OpenSearchEmitter() =
     }}
   }}
 }}"""
-                mapping, Canon.Core.Fidelity.Approximate "OpenSearch drops foreign keys, constraints, and defaults"
+                mapping, Canon.Core.Fidelity.Approximate (Canon.Core.Weaker "OpenSearch drops foreign keys, constraints, and defaults")
             )

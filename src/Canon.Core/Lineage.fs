@@ -1,18 +1,33 @@
 namespace Canon.Core
 
+/// Direction matters. These have different owners and different blast radii.
+type Divergence =
+    /// F# rejects rows PostgreSQL admits — breaks READS of resident data.
+    | Stronger of reason: string
+    /// F# admits rows PostgreSQL rejects — breaks WRITES, surfaces at INSERT.
+    | Weaker of reason: string
+    override this.ToString() =
+        match this with
+        | Stronger r -> sprintf "Stronger: %s" (Sanitizer.sanitizeComment r)
+        | Weaker r -> sprintf "Weaker: %s" (Sanitizer.sanitizeComment r)
+
 /// Represents the translation fidelity of a constraint into a target language.
 [<RequireQualifiedAccess>]
 type Fidelity =
     | Exact
-    | Approximate of reason: string
-    | Unsupported of reason: string
-    | Unknown
+    | Conditional   of assumptions : string list
+    | Approximate   of Divergence
+    | DatabaseOwned of enforcer : string
+    | Manual        of owner : string * evidenceRef : string
+    | Unsupported   of reason : string
     override this.ToString() =
         match this with
         | Exact -> "Exact"
-        | Approximate r -> $"Approximate: {Sanitizer.sanitizeComment r}"
-        | Unsupported r -> $"Unsupported: {Sanitizer.sanitizeComment r}"
-        | Unknown -> "Unknown"
+        | Conditional a -> let str = String.concat ", " a in sprintf "Conditional: [%s]" str
+        | Approximate d -> sprintf "Approximate (%O)" d
+        | DatabaseOwned e -> sprintf "DatabaseOwned by %s" e
+        | Manual (o, e) -> sprintf "Manual (%s, %s)" o e
+        | Unsupported r -> sprintf "Unsupported: %s" (Sanitizer.sanitizeComment r)
 
 type ConstraintFidelity = {
     Constraint: Lattice<Constraint>
@@ -25,9 +40,12 @@ module Fidelity =
         match f1, f2 with
         | Fidelity.Unsupported r1, Fidelity.Unsupported r2 -> Fidelity.Unsupported $"{r1}; {r2}"
         | Fidelity.Unsupported r, _ | _, Fidelity.Unsupported r -> Fidelity.Unsupported r
-        | Fidelity.Unknown, _ | _, Fidelity.Unknown -> Fidelity.Unknown
-        | Fidelity.Approximate r1, Fidelity.Approximate r2 -> Fidelity.Approximate $"{r1}; {r2}"
-        | Fidelity.Approximate r, _ | _, Fidelity.Approximate r -> Fidelity.Approximate r
+        | Fidelity.Approximate d1, Fidelity.Approximate d2 -> Fidelity.Approximate (Weaker $"{d1} and {d2}")
+        | Fidelity.Approximate d, _ | _, Fidelity.Approximate d -> Fidelity.Approximate d
+        | Fidelity.Manual (o, e), _ | _, Fidelity.Manual (o, e) -> Fidelity.Manual (o, e)
+        | Fidelity.DatabaseOwned e1, _ | _, Fidelity.DatabaseOwned e1 -> Fidelity.DatabaseOwned e1
+        | Fidelity.Conditional a1, Fidelity.Conditional a2 -> Fidelity.Conditional (a1 @ a2)
+        | Fidelity.Conditional a, _ | _, Fidelity.Conditional a -> Fidelity.Conditional a
         | Fidelity.Exact, Fidelity.Exact -> Fidelity.Exact
 
 type FidelityReport = {

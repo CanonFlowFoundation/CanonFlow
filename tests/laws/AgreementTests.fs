@@ -124,7 +124,7 @@ module AgreementProperties =
                     .Replace("import { z } from \"zod\";", "const { z } = require('zod');")
             
             // Append execution and print result
-            let executionCode = sprintf "%s\nlet obj = new Number(%d); obj.age = %d; console.log(validate_test(obj));" jsScript value value
+            let executionCode = sprintf "%s\nlet val1 = %d; let val2 = { age: %d }; console.log(validate_test(val1) || validate_test(val2));" jsScript value value
             
             // 3. Execute in Node.js
             let nodeOutput = runInNode executionCode

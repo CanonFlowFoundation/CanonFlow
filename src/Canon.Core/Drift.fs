@@ -22,15 +22,36 @@ module DriftEngine =
     let analyzeFidelity (field: string) (targetSystem: string) (fidelity: Fidelity) (dbConstraintStr: string) : DriftViolation option =
         match fidelity with
         | Fidelity.Exact -> None // No drift
-        | Fidelity.Approximate reason ->
+        | Fidelity.Approximate (Stronger reason) ->
             Some {
                 Field = field
                 TargetSystem = targetSystem
                 DatabaseTruth = dbConstraintStr
-                TargetReality = "Approximate"
+                TargetReality = "Approximate (Stronger)"
                 Severity = Medium
                 FixAction = $"Review frontend validator bounds. Reason: {reason}"
             }
+        | Fidelity.Approximate (Weaker reason) ->
+            Some {
+                Field = field
+                TargetSystem = targetSystem
+                DatabaseTruth = dbConstraintStr
+                TargetReality = "Approximate (Weaker)"
+                Severity = High
+                FixAction = $"Target admits invalid writes. Reason: {reason}"
+            }
+        | Fidelity.Conditional a ->
+            let str = String.concat ", " a
+            Some {
+                Field = field
+                TargetSystem = targetSystem
+                DatabaseTruth = dbConstraintStr
+                TargetReality = "Conditional"
+                Severity = Low
+                FixAction = sprintf "Ensure runtime assumptions hold: %s" str
+            }
+        | Fidelity.DatabaseOwned _ | Fidelity.Manual _ ->
+            None
         | Fidelity.Unsupported reason ->
             Some {
                 Field = field
@@ -39,15 +60,6 @@ module DriftEngine =
                 TargetReality = "Missing / Unsupported"
                 Severity = High
                 FixAction = $"Implement custom backend middleware guard. Reason: {reason}"
-            }
-        | Fidelity.Unknown ->
-            Some {
-                Field = field
-                TargetSystem = targetSystem
-                DatabaseTruth = dbConstraintStr
-                TargetReality = "Unknown"
-                Severity = Medium
-                FixAction = "Review target system mapping or wait for HITL intervention."
             }
 
     /// Generates a full drift report for a table based on generated fidelities.
