@@ -52,6 +52,8 @@ type Constraint =
     | NonEmpty
     | PrimaryKey
     | Opaque of string
+    | IsNull
+    | IsNotNull
     | FieldBound of string * Constraint
 
 /// A closed six-constructor bounded complemented lattice for query formulation.

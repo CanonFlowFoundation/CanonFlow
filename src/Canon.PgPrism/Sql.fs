@@ -5,7 +5,7 @@ open System.Text
 
 module Sql =
 
-    let typeToSql (t: SqlType) =
+    let rec typeToSql (t: SqlType) =
         match t with
         | SqlType.Uuid -> "UUID"
         | SqlType.Text -> "TEXT"
@@ -18,16 +18,21 @@ module Sql =
         | SqlType.TimestampTz -> "TIMESTAMPTZ"
         | SqlType.Timestamp -> "TIMESTAMP"
         | SqlType.Date -> "DATE"
-        | SqlType.TextArray -> "TEXT[]"
         | SqlType.Jsonb -> "JSONB"
+        | SqlType.Array inner -> $"{typeToSql inner}[]"
+        | SqlType.Enum (name, _) -> name
+
+    type C = Canon.Core.Constraint
 
     let rec emitConstraint (c: Lattice<Constraint>) : string =
         match c with
         | True -> "TRUE"
         | False -> "FALSE"
-        | Leaf (FieldBound (col, Range(Some(Exclusive min), None))) -> $"{col} > {min}"
-        | Leaf (FieldBound (col, Range(Some(Inclusive min), None))) -> $"{col} >= {min}"
-        | Leaf (FieldBound (col, Opaque sql)) ->
+        | Leaf (C.FieldBound (col, C.Range(Some(Exclusive min), None))) -> $"{col} > {min}"
+        | Leaf (C.FieldBound (col, C.Range(Some(Inclusive min), None))) -> $"{col} >= {min}"
+        | Leaf (C.FieldBound (col, C.IsNull)) -> $"{col} IS NULL"
+        | Leaf (C.FieldBound (col, C.IsNotNull)) -> $"{col} IS NOT NULL"
+        | Leaf (C.FieldBound (col, C.Opaque sql)) ->
             if sql.StartsWith("RegexMatch: ") then
                 let pattern = sql.Substring(12)
                 $"{col} ~ '{pattern}'"
@@ -57,6 +62,22 @@ module Sql =
         for c in def.Constraints do
             sb.AppendLine(",") |> ignore
             sb.Append($"    CONSTRAINT {c.Name} CHECK ({emitConstraint c.Expr})") |> ignore
+
+        for fk in def.ForeignKeys do
+            sb.AppendLine(",") |> ignore
+            let localStr = String.concat ", " fk.LocalColumns
+            let targetStr = String.concat ", " fk.TargetColumns
+            sb.Append($"    CONSTRAINT {fk.Name} FOREIGN KEY ({localStr}) REFERENCES {fk.TargetTable} ({targetStr})") |> ignore
+            match fk.OnDelete with
+            | Some "c" -> sb.Append(" ON DELETE CASCADE") |> ignore
+            | Some "r" -> sb.Append(" ON DELETE RESTRICT") |> ignore
+            | Some "n" -> sb.Append(" ON DELETE SET NULL") |> ignore
+            | _ -> ()
+            match fk.OnUpdate with
+            | Some "c" -> sb.Append(" ON UPDATE CASCADE") |> ignore
+            | Some "r" -> sb.Append(" ON UPDATE RESTRICT") |> ignore
+            | Some "n" -> sb.Append(" ON UPDATE SET NULL") |> ignore
+            | _ -> ()
             
         sb.AppendLine() |> ignore
         sb.AppendLine(");") |> ignore

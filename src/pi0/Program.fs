@@ -6,11 +6,25 @@ open Canon.Core
 [<EntryPoint>]
 let main argv =
     let sql = """
-    CREATE TABLE accounts (
+    CREATE TYPE status_enum AS ENUM ('active', 'inactive');
+
+    CREATE TABLE users (
         id UUID PRIMARY KEY,
-        username VARCHAR(50) NOT NULL UNIQUE,
-        balance NUMERIC(15,2) NOT NULL,
-        CONSTRAINT balance_positive CHECK (balance >= 0)
+        status status_enum DEFAULT 'active',
+        metadata JSONB,
+        tags TEXT[]
+    );
+
+    CREATE TABLE posts (
+        id UUID PRIMARY KEY,
+        user_id UUID,
+        title VARCHAR(100),
+        published_at TIMESTAMP,
+        CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+        CONSTRAINT check_title_published CHECK (
+            (published_at IS NULL) OR (title IS NOT NULL)
+        ),
+        UNIQUE (user_id, title)
     );
     """
 
@@ -26,22 +40,26 @@ let main argv =
         
         printfn "\n=== 2. JSON -> CanonFlow IR (Decode.fs) ==="
         let tables = Decode.decodeSchema doc.RootElement
-        let accountTable = tables |> List.head
-        printfn "Extracted Table: %s" accountTable.Name
-        printfn "Columns:"
-        for c in accountTable.Columns do
-            printfn "  - %s (Type: %A, NotNull: %b, PK: %b)" c.Name c.Type c.NotNull c.PrimaryKey
-        
-        printfn "Constraints (Lattice AST):"
-        for c in accountTable.Constraints do
-            printfn "  - %s: %A" c.Name c.Expr
+        for table in tables do
+            printfn "\nExtracted Table: %s" table.Name
+            printfn "Columns:"
+            for c in table.Columns do
+                printfn "  - %s (Type: %A, NotNull: %b, PK: %b, Unique: %b, Default: %A)" c.Name c.Type c.NotNull c.PrimaryKey c.Unique c.Default
             
-        printfn "\n=== 3. CanonFlow IR -> F# Domain (Emit.fs) ==="
-        let fsCode = Emit.generateFSharpDomain accountTable
-        printfn "%s" fsCode
-        
-        printfn "=== 4. CanonFlow IR -> SQL DDL (Sql.fs) ==="
-        let sqlOut = Sql.emitTable accountTable
-        printfn "%s" sqlOut
+            printfn "Constraints (Lattice AST):"
+            for c in table.Constraints do
+                printfn "  - %s: %A" c.Name c.Expr
+                
+            printfn "Foreign Keys:"
+            for fk in table.ForeignKeys do
+                printfn "  - %s -> %s" fk.Name fk.TargetTable
+                
+            printfn "\n=== 3. CanonFlow IR -> F# Domain (Emit.fs) ==="
+            let fsCode = Emit.generateFSharpDomain table
+            printfn "%s" fsCode
+            
+            printfn "=== 4. CanonFlow IR -> SQL DDL (Sql.fs) ==="
+            let sqlOut = Sql.emitTable table
+            printfn "%s" sqlOut
     
     0
