@@ -113,54 +113,66 @@ module Decode =
     type C = Canon.Core.Constraint
 
     let rec decodeExpr (expr: JsonElement) : Lattice<Constraint> =
-        if expr.TryGetProperty("A_Expr") |> fst then
-            let ae = expr.GetProperty("A_Expr")
-            let opName = ae.GetProperty("name").[0].GetProperty("String").GetProperty("sval").GetString()
-            match opName with
-            | "~" ->
-                let col = getColumnRef (ae.GetProperty("lexpr"))
-                let pattern = getStringConst (ae.GetProperty("rexpr"))
-                Lattice.Leaf (C.FieldBound(col, C.Opaque($"RegexMatch: {pattern}")))
-            | "AND" ->
-                Lattice.And (decodeExpr (ae.GetProperty("lexpr")), decodeExpr (ae.GetProperty("rexpr")))
-            | "OR" ->
-                Lattice.Or (decodeExpr (ae.GetProperty("lexpr")), decodeExpr (ae.GetProperty("rexpr")))
-            | ">" | ">=" | "<" | "<=" | "=" | "!=" ->
-                let col = getColumnRef (ae.GetProperty("lexpr"))
-                let value = getNumericConst (ae.GetProperty("rexpr"))
+        try
+            if expr.TryGetProperty("A_Expr") |> fst then
+                let ae = expr.GetProperty("A_Expr")
+                let opName = ae.GetProperty("name").[0].GetProperty("String").GetProperty("sval").GetString()
                 match opName with
-                | ">" when value = 0m -> Lattice.Leaf (C.FieldBound(col, C.Range(Some(Exclusive 0m), None)))
-                | ">=" when value = 0m -> Lattice.Leaf (C.FieldBound(col, C.Range(Some(Inclusive 0m), None)))
-                | _ -> Lattice.Leaf (C.FieldBound(col, C.Opaque($"NumericRange {opName} {value}")))
-            | _ -> Lattice.Leaf (C.Opaque $"Unsupported Operator: {opName}")
+                | "~" ->
+                    if ae.GetProperty("lexpr").TryGetProperty("ColumnRef") |> fst then
+                        let col = getColumnRef (ae.GetProperty("lexpr"))
+                        let pattern = getStringConst (ae.GetProperty("rexpr"))
+                        Lattice.Leaf (C.FieldBound(col, C.Opaque($"RegexMatch: {pattern}")))
+                    else
+                        Lattice.Leaf (C.Opaque $"Regex on non-column")
+                | "AND" ->
+                    Lattice.And (decodeExpr (ae.GetProperty("lexpr")), decodeExpr (ae.GetProperty("rexpr")))
+                | "OR" ->
+                    Lattice.Or (decodeExpr (ae.GetProperty("lexpr")), decodeExpr (ae.GetProperty("rexpr")))
+                | ">" | ">=" | "<" | "<=" | "=" | "!=" ->
+                    if ae.GetProperty("lexpr").TryGetProperty("ColumnRef") |> fst then
+                        let col = getColumnRef (ae.GetProperty("lexpr"))
+                        if ae.GetProperty("rexpr").TryGetProperty("A_Const") |> fst then
+                            let value = getNumericConst (ae.GetProperty("rexpr"))
+                            match opName with
+                            | ">" when value = 0m -> Lattice.Leaf (C.FieldBound(col, C.Range(Some(Exclusive 0m), None)))
+                            | ">=" when value = 0m -> Lattice.Leaf (C.FieldBound(col, C.Range(Some(Inclusive 0m), None)))
+                            | _ -> Lattice.Leaf (C.FieldBound(col, C.Opaque($"NumericRange {opName} {value}")))
+                        else
+                            Lattice.Leaf (C.FieldBound(col, C.Opaque($"CrossColumn {opName}")))
+                    else
+                        Lattice.Leaf (C.Opaque $"FuncCall or Complex {opName}")
+                | _ -> Lattice.Leaf (C.Opaque $"Unsupported Operator: {opName}")
 
-        elif expr.TryGetProperty("BoolExpr") |> fst then
-            let be = expr.GetProperty("BoolExpr")
-            let boolop = be.GetProperty("boolop").GetString()
-            let args = be.GetProperty("args").EnumerateArray() |> Seq.toList
-            if boolop = "OR_EXPR" then
-                Lattice.Or (decodeExpr args.[0], decodeExpr args.[1])
-            elif boolop = "AND_EXPR" then
-                Lattice.And (decodeExpr args.[0], decodeExpr args.[1])
-            else Lattice.Leaf (C.Opaque "unknown bool expr")
+            elif expr.TryGetProperty("BoolExpr") |> fst then
+                let be = expr.GetProperty("BoolExpr")
+                let boolop = be.GetProperty("boolop").GetString()
+                let args = be.GetProperty("args").EnumerateArray() |> Seq.toList
+                if boolop = "OR_EXPR" then
+                    Lattice.Or (decodeExpr args.[0], decodeExpr args.[1])
+                elif boolop = "AND_EXPR" then
+                    Lattice.And (decodeExpr args.[0], decodeExpr args.[1])
+                else Lattice.Leaf (C.Opaque "unknown bool expr")
 
-        elif expr.TryGetProperty("NullTest") |> fst then
-            let nt = expr.GetProperty("NullTest")
-            let nulltestType = nt.GetProperty("nulltesttype").GetString()
-            let col = getColumnRef (nt.GetProperty("arg"))
-            if nulltestType = "IS_NULL" then Lattice.Leaf (C.FieldBound(col, C.IsNull))
-            else Lattice.Leaf (C.FieldBound(col, C.IsNotNull))
+            elif expr.TryGetProperty("NullTest") |> fst then
+                let nt = expr.GetProperty("NullTest")
+                let nulltestType = nt.GetProperty("nulltesttype").GetString()
+                let col = getColumnRef (nt.GetProperty("arg"))
+                if nulltestType = "IS_NULL" then Lattice.Leaf (C.FieldBound(col, C.IsNull))
+                else Lattice.Leaf (C.FieldBound(col, C.IsNotNull))
 
-        elif expr.TryGetProperty("FuncCall") |> fst then
-            let fc = expr.GetProperty("FuncCall")
-            let funcName = fc.GetProperty("funcname").[0].GetProperty("String").GetProperty("sval").GetString()
-            match funcName with
-            | "length" -> Lattice.Leaf (C.Opaque "LengthCheck")
-            | _ -> Lattice.Leaf (C.Opaque $"Unsupported Function: {funcName}")
-        elif expr.TryGetProperty("ColumnRef") |> fst then
-            Lattice.Leaf (C.Opaque "bare column ref")
-        else
-            Lattice.Leaf (C.Opaque "unknown expression")
+            elif expr.TryGetProperty("FuncCall") |> fst then
+                let fc = expr.GetProperty("FuncCall")
+                let funcName = fc.GetProperty("funcname").[0].GetProperty("String").GetProperty("sval").GetString()
+                match funcName with
+                | "length" -> Lattice.Leaf (C.Opaque "LengthCheck")
+                | _ -> Lattice.Leaf (C.Opaque $"Unsupported Function: {funcName}")
+            elif expr.TryGetProperty("ColumnRef") |> fst then
+                Lattice.Leaf (C.Opaque "bare column ref")
+            else
+                Lattice.Leaf (C.Opaque "unknown expression")
+        with
+        | _ -> Lattice.Leaf (C.Opaque "Complex expression (unhandled AST node)")
 
     let decodeColumn (enums: Map<string, string list>) (cd: JsonElement) : ColumnDef =
         let name = cd.GetProperty("colname").GetString()

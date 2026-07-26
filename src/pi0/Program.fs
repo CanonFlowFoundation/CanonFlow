@@ -28,7 +28,7 @@ let main argv =
     );
     """
 
-    printfn "=== 1. SQL -> JSON (PgQuery) ==="
+    printfn "=== 1. SQL -> JSON (pgsqlparser) ==="
     let result = Parser.Parse(sql)
     if not result.IsSuccess then
         printfn "Parse Error: %A" result.Error

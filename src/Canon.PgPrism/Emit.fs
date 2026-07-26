@@ -51,3 +51,26 @@ module Emit =
             sb.AppendLine($"type {col.Name} = private {col.Name} of {typeName}") |> ignore
             
         sb.ToString()
+
+    /// Generates F# DataAccess Exception Mapper for DatabaseOnly constraints
+    let generateDataAccessMapper (def: TableDef) : string =
+        let sb = System.Text.StringBuilder()
+        sb.AppendLine($"module {def.Name}DataAccess") |> ignore
+        sb.AppendLine() |> ignore
+        sb.AppendLine("open Npgsql") |> ignore
+        sb.AppendLine($"open {def.Name}Domain") |> ignore
+        sb.AppendLine() |> ignore
+        sb.AppendLine("type DomainError =") |> ignore
+        sb.AppendLine("    | DatabaseConstraintViolation of constraintName: string * message: string") |> ignore
+        sb.AppendLine("    | UnknownDatabaseError of string") |> ignore
+        sb.AppendLine() |> ignore
+        sb.AppendLine("let mapPostgresError (ex: PostgresException) =") |> ignore
+        sb.AppendLine("    match ex.SqlState with") |> ignore
+        sb.AppendLine("    | \"23505\" -> Result.Error (DatabaseConstraintViolation(ex.ConstraintName, \"Unique violation\"))") |> ignore
+        sb.AppendLine("    | \"23514\" -> Result.Error (DatabaseConstraintViolation(ex.ConstraintName, \"Check constraint violation\"))") |> ignore
+        sb.AppendLine("    | \"23503\" -> Result.Error (DatabaseConstraintViolation(ex.ConstraintName, \"Foreign key violation\"))") |> ignore
+        sb.AppendLine("    | \"23502\" -> Result.Error (DatabaseConstraintViolation(ex.ColumnName, \"Not null violation\"))") |> ignore
+        sb.AppendLine("    | _ -> Result.Error (UnknownDatabaseError ex.Message)") |> ignore
+        sb.AppendLine() |> ignore
+        
+        sb.ToString()
