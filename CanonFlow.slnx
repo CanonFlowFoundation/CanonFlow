@@ -10,6 +10,7 @@
     <Project Path="src/Canon.Flow/Canon.Flow.fsproj" />
     <Project Path="src/Canon.Introspect/Canon.Introspect.fsproj" />
     <Project Path="src/Canon.SqlHydra/Canon.SqlHydra.fsproj" />
+    <Project Path="src/Canon.PgPrism/Canon.PgPrism.fsproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/integration/">
