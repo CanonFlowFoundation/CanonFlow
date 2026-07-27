@@ -10,9 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ReportCommon.fs" />
     <Compile Include="VerdictView.fs" />
     <Compile Include="HtmlReport.fs" />
     <Compile Include="MarkdownReports.fs" />
+    <Compile Include="SarifReport.fs" />
   </ItemGroup>
 
   <ItemGroup>

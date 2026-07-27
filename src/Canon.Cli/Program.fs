@@ -5,6 +5,8 @@ open Argu
 open Canon.Core
 open Canon.Introspect.Postgres
 open Canon.Fable
+open CanonFlow.Assurance
+open CanonFlow.Assurance.Verification
 
 type EvaluatorArguments =
     | [<CliPrefix(CliPrefix.DoubleDash)>] Manifest of string
@@ -18,15 +20,52 @@ type EvaluatorArguments =
 
 type ReceiptArguments =
     | [<CliPrefix(CliPrefix.DoubleDash)>] Receipt of string
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Public_Key of string
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Allow_Unsigned
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Offline
 
     interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
         member s.Usage =
             match s with
             | Receipt _ -> "Path to the Canonical Evidence Receipt."
+            | Public_Key _ -> "Path to a hex-encoded Ed25519 public key."
+            | Allow_Unsigned -> "Verify canonical integrity without requiring a signature."
+            | Offline -> "Require offline verification (the verifier never uses the network)."
+
+type SelfTestArguments =
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Output of string
+
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
+        member s.Usage =
+            match s with
+            | Output _ -> "Path for the deterministic self-test JSON result."
+
+type VersionArguments =
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Json
+
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
+        member s.Usage =
+            match s with
+            | Json -> "Emit machine-readable JSON."
+
+type ReplayArguments =
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Receipt of string
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Input of string
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Output of string
+
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
+        member s.Usage =
+            match s with
+            | Receipt _ -> "Path to the original assessment.cff."
+            | Input _ -> "Input directory containing canonflow-evaluation.json."
+            | Output _ -> "Directory for replay artifacts."
 
 type CliArguments =
     | [<CliPrefix(CliPrefix.None)>] Evaluate of ParseResults<EvaluatorArguments>
     | [<CliPrefix(CliPrefix.None)>] Receipt_Verify of ParseResults<ReceiptArguments>
+    | [<CliPrefix(CliPrefix.None)>] Self_Test of ParseResults<SelfTestArguments>
+    | [<CliPrefix(CliPrefix.None)>] Version of ParseResults<VersionArguments>
+    | [<CliPrefix(CliPrefix.None)>] Replay of ParseResults<ReplayArguments>
     | [<CliPrefix(CliPrefix.DoubleDash)>] Pg of string
     | [<CliPrefix(CliPrefix.DoubleDash)>] Contracts
     | [<CliPrefix(CliPrefix.DoubleDash)>] ContractsKotlin
@@ -45,6 +84,9 @@ type CliArguments =
             match s with
             | Evaluate _ -> "Evaluate a CanonFlow manifest in an isolated environment."
             | Receipt_Verify _ -> "Verify a canonical evidence receipt offline."
+            | Self_Test _ -> "Run deterministic evaluator kernel checks."
+            | Version _ -> "Print evaluator and runtime versions."
+            | Replay _ -> "Re-evaluate declared inputs and compare replay identity."
             | Pg _ -> "Introspect a Postgres database using the provided connection string."
             | Contracts -> "Emit JSON Schema and TypeScript clients."
             | ContractsKotlin -> "Emit Kotlin validators."
@@ -69,22 +111,121 @@ module Program =
         if results.Contains(Evaluate) then
             let evalArgs : ParseResults<EvaluatorArguments> = results.GetResult(Evaluate)
             let manifestPath = evalArgs.GetResult(Manifest)
-            let outputPath = evalArgs.GetResult(Output)
-            printfn $"[Evaluator] Running isolated assessment on {manifestPath} -> {outputPath}"
-            
-            // Evaluator orchestrator logic will be called here
-            System.IO.Directory.CreateDirectory(outputPath) |> ignore
-            System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "assessment.cff"), "stub")
-            
-            0
+            let outputPath = evalArgs.GetResult(EvaluatorArguments.Output)
+            match CanonFlow.Evaluator.Pipeline.evaluate manifestPath with
+            | Error error ->
+                eprintfn $"Evaluation rejected: {error}"
+                64
+            | Ok run ->
+                System.IO.Directory.CreateDirectory(outputPath) |> ignore
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "assessment.cff"), run.CanonicalReceipt)
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "VERDICT.json"), CanonFlow.Reports.VerdictView.generate run.Receipt)
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "REPORT.html"), CanonFlow.Reports.HtmlReport.generate run.Receipt)
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "EVIDENCE.md"), CanonFlow.Reports.MarkdownReports.generateEvidence run.Receipt)
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "LOSS.md"), CanonFlow.Reports.MarkdownReports.generateLoss run.Receipt)
+                System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "findings.sarif"), CanonFlow.Reports.SarifReport.generate run.Receipt)
+                printfn $"Receipt: {run.ReceiptDigest}"
+                run.ExitCode
         elif results.Contains(Receipt_Verify) then
             let receiptArgs : ParseResults<ReceiptArguments> = results.GetResult(Receipt_Verify)
-            let receiptPath = receiptArgs.GetResult(Receipt)
-            printfn $"[Evaluator] Verifying receipt at {receiptPath}..."
-            
-            // Receipt verification logic will be called here
-            printfn "Verification Failed (Stub)"
-            1
+            let receiptPath = receiptArgs.GetResult(ReceiptArguments.Receipt)
+            try
+                let receiptJson = System.IO.File.ReadAllText(receiptPath)
+                let publicKey =
+                    receiptArgs.TryGetResult(Public_Key)
+                    |> Option.map (fun path -> System.IO.File.ReadAllText(path).Trim() |> Convert.FromHexString)
+                let allowUnsigned = receiptArgs.Contains(Allow_Unsigned)
+                match CanonFlow.Assurance.Verification.ReceiptVerifier.verifyEnvelopeJson receiptJson publicKey allowUnsigned with
+                | Ok digest ->
+                    printfn $"Receipt canonical digest valid: {digest}"
+                    0
+                | Error error ->
+                    eprintfn $"Receipt invalid: {error}"
+                    1
+            with ex ->
+                eprintfn $"Verifier failure: {ex.Message}"
+                3
+        elif results.Contains(Replay) then
+            let replayArgs : ParseResults<ReplayArguments> = results.GetResult(Replay)
+            let receiptPath = replayArgs.GetResult(ReplayArguments.Receipt)
+            let inputPath = replayArgs.GetResult(Input)
+            let outputPath = replayArgs.GetResult(ReplayArguments.Output)
+            try
+                let originalJson = System.IO.File.ReadAllText(receiptPath)
+                match ReceiptVerifier.verifyCanonicalJson originalJson with
+                | Error error ->
+                    eprintfn $"Replay rejected noncanonical receipt: {error}"
+                    1
+                | Ok _ ->
+                    use document = System.Text.Json.JsonDocument.Parse(originalJson)
+                    let expectedIdentity = document.RootElement.GetProperty("replayIdentity").GetString()
+                    let manifestPath = System.IO.Path.Combine(inputPath, "canonflow-evaluation.json")
+                    match CanonFlow.Evaluator.Pipeline.evaluate manifestPath with
+                    | Error error ->
+                        eprintfn $"Replay evaluation failed: {error}"
+                        3
+                    | Ok replay when replay.Receipt.ReplayIdentity <> expectedIdentity ->
+                        eprintfn "Replay identity mismatch."
+                        1
+                    | Ok replay ->
+                        System.IO.Directory.CreateDirectory(outputPath) |> ignore
+                        System.IO.File.WriteAllText(
+                            System.IO.Path.Combine(outputPath, "assessment.cff"),
+                            replay.CanonicalReceipt)
+                        let replayView =
+                            System.Text.Json.JsonSerializer.Serialize(
+                                {|
+                                    matched = true
+                                    replayIdentity = replay.Receipt.ReplayIdentity
+                                    assessmentVerdict = ReceiptText.verdict replay.Receipt.Verdict
+                                |},
+                                System.Text.Json.JsonSerializerOptions(WriteIndented = true))
+                        System.IO.File.WriteAllText(
+                            System.IO.Path.Combine(outputPath, "REPLAY.json"),
+                            replayView)
+                        0
+            with ex ->
+                eprintfn $"Replay failure: {ex.Message}"
+                3
+        elif results.Contains(Self_Test) then
+            let selfTestArgs : ParseResults<SelfTestArguments> = results.GetResult(Self_Test)
+            let outputPath = selfTestArgs.GetResult(SelfTestArguments.Output)
+            try
+                let checks = [
+                    "sha256-abc", Hash.computeSha256 "abc" = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+                    "empty-assessment", Assessment.summarize EvidenceHealth.Complete [] = Verdict.Inconclusive
+                    "canonical-json", ReceiptVerifier.verifyCanonicalJson """{"a":1,"b":1}""" |> Result.isOk
+                    "duplicate-json-rejected", ReceiptVerifier.verifyCanonicalJson """{"a":1,"a":1}""" |> Result.isError
+                ]
+                let passed = checks |> List.forall snd
+                let payload =
+                    checks
+                    |> List.map (fun (name, success) -> {| name = name; passed = success |})
+                    |> fun entries ->
+                        System.Text.Json.JsonSerializer.Serialize(
+                            {| schemaVersion = "1.0"; passed = passed; checks = entries |},
+                            System.Text.Json.JsonSerializerOptions(WriteIndented = true))
+                let parent = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(outputPath))
+                System.IO.Directory.CreateDirectory(parent) |> ignore
+                System.IO.File.WriteAllText(outputPath, payload)
+                if passed then 0 else 3
+            with ex ->
+                eprintfn $"Self-test failure: {ex.Message}"
+                3
+        elif results.Contains(Version) then
+            let versionArgs : ParseResults<VersionArguments> = results.GetResult(Version)
+            if versionArgs.Contains(Json) then
+                let payload =
+                    System.Text.Json.JsonSerializer.Serialize(
+                        {|
+                            evaluator = "0.1.0-alpha"
+                            runtime = Environment.Version.ToString()
+                            framework = Runtime.InteropServices.RuntimeInformation.FrameworkDescription
+                        |})
+                printfn "%s" payload
+            else
+                printfn "CanonFlow Evaluator 0.1.0-alpha (.NET %O)" Environment.Version
+            0
         elif results.Contains(Pg) then
             let connStr = results.GetResult(Pg)
             printfn "[Stage 1: Parse] Introspecting Postgres Schema..."

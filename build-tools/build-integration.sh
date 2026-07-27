@@ -1,18 +1,36 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-ROOT_DIR="$DIR/../.."
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+workspace_root="$(cd "$script_dir/../.." && pwd)"
+canonflow_root="${CANONFLOW_ROOT:-$workspace_root/CanonFlow}"
+ondcflow_root="${ONDCFLOW_ROOT:-$workspace_root/ONDCFlow}"
 
-echo "=== 1. Building and Packing CanonFlow.Assurance ==="
-cd "$ROOT_DIR/CanonFlow"
-dotnet restore --locked-mode
-dotnet pack src/CanonFlow.Assurance/CanonFlow.Assurance.fsproj -c Release -o "$ROOT_DIR/ONDCFlow/local-feed"
+test -f "$canonflow_root/CanonFlow.slnx" || {
+    echo "CanonFlow checkout not found at $canonflow_root." >&2
+    exit 1
+}
+test -f "$ondcflow_root/ONDCFlow.slnx" || {
+    echo "ONDCFlow checkout not found at $ondcflow_root." >&2
+    exit 1
+}
+test "$(dotnet --version)" = "10.0.301" || {
+    echo "The integration gate requires exactly .NET SDK 10.0.301." >&2
+    exit 1
+}
 
-echo "=== 2. Building ONDCFlow ==="
-cd "$ROOT_DIR/ONDCFlow"
-dotnet restore --locked-mode
-dotnet build -c Release --no-restore
-dotnet test -c Release --no-build
+(
+    cd "$ondcflow_root"
+    dotnet restore ONDCFlow.slnx --locked-mode
+    dotnet build ONDCFlow.slnx -c Release --no-restore
+    dotnet test ONDCFlow.slnx -c Release --no-build --no-restore
+)
 
-echo "Integration verified!"
+(
+    cd "$canonflow_root"
+    dotnet restore CanonFlow.slnx --locked-mode
+    dotnet build CanonFlow.slnx -c Release --no-restore
+    dotnet test CanonFlow.slnx -c Release --no-build --no-restore
+)
+
+printf 'Cross-repository locked integration passed.\n'

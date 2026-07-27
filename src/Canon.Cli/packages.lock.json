@@ -26,6 +26,14 @@
           "FSharp.Core": "4.7.1"
         }
       },
+      "FSharp.SystemTextJson": {
+        "type": "Transitive",
+        "resolved": "1.4.36",
+        "contentHash": "1xLk0SBF1nedD74B77rcArjD2d+DeZwbNI7BVCAyKwIBERo1VoX8Mf4AtX0OV2L3ZeM/XS1b6BuhXCyoh0KBnw==",
+        "dependencies": {
+          "FSharp.Core": "4.7.0"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
         "resolved": "8.0.2",
@@ -108,16 +116,18 @@
       "canonflow.evaluator": {
         "type": "Project",
         "dependencies": {
-          "CanonFlow.Assurance": "[0.1.0-alpha, )",
+          "CanonFlow.Assurance": "[0.1.4-alpha, )",
           "FSharp.Core": "[9.0.300, )",
           "FsToolkit.ErrorHandling": "[5.2.0, )",
+          "ONDCFlow.Core": "[0.1.3-alpha, )",
+          "ONDCFlow.Profile.Retail": "[0.1.3-alpha, )",
           "Thoth.Json.Net": "[12.0.0, )"
         }
       },
       "canonflow.reports": {
         "type": "Project",
         "dependencies": {
-          "CanonFlow.Assurance": "[0.1.0-alpha, )",
+          "CanonFlow.Assurance": "[0.1.4-alpha, )",
           "FSharp.Core": "[9.0.300, )",
           "Thoth.Json.Net": "[12.0.0, )"
         }
@@ -162,6 +172,28 @@
         "contentHash": "hCbO8box7i/XXiTFqCJ3GoowyLqx3JXxyrbOJ6om7dr+eAknvBNhhUHeJVGAQo44sySZTfdVffp4BrtPeLZOAA==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "8.0.2"
+        }
+      },
+      "ONDCFlow.Core": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.3-alpha, )",
+        "resolved": "0.1.3-alpha",
+        "contentHash": "ZES1LRYoRZgyWZdEH4FXWUMzfqpDVfqTyNK9S50ycazGLc9wUQv3joDQ2k+/Em7kqrzFyDfX7hRSdCDQD1A9CA==",
+        "dependencies": {
+          "CanonFlow.Assurance": "0.1.4-alpha",
+          "FSharp.Core": "9.0.300",
+          "FSharp.SystemTextJson": "1.4.36",
+          "FSharp.UMX": "1.1.0"
+        }
+      },
+      "ONDCFlow.Profile.Retail": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.3-alpha, )",
+        "resolved": "0.1.3-alpha",
+        "contentHash": "53yzrC2XFshruKotfoE6QjV0IpXD+J9liyr3b4osB3CRKDivonbQ6fGTuSs7tEbJMc6hkDFV/nIdVGnbsASmGQ==",
+        "dependencies": {
+          "FSharp.Core": "9.0.300",
+          "ONDCFlow.Core": "0.1.3-alpha"
         }
       },
       "Thoth.Json.Net": {

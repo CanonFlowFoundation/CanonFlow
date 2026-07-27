@@ -1,0 +1,61 @@
+name: Evaluator M0-M8 Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CanonFlow
+        uses: actions/checkout@v4
+        with:
+          path: CanonFlow
+
+      - name: Checkout ONDCFlow
+        uses: actions/checkout@v4
+        with:
+          repository: CanonFlowFoundation/Ondcflow
+          path: ONDCFlow
+
+      - name: Install exact .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.301
+
+      - name: Cross-repository locked build and tests
+        working-directory: CanonFlow
+        run: build-tools/build-integration.sh
+
+      - name: Build pinned evaluator image
+        working-directory: CanonFlow
+        run: docker build --pull=false --tag canonflow-evaluator:0.1.0-alpha .
+
+      - name: Run hardened four-verdict and FsAssay gates
+        working-directory: CanonFlow
+        run: build-tools/test-container-hardening.sh
+
+      - name: Install pinned supply-chain tools
+        working-directory: CanonFlow
+        run: build-tools/install-supply-chain-tools.sh "$RUNNER_TEMP/canonflow-tools"
+
+      - name: Build and verify signed air-gap bundle
+        working-directory: CanonFlow
+        env:
+          COSIGN_PASSWORD: ci-ephemeral-key
+          IMAGE_NAME: canonflow-evaluator:0.1.0-alpha
+          VERSION: 0.1.0-alpha
+        run: |
+          export PATH="$RUNNER_TEMP/canonflow-tools:$PATH"
+          cosign generate-key-pair --output-key-prefix "$RUNNER_TEMP/ci-release"
+          export COSIGN_KEY="$RUNNER_TEMP/ci-release.key"
+          export BUNDLE_DIR="$RUNNER_TEMP/canonflow-evaluator-airgap-ci"
+          ./build-airgap.sh
+          "$BUNDLE_DIR/verify-airgap.sh"

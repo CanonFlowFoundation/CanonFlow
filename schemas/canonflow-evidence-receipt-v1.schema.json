@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonflow.dev/schemas/canonflow-evidence-receipt-v1.json",
+  "title": "CanonFlow Evidence Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "receiptType", "replayIdentity", "subject", "evaluator", "context", "assessments", "verdict", "seal"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "receiptType": { "const": "CanonFlowEvidenceReceipt" },
+    "replayIdentity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "schema", "sourceDirectories", "manifestDigest", "artifacts"],
+      "properties": {
+        "root": { "type": "string" },
+        "schema": { "type": "string" },
+        "sourceDirectories": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "manifestDigest": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "digest"],
+            "properties": {
+              "path": { "type": "string" },
+              "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engineId", "engineVersion"],
+      "properties": {
+        "engineId": { "type": "string" },
+        "engineVersion": { "type": "string" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instant", "timeProvenance", "locale", "networkPolicy"],
+      "properties": {
+        "instant": { "type": "string" },
+        "timeProvenance": { "type": "string" },
+        "locale": { "type": "string" },
+        "networkPolicy": { "type": "string" }
+      }
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["componentId", "componentVersion", "health", "compliance", "applicableRules", "evaluatedRules", "evidence"],
+        "properties": {
+          "componentId": { "type": "string" },
+          "componentVersion": { "type": "string" },
+          "health": { "enum": ["Complete", "Partial", "Broken"] },
+          "compliance": { "enum": ["Conformant", "NonConformant", "NotEstablished"] },
+          "applicableRules": { "type": "integer", "minimum": 0 },
+          "evaluatedRules": { "type": "integer", "minimum": 0 },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "kind", "value", "provenance"],
+              "properties": {
+                "path": { "type": "string" },
+                "kind": { "type": "string" },
+                "value": { "type": ["string", "null"] },
+                "provenance": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "verdict": { "enum": ["Pass", "Inconclusive", "Fail", "ToolFailure"] },
+    "seal": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "algorithm", "keyId", "signature"],
+          "properties": {
+            "status": { "enum": ["Signed", "Unsigned"] },
+            "algorithm": { "enum": ["Ed25519", null] },
+            "keyId": { "type": ["string", "null"] },
+            "signature": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    }
+  }
+}

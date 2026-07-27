@@ -14,7 +14,9 @@
     <Compile Include="Budgets.fs" />
     <Compile Include="ComponentRunner.fs" />
     <Compile Include="FsAssayRunner.fs" />
+    <Compile Include="OndcRunner.fs" />
     <Compile Include="Policy.fs" />
+    <Compile Include="Pipeline.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +26,8 @@
   <ItemGroup>
     <PackageReference Include="Thoth.Json.Net" />
     <PackageReference Include="FsToolkit.ErrorHandling" />
+    <PackageReference Include="ONDCFlow.Core" />
+    <PackageReference Include="ONDCFlow.Profile.Retail" />
   </ItemGroup>
 
 </Project>

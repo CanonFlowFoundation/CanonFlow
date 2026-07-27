@@ -1,0 +1,17 @@
+{
+  "id": "fsassay-production-v1",
+  "tool": "FsAssay.Cli",
+  "tool_version": "1.0.1",
+  "domain_profile": "core",
+  "outputs": [
+    "json",
+    "sarif"
+  ],
+  "policy": {
+    "violation_exit_code": 1,
+    "tool_failure_exit_code": 64,
+    "violation_verdict": "Fail",
+    "tool_failure_verdict": "ToolFailure",
+    "negative_sentinel": "FSA-C02"
+  }
+}

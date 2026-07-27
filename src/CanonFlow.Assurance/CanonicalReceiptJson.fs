@@ -2,6 +2,7 @@ namespace CanonFlow.Assurance
 
 open System
 open System.Text
+open System.Globalization
 
 type CanonicalJson =
     | JString of string
@@ -13,7 +14,7 @@ type CanonicalJson =
 
 module CanonicalReceiptJson =
     
-    // RFC 8785 ง3.2.2.2 minimal string escaping
+    // RFC 8785 ยง3.2.2.2 minimal string escaping
     let private escapeString (s: string) =
         let sb = StringBuilder()
         sb.Append('"') |> ignore
@@ -32,7 +33,7 @@ module CanonicalReceiptJson =
         sb.Append('"') |> ignore
         sb.ToString()
 
-    // RFC 8785 ง3.2.3 requires sorting by UTF-16 code units.
+    // RFC 8785 ยง3.2.3 requires sorting by UTF-16 code units.
     // In .NET, String.CompareOrdinal performs a UTF-16 code unit comparison.
     let private sortKeysExplicit (props: (string * CanonicalJson) list) =
         let arr = props |> List.toArray
@@ -44,7 +45,7 @@ module CanonicalReceiptJson =
         | JNull -> "null"
         | JBool true -> "true"
         | JBool false -> "false"
-        | JNumber n -> n.ToString()
+        | JNumber n -> n.ToString(CultureInfo.InvariantCulture)
         | JString s -> escapeString s
         | JArray items ->
             let inner = items |> List.map serialize |> String.concat ","
@@ -62,6 +63,14 @@ module CanonicalReceiptJson =
             "root", JString s.Root
             "schema", JString s.Schema
             "sourceDirectories", JArray (s.SourceDirectories |> List.map JString)
+            "manifestDigest", (s.ManifestDigest |> Option.map JString |> Option.defaultValue JNull)
+            "artifacts", JArray (
+                s.Artifacts
+                |> List.map (fun artifact ->
+                    JObject [
+                        "path", JString artifact.Path
+                        "digest", JString artifact.Digest
+                    ]))
         ]
 
     let encodeEvaluator (e: EvaluatorRecord) =
@@ -90,8 +99,8 @@ module CanonicalReceiptJson =
         JObject [
             "componentId", JString a.ComponentId
             "componentVersion", JString a.ComponentVersion
-            "health", JString a.Health
-            "compliance", JString a.Compliance
+            "health", JString (ReceiptText.health a.Health)
+            "compliance", JString (ReceiptText.compliance a.Compliance)
             "applicableRules", JNumber a.ApplicableRules
             "evaluatedRules", JNumber a.EvaluatedRules
             "evidence", JArray (a.Evidence |> List.map encodeEvidenceRef)
@@ -101,13 +110,38 @@ module CanonicalReceiptJson =
         JObject [
             "schemaVersion", JString r.SchemaVersion
             "receiptType", JString r.ReceiptType
+            "replayIdentity", JString r.ReplayIdentity
             "subject", encodeSubject r.Subject
             "evaluator", encodeEvaluator r.Evaluator
             "context", encodeContext r.Context
             "assessments", JArray (r.Assessments |> List.map encodeAssessment)
-            "verdict", JString r.Verdict
+            "verdict", JString (ReceiptText.verdict r.Verdict)
         ]
 
     let serializeReceipt (env: CanonFlowEvidenceReceipt) =
         serialize (encodeReceipt env)
+
+    let private encodeSeal seal =
+        JObject [
+            "status", JString (match seal.Status with | SealStatus.Signed -> "Signed" | SealStatus.Unsigned -> "Unsigned")
+            "algorithm", (match seal.Algorithm with | Some SealAlgorithm.Ed25519 -> JString "Ed25519" | None -> JNull)
+            "keyId", (match seal.KeyId with | Some value -> JString value | None -> JNull)
+            "signature", (match seal.Signature with | Some value -> JString value | None -> JNull)
+        ]
+
+    let encodeEnvelope receipt =
+        match encodeReceipt receipt with
+        | JObject properties ->
+            JObject (("seal", receipt.Seal |> Option.map encodeSeal |> Option.defaultValue JNull) :: properties)
+        | _ -> invalidOp "Receipt encoding must produce an object."
+
+    let serializeEnvelope receipt =
+        receipt |> encodeEnvelope |> serialize
+
+    let serializeSigningPayload receipt =
+        let sealWithoutSignature =
+            receipt.Seal
+            |> Option.map (fun seal -> { seal with Signature = None })
+        { receipt with Seal = sealWithoutSignature }
+        |> serializeEnvelope
 

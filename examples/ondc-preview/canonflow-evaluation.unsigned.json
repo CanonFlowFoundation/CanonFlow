@@ -1,0 +1,14 @@
+{
+  "$schema": "https://canonflow.dev/schemas/evaluation-manifest-v1.json",
+  "subject": {
+    "root": ".",
+    "artifacts": ["evidence-bundle.json"]
+  },
+  "evaluationContext": {
+    "instant": "2026-07-27T10:30:00Z",
+    "timeProvenance": "Declared",
+    "network": "Forbidden",
+    "locale": "invariant"
+  },
+  "profiles": ["ondc-retail-1.2.0-preview"]
+}

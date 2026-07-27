@@ -11,8 +11,8 @@ type SealStatus =
     | Unsigned
 
 type ReceiptSeal = {
-    Status: string
-    Algorithm: string option
+    Status: SealStatus
+    Algorithm: SealAlgorithm option
     KeyId: string option
     Signature: string option
 }
@@ -20,14 +20,14 @@ type ReceiptSeal = {
 module Seal =
     
     let createUnsigned () =
-        { Status = "Unsigned"
+        { Status = SealStatus.Unsigned
           Algorithm = None
           KeyId = None
           Signature = None }
 
     let createSigned keyId signatureBase64 =
-        { Status = "Signed"
-          Algorithm = Some "Ed25519"
+        { Status = SealStatus.Signed
+          Algorithm = Some SealAlgorithm.Ed25519
           KeyId = Some keyId
           Signature = Some signatureBase64 }
 

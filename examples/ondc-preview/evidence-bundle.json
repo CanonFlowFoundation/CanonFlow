@@ -1,0 +1,101 @@
+{
+  "source_lock": {
+    "digest": "sha256:06f777b4a3ad5716a3e05dd33c3d1b38909b91987f956e16cf50a0e5ed87d8bd",
+    "protocol": "ONDC",
+    "protocol_version": "1.2.0"
+  },
+  "traces": [
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "search",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000001",
+        "timestamp": "2026-07-27T10:00:00Z"
+      },
+      "message": { "intent": {} }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "on_search",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000002",
+        "timestamp": "2026-07-27T10:00:01Z"
+      },
+      "message": { "catalog": {} }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "select",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000003",
+        "timestamp": "2026-07-27T10:00:02Z"
+      },
+      "message": { "order": { "items": [] } }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "on_select",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000004",
+        "timestamp": "2026-07-27T10:00:03Z"
+      },
+      "message": { "order": { "quote": { "price": { "value": "150.00" } } } }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "init",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000005",
+        "timestamp": "2026-07-27T10:00:04Z"
+      },
+      "message": { "order": { "billing": {} } }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "on_init",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000006",
+        "timestamp": "2026-07-27T10:00:05Z"
+      },
+      "message": { "order": { "quote": { "price": { "value": "150.00" } } } }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "confirm",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000007",
+        "timestamp": "2026-07-27T10:00:06Z"
+      },
+      "message": {
+        "order": {
+          "id": "ORDER-12345",
+          "state": "Created",
+          "quote": { "price": { "value": "150.00" } }
+        }
+      }
+    },
+    {
+      "context": {
+        "domain": "nic2004:52110",
+        "action": "on_confirm",
+        "transaction_id": "a9aaecca-10b7-4d19-b640-b047a7c62195",
+        "message_id": "00000000-0000-0000-0000-000000000008",
+        "timestamp": "2026-07-27T10:00:07Z"
+      },
+      "message": {
+        "order": {
+          "id": "ORDER-12345",
+          "state": "Accepted",
+          "quote": { "price": { "value": "150.00" } }
+        }
+      }
+    }
+  ]
+}

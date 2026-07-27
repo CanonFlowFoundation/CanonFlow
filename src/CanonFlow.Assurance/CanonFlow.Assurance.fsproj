@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>CanonFlow.Assurance</PackageId>
-    <Version>0.1.0-alpha</Version>
+    <Version>0.1.4-alpha</Version>
     <Authors>CanonFlow Foundation</Authors>
     <Description>Deterministic Semantic Infrastructure Core</Description>
     <RepositoryUrl>https://github.com/CanonFlowFoundation/CanonFlow</RepositoryUrl>
@@ -21,8 +21,9 @@
     <Compile Include="Seal.fs" />
     <Compile Include="Receipt.fs" />
     <Compile Include="Ed25519Verify.fs" />
-    <Compile Include="Verification.fs" />
+    <Compile Include="Ed25519Sign.fs" />
     <Compile Include="CanonicalReceiptJson.fs" />
+    <Compile Include="Verification.fs" />
   </ItemGroup>
 
   <ItemGroup>

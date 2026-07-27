@@ -1,6 +1,6 @@
 <Project>
   <Target Name="CanonFlowAssay" BeforeTargets="CoreCompile">
-    <Exec Command="dotnet fsi &quot;$(MSBuildThisFileDirectory)build-tools\fsassay.fsx&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
+    <Exec Command="dotnet fsi &quot;$(MSBuildThisFileDirectory)build-tools/fsassay.fsx&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
     <!-- Run fsharplint as well. Note that we only run this on our own projects, not injected downstream, unless specified. -->
     
   </Target>

@@ -1,0 +1,9 @@
+**/.git
+**/bin
+**/obj
+**/node_modules
+**/TestResults
+src/Canon.Mcp
+src/CanonFlow.Viewer
+tests
+canonflow-evaluator-airgap-*

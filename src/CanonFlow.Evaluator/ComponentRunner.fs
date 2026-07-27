@@ -20,48 +20,62 @@ module ComponentRunner =
         | 2 -> Verdict.Inconclusive
         | _ -> Verdict.ToolFailure
 
-    let runComponentAsync (executablePath: string) (args: string) (budget: EvaluationBudget) =
+    let runComponentAsync (executablePath: string) (args: string list) (budget: EvaluationBudget) =
         async {
             let stopwatch = Stopwatch.StartNew()
-            
-            use process_ = new Process()
-            process_.StartInfo.FileName <- executablePath
-            process_.StartInfo.Arguments <- args
-            process_.StartInfo.UseShellExecute <- false
-            process_.StartInfo.RedirectStandardOutput <- true
-            process_.StartInfo.RedirectStandardError <- true
-            process_.StartInfo.CreateNoWindow <- true
+            try
+                use process_ = new Process()
+                process_.StartInfo.FileName <- executablePath
+                args |> List.iter process_.StartInfo.ArgumentList.Add
+                process_.StartInfo.UseShellExecute <- false
+                process_.StartInfo.RedirectStandardOutput <- true
+                process_.StartInfo.RedirectStandardError <- true
+                process_.StartInfo.CreateNoWindow <- true
 
-            let! started = process_.Start() |> ignore; async.Return(true)
-            
-            let outputTask = process_.StandardOutput.ReadToEndAsync()
-            let errorTask = process_.StandardError.ReadToEndAsync()
+                if not (process_.Start()) then
+                    stopwatch.Stop()
+                    return {
+                        ExitCode = 3
+                        Output = ""
+                        Error = $"Component process did not start: {executablePath}"
+                        ExecutionTimeMs = stopwatch.ElapsedMilliseconds
+                    }
+                else
+                    let outputTask = process_.StandardOutput.ReadToEndAsync()
+                    let errorTask = process_.StandardError.ReadToEndAsync()
+                    let! isCompleted =
+                        Async.AwaitTask(
+                            System.Threading.Tasks.Task.Run(fun () ->
+                                process_.WaitForExit(budget.ComponentTimeoutSeconds * 1000)
+                            )
+                        )
 
-            let! isCompleted = 
-                Async.AwaitTask(
-                    System.Threading.Tasks.Task.Run(fun () -> 
-                        process_.WaitForExit(budget.ComponentTimeoutSeconds * 1000)
-                    )
-                )
+                    stopwatch.Stop()
 
-            stopwatch.Stop()
+                    if not isCompleted then
+                        process_.Kill()
+                        return {
+                            ExitCode = 3
+                            Output = ""
+                            Error = "Process exceeded timeout budget"
+                            ExecutionTimeMs = stopwatch.ElapsedMilliseconds
+                        }
+                    else
+                        let! output = outputTask |> Async.AwaitTask
+                        let! error = errorTask |> Async.AwaitTask
 
-            if not isCompleted then
-                process_.Kill()
+                        return {
+                            ExitCode = process_.ExitCode
+                            Output = output
+                            Error = error
+                            ExecutionTimeMs = stopwatch.ElapsedMilliseconds
+                        }
+            with ex ->
+                stopwatch.Stop()
                 return {
-                    ExitCode = 3 // ToolFailure due to timeout
+                    ExitCode = 3
                     Output = ""
-                    Error = "Process exceeded timeout budget"
-                    ExecutionTimeMs = stopwatch.ElapsedMilliseconds
-                }
-            else
-                let! output = outputTask |> Async.AwaitTask
-                let! error = errorTask |> Async.AwaitTask
-                
-                return {
-                    ExitCode = process_.ExitCode
-                    Output = output
-                    Error = error
+                    Error = $"Component execution failed: {ex.Message}"
                     ExecutionTimeMs = stopwatch.ElapsedMilliseconds
                 }
         }

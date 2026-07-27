@@ -1,0 +1,14 @@
+{
+  "$schema": "https://canonflow.dev/schemas/evaluation-manifest-v1.json",
+  "subject": {
+    "root": ".",
+    "artifacts": ["schema.sql"]
+  },
+  "evaluationContext": {
+    "instant": "2026-07-27T10:30:00Z",
+    "timeProvenance": "Declared",
+    "network": "Forbidden",
+    "locale": "invariant"
+  },
+  "profiles": ["profile-not-installed"]
+}
