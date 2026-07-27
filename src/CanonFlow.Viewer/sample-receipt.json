@@ -1,0 +1,48 @@
+{
+  "SchemaVersion": "1.0",
+  "ReceiptType": "Assessment",
+  "Subject": {
+    "Hash": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+  },
+  "Evaluator": {
+    "Id": "CanonFlow.Evaluator",
+    "Version": "1.0.0"
+  },
+  "Context": {
+    "Instant": "2026-07-27T10:00:00Z",
+    "Hash": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
+  },
+  "Assessments": [
+    {
+      "ComponentId": "BAP Node",
+      "ComponentVersion": "v2.1.0",
+      "Health": "Healthy",
+      "Compliance": "Pass",
+      "ApplicableRules": 42,
+      "EvaluatedRules": 42
+    },
+    {
+      "ComponentId": "BPP Node",
+      "ComponentVersion": "v1.9.4",
+      "Health": "Healthy",
+      "Compliance": "Pass",
+      "ApplicableRules": 18,
+      "EvaluatedRules": 18
+    },
+    {
+      "ComponentId": "Registry Sidecar",
+      "ComponentVersion": "v1.0.0",
+      "Health": "Healthy",
+      "Compliance": "Pass",
+      "ApplicableRules": 5,
+      "EvaluatedRules": 5
+    }
+  ],
+  "Verdict": "Pass",
+  "Seal": {
+    "Status": "Signed",
+    "Algorithm": "Ed25519",
+    "KeyId": "canon-key-1",
+    "Signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

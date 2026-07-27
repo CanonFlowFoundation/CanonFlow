@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CanonFlow Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header>
+      <h1>CanonFlow Viewer</h1>
+      <span class="version-badge">M11 Preview</span>
+    </header>
+
+    <main>
+      <!-- Drop Zone -->
+      <div id="drop-zone">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+        </svg>
+        <h2>Drag & Drop Receipt</h2>
+        <p>Drop a CanonFlow VERDICT.json or receipt.json here to view the assessment.</p>
+        <input type="file" id="file-input" accept=".json" />
+      </div>
+
+      <!-- Dashboard (Hidden by default) -->
+      <div id="dashboard">
+        <div class="dashboard-header">
+          <div class="meta-info" id="meta-info">
+            <!-- Populated by JS -->
+          </div>
+          <button class="btn-reset" id="btn-reset">Load Another</button>
+        </div>
+
+        <div class="verdict-banner" id="verdict-banner">
+          <div>
+            <h2 class="verdict-title">Overall Verdict</h2>
+            <p class="verdict-value" id="overall-verdict">-</p>
+          </div>
+        </div>
+
+        <div class="hashes-grid">
+          <div class="hash-card">
+            <div class="hash-label">Context Hash</div>
+            <div class="hash-value" id="hash-context">-</div>
+          </div>
+          <div class="hash-card">
+            <div class="hash-label">Subject Hash</div>
+            <div class="hash-value" id="hash-subject">-</div>
+          </div>
+          <div class="hash-card">
+            <div class="hash-label">Receipt Seal (Signature)</div>
+            <div class="hash-value" id="hash-seal" style="word-break: break-all; white-space: normal;">-</div>
+          </div>
+        </div>
+
+        <div class="assessments-section fade-in-up" style="animation-delay: 0.2s">
+          <h3>Component Assessments</h3>
+          <div class="assessments-list" id="assessments-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
