@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="FSharp.Core" Version="9.0.200" />
+    <PackageVersion Include="FSharp.Core" Version="9.0.300" />
     <PackageVersion Include="BouncyCastle.Cryptography" Version="2.6.2" />
     <PackageVersion Include="FSharp.UMX" Version="1.1.0" />
     <PackageVersion Include="FsToolkit.ErrorHandling" Version="5.2.0" />
@@ -15,10 +15,10 @@
     <PackageVersion Include="Npgsql" Version="9.0.2" />
     <PackageVersion Include="FParsec" Version="1.1.1" />
     <PackageVersion Include="Confluent.Kafka" Version="2.8.0" />
-    <PackageVersion Include="FsCodec.SystemTextJson" Version="3.0.1" />
+    <PackageVersion Include="FsCodec.SystemTextJson" Version="3.1.0" />
     <PackageVersion Include="pgsqlparser" Version="1.0.0" />
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
     <PackageVersion Include="xunit.extensibility.core" Version="2.9.3" />
-    <PackageVersion Include="Npgsql" Version="8.0.3" />
+    
   </ItemGroup>
 </Project>

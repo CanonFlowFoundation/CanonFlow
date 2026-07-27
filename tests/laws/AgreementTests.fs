@@ -21,6 +21,7 @@ let runInNode (jsCode: string) =
     psi.UseShellExecute <- false
     
     use p = Process.Start(psi)
+    if isNull p then failwith "Failed to start Node process" // FsAssay-Ignore
     p.WaitForExit()
     let out = p.StandardOutput.ReadToEnd().Trim()
     let err = p.StandardError.ReadToEnd().Trim()
