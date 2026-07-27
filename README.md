@@ -1,109 +1,91 @@
 # CanonFlow
 
-CanonFlow is not another application framework. It is a correctness framework.
+CanonFlow is a correctness framework rather than a traditional application framework. It is designed for software systems governed by strict business rules—such as tax calculations, banking rules, insurance claims, healthcare workflows, approvals, compliance mandates, or complex pricing. CanonFlow provides a mechanism to express these rules as executable, verifiable models, preventing the scattering of logic across thousands of lines of code.
 
-If your software has business rules that must be followed consistently—tax calculations, banking rules, insurance claims, healthcare workflows, approvals, compliance, or complex pricing—CanonFlow helps you express those rules as executable, verifiable models instead of scattering them across thousands of lines of code.
+## Ideal Use Cases
+- Business domains with complex, evolving rules.
+- Systems where incorrect decisions carry high costs (financial, legal, or reputational).
+- Applications requiring auditability and explainability for system decisions.
+- Distributed architectures where multiple systems must implement the same rules consistently.
+- Codebases with contributions from AI agents or multiple developers.
 
-## Use CanonFlow if...
-- Your business has complex rules that change over time.
-- Wrong decisions cost money, legal exposure, or customer trust.
-- You need to explain why a decision was made.
-- Multiple systems must implement the same rules consistently.
-- AI agents or multiple developers are contributing code.
-- Auditors or customers may ask, "Why did the system decide this?"
+## Non-Ideal Use Cases
+- Simple CRUD applications.
+- Systems with straightforward, static rules.
+- Personal websites, portfolios, or landing pages.
+- Prototypes where speed of delivery outweighs long-term correctness.
+- Projects where the overhead of formal rule modeling exceeds its benefits.
 
-## Don't use CanonFlow if...
-- You're building a simple CRUD application.
-- Your rules are straightforward and unlikely to change.
-- A personal website, blog, portfolio, or landing page is your project.
-- A prototype or weekend hack matters more than long-term correctness.
-- The overhead of modeling rules outweighs the benefit.
-
-## A simple example
-
-Imagine a shopping app.
+## Example Scenario: E-Commerce Application
 
 **Without CanonFlow:**
 ```javascript
 if (customer.IsPremium && total > 5000) { ... }
 ```
-The same rule appears in five services. Six months later, marketing changes it. One service is forgotten. Now customers get inconsistent discounts.
+A discount rule may be duplicated across multiple microservices. When marketing requirements change, updating all instances becomes error-prone, leading to inconsistent system behavior.
 
 **With CanonFlow:**
+A single `PremiumDiscountRule` serves as the verified source of truth. Every service queries CanonFlow, ensuring consistent evaluation across the entire architecture.
 
-`PremiumDiscountRule`
+## AI Agent Integration
 
-There is one source of truth. Every service asks CanonFlow. Everyone gets the same answer.
+When integrated with AI, CanonFlow provides a verified domain model rather than relying on the AI to memorize complex business logic. The AI agent leverages the CanonFlow model to make decisions, preventing it from inventing undocumented rules.
 
-## For AI
+## Trade-Offs
 
-Instead of telling an AI:
-*"Please remember all these business rules..."*
+Adopting CanonFlow requires an upfront investment in modeling the domain. In exchange, the system gains:
+- Consistency
+- Explainability
+- Reduced production bugs
+- Easier long-term maintenance
+- Greater confidence during rule modifications
 
-you give it:
-*"Use the CanonFlow model."*
+## Core Proposition
 
-The AI doesn't invent rules—it follows the verified model.
+CanonFlow is intended for applications where value is derived from accurate business decisions, rather than pure data storage. 
 
-## The honest trade-off
+## Alternatives and Positioning
 
-CanonFlow is not free. You spend more effort upfront modeling your domain. In return you gain:
-- consistency
-- explainability
-- fewer production bugs
-- easier maintenance
-- greater confidence when rules change
+CanonFlow occupies a distinct niche and can be compared to various tools based on the specific problem being solved:
 
-## The one-sentence pitch
-
-If your application's value comes from getting business decisions right—not just storing data—CanonFlow is worth considering. If your app is mostly CRUD, it probably isn't.
-
-## Alternatives to CanonFlow
-
-CanonFlow competes with different kinds of tools depending on the problem.
-
-| If you need... | Consider... | Compared to CanonFlow |
+| Requirement | Alternative | Comparison to CanonFlow |
 | --- | --- | --- |
-| Simple business rules | Hand-written domain logic | Lowest complexity, least structure |
-| Workflow orchestration | Temporal, Camunda, Dapr Workflow | Great for process orchestration, not business rule modeling |
-| Rule engines | Drools, NRules | Mature rule engines, but generally don't emphasize strongly typed F# domain modeling |
-| Decision modeling | Camunda DMN | Good for business analysts and decision tables |
-| Event sourcing | EventStoreDB, Marten | Solves history and state, not business rule correctness by itself |
-| Type-safe domain modeling | F# with Domain-Driven Design | Closest philosophy, but lacks CanonFlow's verification concepts |
+| Simple business rules | Hand-written domain logic | Lower complexity, but lacks formal structure and verification |
+| Workflow orchestration | Temporal, Camunda, Dapr Workflow | Excels at process orchestration, but not designed for business rule modeling |
+| Rule engines | Drools, NRules | Mature engines, but typically lack strongly typed F# domain modeling |
+| Decision modeling | Camunda DMN | Suitable for analysts and decision tables |
+| Event sourcing | EventStoreDB, Marten | Solves history and state, but does not guarantee business rule correctness |
+| Type-safe domain modeling | F# with Domain-Driven Design | Similar philosophy, but lacks CanonFlow's verification and projection concepts |
 
-CanonFlow isn't trying to replace your database, web framework, workflow engine, or message bus. It aims to become the authoritative model of business rules that those systems use.
+CanonFlow does not replace databases, web frameworks, workflow engines, or message buses. Instead, it serves as the authoritative model of business rules utilized by those systems.
 
-- **Small startup CRUD app:** Don't use CanonFlow yet. Keep it simple.
-- **Growing SaaS with many changing business rules:** Evaluate CanonFlow or a mature rule engine.
-- **Regulated domains (tax, finance, insurance, healthcare):** CanonFlow becomes much more compelling because correctness and traceability matter.
-- **Need to orchestrate long-running processes:** Use a workflow engine such as Temporal or Camunda, and potentially pair it with CanonFlow if you also need a verified rule model.
+- **Startups / Simple CRUD:** Hand-written logic is often sufficient.
+- **Growing SaaS (Dynamic Rules):** CanonFlow or a mature rule engine becomes necessary.
+- **Regulated Domains:** CanonFlow is highly compelling due to its correctness and traceability guarantees.
+- **Long-Running Processes:** Workflow engines (Temporal, Camunda) can be paired with CanonFlow for verified rule evaluation within orchestrated processes.
 
-Use the best tool for each concern. Let CanonFlow own business decision logic, while databases store data, workflow engines orchestrate processes, and web frameworks handle APIs.
+## The Current Landscape
 
-## The current landscape
+While several projects address parts of this problem space, there is no single drop-in alternative that offers CanonFlow's full feature set:
 
-I don't think there is one compelling drop-in alternative to CanonFlow. Instead, there are projects that overlap with parts of what you're building:
-
-| Project | What it does | Compared to CanonFlow |
+| Project | Focus | Comparison to CanonFlow |
 | --- | --- | --- |
-| PolicyFlow | AI workflow governance and policy-as-code for agent development. | Similar governance ideas, but focused on agent workflows rather than business domain modeling. |
-| CanonSys | Policy DSL for governing autonomous agents with evidence trails. | Strong overlap for agent authorization and auditing, but not a general business-rule engine. |
-| cascadeflow | Runtime policy enforcement for AI agents (cost, approvals, routing, compliance). | Runtime governance for AI, not domain or statutory modeling. |
-| FPF (First Principles Framework) | Pattern language for evidence, architecture, and engineering decisions. | Similar philosophy around evidence and disciplined engineering, but it's a framework of practices, not an executable domain model. |
+| PolicyFlow | AI workflow governance and policy-as-code | Focuses on agent workflows rather than business domain modeling |
+| CanonSys | Policy DSL for governing autonomous agents | Overlaps in agent auditing, but is not a general business-rule engine |
+| cascadeflow | Runtime policy enforcement for AI agents | Handles runtime governance for AI, not statutory or domain modeling |
+| FPF (First Principles Framework) | Pattern language for architecture | A framework of practices, not an executable domain model |
 
-We don't see an open-source project that combines all of these into one system:
+CanonFlow distinguishes itself by combining the following into a cohesive system:
 - Strongly typed domain model
 - Executable business rules
-- Rule provenance (where did this rule come from?)
+- Rule provenance (tracking rule origins)
 - Effective dates and supersession
-- Verification/proof concepts
-- AI-agent consumption
+- Verification and formal proofs
+- AI-agent consumption capabilities
 - Code generation
 - Domain-specific correctness
 
-That combination is what makes CanonFlow different.
-
-## CanonFlow vs ...
+## Competitors and Synergies
 
 *Detailed comparisons coming soon:*
 - CanonFlow vs Drools
@@ -113,9 +95,9 @@ That combination is what makes CanonFlow different.
 - CanonFlow vs DDD
 - CanonFlow vs Plain F#
 
-**Conclusion:** CanonFlow's biggest competitors are plain code (if/else, switch statements, services), Domain-Driven Design without a formal rule engine, DMN/rule engines for enterprises, and workflow engines that people mistakenly use to encode business rules.
+CanonFlow's primary competitors are plain code (if/else, switch statements, services), Domain-Driven Design without a formal rule engine, enterprise DMN/rule engines, and workflow engines incorrectly utilized for encoding business rules.
 
-Business rules are first-class assets, separate from workflows, APIs, and storage, and can be verified, evolved, and consumed by both humans and AI. This is where CanonFlow shines.
+CanonFlow treats business rules as first-class assets—separate from workflows, APIs, and storage—that can be verified, evolved, and consumed by both humans and AI.
 
 ---
 
