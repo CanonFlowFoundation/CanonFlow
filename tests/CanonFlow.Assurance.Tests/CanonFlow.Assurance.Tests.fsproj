@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="HashTests.fs" />
     <Compile Include="KernelTests.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
