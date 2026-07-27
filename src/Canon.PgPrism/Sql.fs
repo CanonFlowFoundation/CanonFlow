@@ -46,19 +46,21 @@ module Sql =
         let sb = StringBuilder()
         sb.AppendLine($"CREATE TABLE {def.Name} (") |> ignore
         
-        let mutable isFirst = true
-        for col in def.Columns do
-            if not isFirst then sb.AppendLine(",") |> ignore
-            isFirst <- false
+        let colDefs =
+            def.Columns |> List.map (fun col ->
+                let colSb = StringBuilder()
+                colSb.Append($"    {col.Name} {typeToSql col.Type}") |> ignore
+                if col.NotNull then colSb.Append(" NOT NULL") |> ignore
+                if col.PrimaryKey then colSb.Append(" PRIMARY KEY") |> ignore
+                match col.Default with
+                | Some d -> colSb.Append($" DEFAULT {d}") |> ignore
+                | None -> ()
+                if col.Unique then colSb.Append(" UNIQUE") |> ignore
+                colSb.ToString()
+            )
             
-            sb.Append($"    {col.Name} {typeToSql col.Type}") |> ignore
-            if col.NotNull then sb.Append(" NOT NULL") |> ignore
-            if col.PrimaryKey then sb.Append(" PRIMARY KEY") |> ignore
-            match col.Default with
-            | Some d -> sb.Append($" DEFAULT {d}") |> ignore
-            | None -> ()
-            if col.Unique then sb.Append(" UNIQUE") |> ignore
-            
+        sb.Append(String.concat ",\n" colDefs) |> ignore
+        
         for c in def.Constraints do
             sb.AppendLine(",") |> ignore
             sb.Append($"    CONSTRAINT {c.Name} CHECK ({emitConstraint c.Expr})") |> ignore

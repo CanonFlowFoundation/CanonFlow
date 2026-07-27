@@ -5,18 +5,17 @@ open Canon.Introspect
 open Canon.Core
 
 /// The abstract universal Conformance Suite base class.
-/// Third-party developers inherit from this and supply their IConformanceFixture.
+/// Third-party developers inherit from this and supply their ConformanceFixture.
 [<AbstractClass>]
-type ConformanceTests(fixture: IConformanceFixture) =
+type ConformanceTests(fixture: ConformanceFixture) =
     
-    let mutable tables = []
-
     // XUnit runs this constructor for every test, so we cache or fetch
-    do
+    let tables =
         fixture.SetupTestSchema()
         let provider = fixture.GetProvider()
-        tables <- provider.Harvest()
+        let t = provider.Harvest()
         fixture.Teardown()
+        t
 
     [<Fact>]
     member _.``Extracts Primary Keys Successfully`` () =

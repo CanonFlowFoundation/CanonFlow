@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="IEmitter.fs" />
+    <Compile Include="Emitter.fs" />
     <Compile Include="OkfEmitter.fs" />
     <Compile Include="PostgresEmitter.fs" />
     <Compile Include="OpenSearchEmitter.fs" />

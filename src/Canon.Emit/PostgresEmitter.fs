@@ -5,10 +5,9 @@ open Canon.Emit
 open Canon.Introspect
 
 /// Emits Postgres DDL (CREATE TABLE) from the domain schema.
-type PostgresEmitter() =
-    
-    interface IEmitter with
-        member this.Emit(tables: TableDef list) =
+module PostgresEmitter =
+    let createEmitter () : Emitter =
+        { Emit = fun (tables: TableDef list) ->
             let sb = Text.StringBuilder()
             
             for table in tables do
@@ -37,3 +36,4 @@ type PostgresEmitter() =
                 sb.AppendLine() |> ignore
                 
             [ sb.ToString(), Canon.Core.Fidelity.Exact ] // Return single DDL string for all tables, Postgres is exact to the TableDef
+        }

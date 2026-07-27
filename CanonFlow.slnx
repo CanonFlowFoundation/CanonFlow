@@ -4,7 +4,7 @@
     <Project Path="src/Canon.Conformance/Canon.Conformance.fsproj" />
     <Project Path="src/Canon.Contracts/Canon.Contracts.fsproj" />
     <Project Path="src/Canon.Core/Canon.Core.fsproj" />
-    <Project Path="src/Canon.Ddd/Canon.Ddd.fsproj" />
+
     <Project Path="src/Canon.Emit/Canon.Emit.fsproj" />
     <Project Path="src/Canon.Fable/Canon.Fable.fsproj" />
     <Project Path="src/Canon.Flow/Canon.Flow.fsproj" />

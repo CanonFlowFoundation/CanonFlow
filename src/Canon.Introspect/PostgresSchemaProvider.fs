@@ -9,10 +9,9 @@ open Npgsql
 
 
 
-/// Postgres implementation of the ISchemaProvider.
-type PostgresSchemaProvider(connectionString: string) =
-    interface ISchemaProvider with
-        member this.Harvest() =
+module PostgresSchemaProvider =
+    let createProvider (connectionString: string) : SchemaProvider =
+        { Harvest = fun () ->
             use conn = new NpgsqlConnection(connectionString)
             conn.Open()
             
@@ -139,5 +138,6 @@ type PostgresSchemaProvider(connectionString: string) =
                     TableConstraints = []
                 }
             )
+        }
 
 #endif

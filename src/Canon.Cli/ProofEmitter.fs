@@ -44,46 +44,47 @@ module ProofEmitter =
         add "This document certifies the semantic translation fidelity between the database truth and the generated frontend contracts (TypeScript / OpenAPI)."
         add ""
         
-        let mutable totalExact = 0
-        let mutable totalApproximate = 0
-        let mutable totalUnsupported = 0
-        
-        add "## Detailed Field Proofs"
-        
-        for t in tables do
-            add $"### Table: `{t.Schema}.{t.Name}`"
-            add ""
-            add "| Column | DB Bound (Truth) | TS Fidelity | OpenAPI Fidelity |"
-            add "|--------|------------------|-------------|------------------|"
-            
-            for c in t.Columns do
-                if not c.ParsedConstraints.IsEmpty then
-                    let dbAst = c.ParsedConstraints |> List.reduce (fun a b -> And(a, b))
-                    let dbStr = formatLattice (SemanticOptimizer.simplify dbAst)
-                    
-                    let tsCode, tsFid = Canon.Fable.Transpiler.emitValidator $"{t.Name}_{c.Name}" dbAst c.IsNullable None
-                    let _, openApiFid = OpenApiTranspiler.emitSchema $"{t.Name}_{c.Name}" dbAst
-                    
-                    let tsFidStr = 
-                        match tsFid with
-                        | Fidelity.Exact -> totalExact <- totalExact + 1; "✅ Exact"
-                        | Fidelity.Approximate r -> totalApproximate <- totalApproximate + 1; $"⚠️ Approx ({r})"
-                        | Fidelity.Conditional _ -> "⚠️ Conditional"
-                        | Fidelity.DatabaseOwned _ -> "✅ DB Owned"
-                        | Fidelity.Manual _ -> "⚠️ Manual"
-                        | Fidelity.Unsupported r -> totalUnsupported <- totalUnsupported + 1; $"❌ Unsupported"
-                        
-                    let openApiFidStr = 
-                        match openApiFid with
-                        | Fidelity.Exact -> totalExact <- totalExact + 1; "✅ Exact"
-                        | Fidelity.Approximate r -> totalApproximate <- totalApproximate + 1; $"⚠️ Approx ({r})"
-                        | Fidelity.Conditional _ -> "⚠️ Conditional"
-                        | Fidelity.DatabaseOwned _ -> "✅ DB Owned"
-                        | Fidelity.Manual _ -> "⚠️ Manual"
-                        | Fidelity.Unsupported r -> totalUnsupported <- totalUnsupported + 1; $"❌ Unsupported"
-                        
-                    add $"| `{c.Name}` | `{dbStr}` | {tsFidStr} | {openApiFidStr} |"
-            add ""
+        let (totalExact, totalApproximate, totalUnsupported) =
+            tables |> List.fold (fun (e, a, u) t ->
+                add $"### Table: `{t.Schema}.{t.Name}`"
+                add ""
+                add "| Column | DB Bound (Truth) | TS Fidelity | OpenAPI Fidelity |"
+                add "|--------|------------------|-------------|------------------|"
+                
+                let (te, ta, tu) =
+                    t.Columns |> List.fold (fun (ce, ca, cu) c ->
+                        if not c.ParsedConstraints.IsEmpty then
+                            let dbAst = c.ParsedConstraints |> List.reduce (fun x y -> And(x, y))
+                            let dbStr = formatLattice (SemanticOptimizer.simplify dbAst)
+                            
+                            let tsCode, tsFid = Canon.Fable.Transpiler.emitValidator $"{t.Name}_{c.Name}" dbAst c.IsNullable None
+                            let _, openApiFid = OpenApiTranspiler.emitSchema $"{t.Name}_{c.Name}" dbAst
+                            
+                            let (nce, nca, ncu, tsFidStr) = 
+                                match tsFid with
+                                | Fidelity.Exact -> (ce + 1, ca, cu, "✅ Exact")
+                                | Fidelity.Approximate r -> (ce, ca + 1, cu, $"⚠️ Approx ({r})")
+                                | Fidelity.Conditional _ -> (ce, ca, cu, "⚠️ Conditional")
+                                | Fidelity.DatabaseOwned _ -> (ce, ca, cu, "✅ DB Owned")
+                                | Fidelity.Manual _ -> (ce, ca, cu, "⚠️ Manual")
+                                | Fidelity.Unsupported r -> (ce, ca, cu + 1, $"❌ Unsupported")
+                                
+                            let (fce, fca, fcu, openApiFidStr) = 
+                                match openApiFid with
+                                | Fidelity.Exact -> (nce + 1, nca, ncu, "✅ Exact")
+                                | Fidelity.Approximate r -> (nce, nca + 1, ncu, $"⚠️ Approx ({r})")
+                                | Fidelity.Conditional _ -> (nce, nca, ncu, "⚠️ Conditional")
+                                | Fidelity.DatabaseOwned _ -> (nce, nca, ncu, "✅ DB Owned")
+                                | Fidelity.Manual _ -> (nce, nca, ncu, "⚠️ Manual")
+                                | Fidelity.Unsupported r -> (nce, nca, ncu + 1, $"❌ Unsupported")
+                                
+                            add $"| `{c.Name}` | `{dbStr}` | {tsFidStr} | {openApiFidStr} |"
+                            (fce, fca, fcu)
+                        else (ce, ca, cu)
+                    ) (e, a, u)
+                add ""
+                (te, ta, tu)
+            ) (0, 0, 0)
             
         add "## Metrics"
         add $"- **Exact Translations:** {totalExact}"

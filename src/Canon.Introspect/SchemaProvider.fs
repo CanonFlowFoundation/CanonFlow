@@ -60,6 +60,7 @@ type TableDef = {
 
 /// Abstraction for database drivers to provide their schema and constraints.
 /// SqlHydra will implement this for Postgres/DuckDB/SQLite.
-type ISchemaProvider =
+type SchemaProvider = {
     /// Harvests the schema from the live database.
-    abstract member Harvest: unit -> TableDef list
+    Harvest: unit -> TableDef list
+}

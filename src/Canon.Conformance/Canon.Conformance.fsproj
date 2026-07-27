@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="IConformanceFixture.fs" />
+    <Compile Include="ConformanceFixture.fs" />
     <Compile Include="ConformanceTests.fs" />
   </ItemGroup>
 

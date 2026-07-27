@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="ISchemaProvider.fs" />
+    <Compile Include="SchemaProvider.fs" />
     <Compile Include="SqlParser.fs" Condition="'$(FABLE_COMPILER)' != 'true'" />
     <Compile Include="PostgresSchemaProvider.fs" Condition="'$(FABLE_COMPILER)' != 'true'" />
     <Compile Include="SqlServerSchemaProvider.fs" Condition="'$(FABLE_COMPILER)' != 'true'" />

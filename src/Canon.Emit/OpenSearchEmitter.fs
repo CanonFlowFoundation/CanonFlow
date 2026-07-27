@@ -5,7 +5,7 @@ open Canon.Introspect
 
 /// Emits an OpenSearch/Elasticsearch index mapping derived from the domain schema.
 /// Converts typed fields into strict OpenSearch field types.
-type OpenSearchEmitter() =
+module OpenSearchEmitter =
     
     // Map standard data types to OpenSearch data types.
     let mapDataType (sqlType: string) =
@@ -17,8 +17,8 @@ type OpenSearchEmitter() =
         | "decimal" | "numeric" -> "double" // Simplified
         | _ -> "keyword" // Default to keyword for strictness (instead of text)
         
-    interface IEmitter with
-        member this.Emit(tables: TableDef list) =
+    let createEmitter () : Emitter =
+        { Emit = fun (tables: TableDef list) ->
             tables |> List.map (fun table ->
                 let props = 
                     table.Columns 
@@ -36,3 +36,4 @@ type OpenSearchEmitter() =
 }}"""
                 mapping, Canon.Core.Fidelity.Approximate (Canon.Core.Weaker "OpenSearch drops foreign keys, constraints, and defaults")
             )
+        }

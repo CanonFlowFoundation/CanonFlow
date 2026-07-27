@@ -33,7 +33,7 @@ type PostgresIntrospectionTests() =
             let! _ = cmd.ExecuteNonQueryAsync()
 
             // 3. Introspect
-            let provider = PostgresSchemaProvider(connStr) :> ISchemaProvider
+            let provider = PostgresSchemaProvider.createProvider(connStr)
             let tables = provider.Harvest()
 
             // 4. Assert against the Domain
@@ -76,7 +76,7 @@ type PostgresIntrospectionTests() =
             }
 
             // 2. Emit DDL
-            let emitter = Canon.Emit.Postgres.PostgresEmitter() :> Canon.Emit.IEmitter
+            let emitter = Canon.Emit.Postgres.PostgresEmitter.createEmitter()
             let ddlList = emitter.Emit([domainSchema])
             let ddl, _ = ddlList.Head
 
@@ -91,7 +91,7 @@ type PostgresIntrospectionTests() =
             let! _ = cmd.ExecuteNonQueryAsync()
 
             // 4. Introspect back
-            let provider = PostgresSchemaProvider(connStr) :> ISchemaProvider
+            let provider = PostgresSchemaProvider.createProvider(connStr)
             let harvestedTables = provider.Harvest()
             let harvestedProducts = harvestedTables |> List.find (fun t -> t.Name = "products")
 

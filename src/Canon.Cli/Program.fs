@@ -20,7 +20,7 @@ type CliArguments =
     | [<CliPrefix(CliPrefix.DoubleDash)>] RestApi
     | [<CliPrefix(CliPrefix.DoubleDash)>] FsCheck
     
-    interface IArgParserTemplate with
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
         member s.Usage =
             match s with
             | Pg _ -> "Introspect a Postgres database using the provided connection string."
@@ -49,7 +49,7 @@ module Program =
             printfn "[Stage 1: Parse] Introspecting Postgres Schema..."
             
             try
-                let provider = PostgresSchemaProvider(connStr) :> Canon.Introspect.ISchemaProvider
+                let provider = PostgresSchemaProvider.createProvider(connStr)
                 let tables = provider.Harvest()
                 
                 printfn "\n[Harvest Results]"
@@ -62,51 +62,63 @@ module Program =
                 // Emitting the Semantic Catalog and Contracts
                 if results.Contains(Diagnose) then
                     printfn "\n[Stage 2: Normalize] / [Stage 3: Optimize] Diagnostic Engine: Scanning for logical contradictions..."
-                    let mutable foundContradiction = false
-                    for t in tables do
-                        for c in t.Columns do
-                            if c.CheckConstraints.Length > 0 then
-                                let lattice = 
-                                    c.CheckConstraints 
-                                    |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
-                                    |> List.map Canon.Introspect.SqlParser.parseConstraint
-                                    |> List.reduce (fun a b -> Lattice.And(a, b))
-                                
-                                let simplified = Canon.Core.SemanticOptimizer.simplify lattice
-                                if simplified = Lattice.False then
-                                    let constraintsStr = String.Join(" AND ", c.CheckConstraints)
-                                    printfn $"[DIAGNOSTIC CONTRADICTION] Table: {t.Name}, Column: {c.Name} has contradictory constraints that collapse to False: {constraintsStr}"
-                                    foundContradiction <- true
+                    let foundContradiction =
+                        tables |> List.exists (fun t ->
+                            t.Columns |> List.exists (fun c ->
+                                if c.CheckConstraints.Length > 0 then
+                                    let lattice = 
+                                        c.CheckConstraints 
+                                        |> List.map (fun s -> if s.StartsWith("CHECK ") then s.Substring(6) else s)
+                                        |> List.map Canon.Introspect.SqlParser.parseConstraint
+                                        |> List.reduce (fun a b -> Lattice.And(a, b))
+                                    
+                                    let simplified = Canon.Core.SemanticOptimizer.simplify lattice
+                                    if simplified = Lattice.False then
+                                        let constraintsStr = String.Join(" AND ", c.CheckConstraints)
+                                        printfn $"[DIAGNOSTIC CONTRADICTION] Table: {t.Name}, Column: {c.Name} has contradictory constraints that collapse to False: {constraintsStr}"
+                                        true
+                                    else false
+                                else false
+                            )
+                        )
                     
                     if not foundContradiction then
                         printfn "No logical contradictions found in the schema."
 
-                    let mutable foundRedundancy = false
-                    for t in tables do
-                        for c in t.Columns do
-                            if c.CheckConstraints.Length > 1 then
-                                let parsed = 
-                                    c.CheckConstraints 
-                                    |> List.map (fun s -> s, if s.StartsWith("CHECK ") then s.Substring(6) else s)
-                                    |> List.map (fun (orig, s) -> orig, Canon.Introspect.SqlParser.parseConstraint s)
-                                    
-                                for i in 0 .. parsed.Length - 1 do
-                                    for j in i + 1 .. parsed.Length - 1 do
-                                        let s1_str, c1 = parsed.[i]
-                                        let s2_str, c2 = parsed.[j]
+                    let foundRedundancy = 
+                        tables |> List.exists (fun t ->
+                            t.Columns |> List.exists (fun c ->
+                                if c.CheckConstraints.Length > 1 then
+                                    let parsed = 
+                                        c.CheckConstraints 
+                                        |> List.map (fun s -> s, if s.StartsWith("CHECK ") then s.Substring(6) else s)
+                                        |> List.map (fun (orig, s) -> orig, Canon.Introspect.SqlParser.parseConstraint s)
+                                        
+                                    let pairs = 
+                                        [ for i in 0 .. parsed.Length - 1 do
+                                            for j in i + 1 .. parsed.Length - 1 do
+                                                yield (parsed.[i], parsed.[j]) ]
+                                                
+                                    pairs |> List.exists (fun ((s1_str, c1), (s2_str, c2)) ->
                                         let combined = Canon.Core.SemanticOptimizer.simplify (Lattice.And(c1, c2))
                                         if combined <> Lattice.False then
                                             let sim1 = Canon.Core.SemanticOptimizer.simplify c1
                                             let sim2 = Canon.Core.SemanticOptimizer.simplify c2
                                             if combined = sim1 && sim1 <> sim2 then
                                                 printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has redundant constraint '{s2_str}' which is subsumed by '{s1_str}'"
-                                                foundRedundancy <- true
+                                                true
                                             elif combined = sim2 && sim1 <> sim2 then
                                                 printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has redundant constraint '{s1_str}' which is subsumed by '{s2_str}'"
-                                                foundRedundancy <- true
+                                                true
                                             elif combined = sim1 && combined = sim2 then
                                                 printfn $"[DIAGNOSTIC REDUNDANCY] Table: {t.Name}, Column: {c.Name} has duplicate constraints '{s1_str}' and '{s2_str}'"
-                                                foundRedundancy <- true
+                                                true
+                                            else false
+                                        else false
+                                    )
+                                else false
+                            )
+                        )
                     
                     if not foundRedundancy then
                         printfn "No redundancies found in the schema."
@@ -261,7 +273,7 @@ module Program =
                 if results.Contains(MigrateTo) then
                     printfn "\n[Schema Migration Engine]"
                     let newConnStr = results.GetResult(MigrateTo)
-                    let newProvider = PostgresSchemaProvider(newConnStr) :> Canon.Introspect.ISchemaProvider
+                    let newProvider = PostgresSchemaProvider.createProvider(newConnStr)
                     let newTables = newProvider.Harvest()
                     
                     let migrationSql = Canon.Emit.MigrationEmitter.generateMigration tables newTables

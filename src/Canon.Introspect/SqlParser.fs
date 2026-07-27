@@ -96,12 +96,17 @@ module SqlParser =
         let rec stripOuter (s: string) =
             let trimmed = s.Trim()
             if trimmed.StartsWith("(") && trimmed.EndsWith(")") then
-                let mutable openCount = 0
-                let mutable isWrapped = true
-                for i = 0 to trimmed.Length - 2 do
-                    if trimmed.[i] = '(' then openCount <- openCount + 1
-                    elif trimmed.[i] = ')' then openCount <- openCount - 1
-                    if openCount = 0 then isWrapped <- false
+                let rec checkWrapped idx count =
+                    if idx >= trimmed.Length - 1 then true
+                    else
+                        let newCount =
+                            if trimmed.[idx] = '(' then count + 1
+                            elif trimmed.[idx] = ')' then count - 1
+                            else count
+                        if newCount = 0 then false
+                        else checkWrapped (idx + 1) newCount
+                
+                let isWrapped = checkWrapped 0 0
                 
                 if isWrapped then
                     let inner = trimmed.Substring(1, trimmed.Length - 2)

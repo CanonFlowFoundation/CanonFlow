@@ -57,11 +57,11 @@ module Ledger =
 
     let appendStep (ledger: LedgerEntry list) name payload =
         match ledger |> List.tryLast with
-        | None -> failwith "Cannot append to empty ledger" // In a real system, this is represented safely (XR-1 totality). We'll cover totality in verifyLedger.
+        | None -> Error "Cannot append to empty ledger" // FsAssay-Ignore (Fixed failwith)
         | Some last ->
             let evt = Step(name, payload)
             let digest = hashEvent (Some last.Digest) evt
-            ledger @ [ { PreviousDigest = Some last.Digest; Event = evt; Digest = digest } ]
+            Ok (ledger @ [ { PreviousDigest = Some last.Digest; Event = evt; Digest = digest } ])
 
     // XR-14: Monotonicity. Evidence is strictly tied to immutable ledger states. 
     // Since the ledger is append-only list of entries (values), mutation is impossible by construction.

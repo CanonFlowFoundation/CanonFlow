@@ -14,5 +14,10 @@
     <Compile Include="Drift.fs" />
     <Compile Include="Refined.fs" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="..\..\build\Canon.Core.targets" PackagePath="build\" />
+    <Content Include="..\..\build-tools\fsassay.fsx" PackagePath="build\" />
+  </ItemGroup>
 
 </Project>
