@@ -1,0 +1,119 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Confluent.Kafka": {
+        "type": "Direct",
+        "requested": "[2.8.0, )",
+        "resolved": "2.8.0",
+        "contentHash": "i5Qb5BPthGXmLRSZWXVLPVNfo9Mxt+UieC+E/ZTFmlGIuPPd57g7Sxp8QP7fYp7qEBXs561jvWDLGaCZqV9ycg==",
+        "dependencies": {
+          "librdkafka.redist": "2.8.0"
+        }
+      },
+      "FsCodec.SystemTextJson": {
+        "type": "Direct",
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "CA55C5nRzmwvS6tBnBqCudH8K+k3p7Jfne52xYZH2Nqf7V+I/CmT0YbjmPj3KSZZW1uB+xAAwDn6srbSBl6Icw==",
+        "dependencies": {
+          "FSharp.Core": "4.5.4",
+          "FsCodec.Box": "[3.1.0, 4.0.0)"
+        }
+      },
+      "FSharp.Core": {
+        "type": "Direct",
+        "requested": "[9.0.300, )",
+        "resolved": "9.0.300",
+        "contentHash": "TVt2J7RCE1KCS2IaONF+p8/KIZ1eHNbW+7qmKF6hGoD4tXl+o07ja1mPtFjMqRa5uHMFaTrGTPn/m945WnDLiQ=="
+      },
+      "FsCodec": {
+        "type": "Transitive",
+        "resolved": "3.1.0",
+        "contentHash": "qdgtl9j6q2PH7t+wK1W1DiIqRerAL149lyJAvtS+fxLAadHY56q61hp0owOf37wL6yvCni1AT44NTBv+golYBg==",
+        "dependencies": {
+          "FSharp.Core": "4.5.4",
+          "FSharp.UMX": "1.0.0"
+        }
+      },
+      "FsCodec.Box": {
+        "type": "Transitive",
+        "resolved": "3.1.0",
+        "contentHash": "YFzI3PQxgZy4NmxA7jG3hdpAPBMZ4lSl08wFL1+h5NNSdsM4uLsFkz6BdoVn+phCHeiHnLUdmYddOeD4h+lPyQ==",
+        "dependencies": {
+          "FSharp.Core": "4.5.4",
+          "FsCodec": "[3.1.0, 4.0.0)",
+          "TypeShape": "10.0.0"
+        }
+      },
+      "librdkafka.redist": {
+        "type": "Transitive",
+        "resolved": "2.8.0",
+        "contentHash": "Gg8nPjn9+Sp6X+O1g9duKarCteFQjpkCVJS06ihVQf4PVnR/jPXkN3vwvWe5zP4L47xiEfU+6wIp4pbIvaQ6rQ=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.2",
+        "contentHash": "3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.2",
+        "contentHash": "nroMDjS7hNBPtkZqVBbSiQaQjWRDxITI8Y7XnDs97rqG3EbzVTNLZQf7bIeUJcaHOV8bca47s1Uxq94+2oGdxA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        }
+      },
+      "TypeShape": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "sp/8J8jyB/Ns4HoC73f8BtsAJKw+OZ27D97VgQlBs1taMlzKplKuaxhQ6ErswDVUHej2WgIfm4wLWy/3wxYSFA==",
+        "dependencies": {
+          "FSharp.Core": "4.5.4"
+        }
+      },
+      "canon.core": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "[9.0.300, )"
+        }
+      },
+      "canon.introspect": {
+        "type": "Project",
+        "dependencies": {
+          "Canon.Core": "[1.0.0, )",
+          "FParsec": "[1.1.1, )",
+          "FSharp.Core": "[9.0.300, )",
+          "Npgsql": "[9.0.2, )"
+        }
+      },
+      "FParsec": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.1, )",
+        "resolved": "1.1.1",
+        "contentHash": "Wdjf/gCNLEwd+0nUCDh9jAIIcKGwfhRramySTnTcVVgNC6i4Vp5aJklUJJfvFkEZMYNZEDGcI8pCa36/TmwmSg==",
+        "dependencies": {
+          "FSharp.Core": "4.3.4"
+        }
+      },
+      "FSharp.UMX": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "XTUy8ZlTT2VHsVXAtxXZ2JfBfWAPxdz6Z8fdGCIvtQflOF8fFnDvkpqVJ8Vz12Jr9s5MXcEHa4dka/DbgAA4Dg==",
+        "dependencies": {
+          "FSharp.Core": "4.3.4"
+        }
+      },
+      "Npgsql": {
+        "type": "CentralTransitive",
+        "requested": "[9.0.2, )",
+        "resolved": "9.0.2",
+        "contentHash": "hCbO8box7i/XXiTFqCJ3GoowyLqx3JXxyrbOJ6om7dr+eAknvBNhhUHeJVGAQo44sySZTfdVffp4BrtPeLZOAA==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2"
+        }
+      }
+    }
+  }
+}
