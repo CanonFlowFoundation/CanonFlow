@@ -1,6 +1,6 @@
 # CanonFlow & ONDCFlow: Lessons Learned (MVP Implementation)
 
-As we conclude the M0-M12 implementation of the CanonFlow Evaluator architecture, we reflect on the technical boundaries, strict functional engineering constraints, and cryptographic demands that shaped the outcome. 
+This document records lessons from the experimental M0-M12 demonstrations. The evaluator, receipt sealing and native/WASM equivalence work are incomplete; these milestones are not a release or certification claim.
 
 Here are the key lessons learned during this highly disciplined engineering effort:
 
@@ -27,4 +27,4 @@ It was critical to prevent `CanonFlow.Assurance` from becoming bloated with fram
 ## 5. Security & Transparency Cannot be Self-Awarded
 Phase M12 taught us that technical enforcement must be paired with governance.
 - **The Issue:** Generating a cryptographically signed receipt is useless if anyone can generate one declaring themselves "ONDC Certified".
-- **The Fix:** We decoupled the cryptographic *seal* from the *assessment result*. Furthermore, we deferred "Certification" to external authorities using `source.lock.json` and a gated GitHub Action (`certify.yml`), strictly preventing self-awarded certificates in the MVP.
+- **Current boundary:** The cryptographic *seal* is decoupled from the assessment result, but signing and authoritative certification remain deferred to external authorities. No repository workflow awards certification.

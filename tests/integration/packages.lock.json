@@ -72,6 +72,22 @@
           "Docker.DotNet.Enhanced": "3.126.1"
         }
       },
+      "Fable.Core": {
+        "type": "Transitive",
+        "resolved": "3.1.6",
+        "contentHash": "w6M1F0zoLk4kTFc1Lx6x1Ft6BD3QwRe0eaLiinAqbjVkcF+iK+NiXGJO+a6q9RAF9NCg0vI48Xku7aNeqG4JVw==",
+        "dependencies": {
+          "FSharp.Core": "4.7.1"
+        }
+      },
+      "FSharp.SystemTextJson": {
+        "type": "Transitive",
+        "resolved": "1.4.36",
+        "contentHash": "1xLk0SBF1nedD74B77rcArjD2d+DeZwbNI7BVCAyKwIBERo1VoX8Mf4AtX0OV2L3ZeM/XS1b6BuhXCyoh0KBnw==",
+        "dependencies": {
+          "FSharp.Core": "4.7.0"
+        }
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "17.13.0",
@@ -181,6 +197,33 @@
           "Npgsql": "[9.0.2, )"
         }
       },
+      "canonflow.assurance": {
+        "type": "Project",
+        "dependencies": {
+          "BouncyCastle.Cryptography": "[2.6.2, )",
+          "FSharp.Core": "[9.0.300, )",
+          "FSharp.UMX": "[1.1.0, )",
+          "FsToolkit.ErrorHandling": "[5.2.0, )",
+          "Thoth.Json.Net": "[12.0.0, )"
+        }
+      },
+      "canonflow.evaluator": {
+        "type": "Project",
+        "dependencies": {
+          "CanonFlow.Assurance": "[0.1.5-alpha, )",
+          "FSharp.Core": "[9.0.300, )",
+          "FsToolkit.ErrorHandling": "[5.2.0, )",
+          "ONDCFlow.Core": "[0.1.4-alpha, )",
+          "ONDCFlow.Profile.Retail": "[0.1.4-alpha, )",
+          "Thoth.Json.Net": "[12.0.0, )"
+        }
+      },
+      "BouncyCastle.Cryptography": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.2, )",
+        "resolved": "2.6.2",
+        "contentHash": "7oWOcvnntmMKNzDLsdxAYqApt+AjpRpP2CShjMfIa3umZ42UQMvH0tl1qAliYPNYO6vTdcGMqnRrCPmsfzTI1w=="
+      },
       "FParsec": {
         "type": "CentralTransitive",
         "requested": "[1.1.1, )",
@@ -188,6 +231,57 @@
         "contentHash": "Wdjf/gCNLEwd+0nUCDh9jAIIcKGwfhRramySTnTcVVgNC6i4Vp5aJklUJJfvFkEZMYNZEDGcI8pCa36/TmwmSg==",
         "dependencies": {
           "FSharp.Core": "4.3.4"
+        }
+      },
+      "FSharp.UMX": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "0+4w4/yBL5z7w1/k198ooPbfMqkzMSXPRVZEVingnwAdjM//QIFG25eJbB3RtoSQAusBwV5B3VcSudxJejd5Bg==",
+        "dependencies": {
+          "FSharp.Core": "4.3.4"
+        }
+      },
+      "FsToolkit.ErrorHandling": {
+        "type": "CentralTransitive",
+        "requested": "[5.2.0, )",
+        "resolved": "5.2.0",
+        "contentHash": "Y7NfN1gDJ5eOANmi8/aEjGHTWrJOYyqwmgtdA3BIZggd0Ph0IIsbewtgNaLkDYFGgkKw6mGlk0iw4RZ2ZRKZhA==",
+        "dependencies": {
+          "FSharp.Core": "9.0.300"
+        }
+      },
+      "ONDCFlow.Core": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.4-alpha, )",
+        "resolved": "0.1.4-alpha",
+        "contentHash": "+Z15MH+2BtfZJwf826VGgmzCHsXrfKTzh05txRqLYuTtYq/SGIdYlB+zbNyHvLKTmdjih+qPDLsKJy19YsBrlA==",
+        "dependencies": {
+          "CanonFlow.Assurance": "0.1.5-alpha",
+          "FSharp.Core": "9.0.300",
+          "FSharp.SystemTextJson": "1.4.36",
+          "FSharp.UMX": "1.1.0"
+        }
+      },
+      "ONDCFlow.Profile.Retail": {
+        "type": "CentralTransitive",
+        "requested": "[0.1.4-alpha, )",
+        "resolved": "0.1.4-alpha",
+        "contentHash": "SuiLE9AxzRNUn/b2ilPrgPSpVoov7shEX1cCuZiWA88c9jyWCUuIxK5kVxFeSRIYpov3wrK69kbxgyxF2zH+7Q==",
+        "dependencies": {
+          "FSharp.Core": "9.0.300",
+          "ONDCFlow.Core": "0.1.4-alpha"
+        }
+      },
+      "Thoth.Json.Net": {
+        "type": "CentralTransitive",
+        "requested": "[12.0.0, )",
+        "resolved": "12.0.0",
+        "contentHash": "n2YyONYdWCFS4Pu7wrqgV/l5tPuN+t3gxEfs/2RwqCiQkRnbgKs9dK61zHeZS5YganAoFbxLSwbaNL7SvSrS9g==",
+        "dependencies": {
+          "FSharp.Core": "4.7.2",
+          "Fable.Core": "3.1.6",
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "xunit.assert": {

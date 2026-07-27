@@ -105,6 +105,15 @@ module AgreementProperties =
     
     [<Property>]
     let ``Node.js validation exactly matches F# evaluation`` (l: Lattice<Constraint>) (value: int) =
+        let nodeAvailable =
+            let path = Environment.GetEnvironmentVariable("PATH")
+            if String.IsNullOrWhiteSpace(path) then false
+            else
+                path.Split(Path.PathSeparator)
+                |> Array.exists (fun directory ->
+                    if OperatingSystem.IsWindows() then File.Exists(Path.Combine(directory, "node.exe"))
+                    else File.Exists(Path.Combine(directory, "node")))
+
         // 1. Native F# evaluation
         let fsResult = evalLattice l value
 
@@ -112,7 +121,7 @@ module AgreementProperties =
         let tsCode, fidelity = Canon.Fable.Transpiler.emitValidator "test" l false None
         
         // Skip if not exact (e.g., unsupported constraints)
-        if fidelity <> Fidelity.Exact then
+        if not nodeAvailable || fidelity <> Fidelity.Exact then
             true
         else
             // Strip TypeScript syntax so Node can run it directly as a script

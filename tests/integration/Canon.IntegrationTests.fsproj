@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="PostgresIntrospectionTests.fs" />
+    <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -25,6 +26,8 @@
     <ProjectReference Include="..\..\src\Canon.Introspect\Canon.Introspect.fsproj" />
     <ProjectReference Include="..\..\src\Canon.Core\Canon.Core.fsproj" />
     <ProjectReference Include="..\..\src\Canon.Emit\Canon.Emit.fsproj" />
+    <ProjectReference Include="..\..\src\CanonFlow.Assurance\CanonFlow.Assurance.fsproj" />
+    <ProjectReference Include="..\..\src\CanonFlow.Evaluator\CanonFlow.Evaluator.fsproj" />
   </ItemGroup>
 
 </Project>

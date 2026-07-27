@@ -63,19 +63,6 @@ module PgsqlAssessor =
                 h, rules
 
         let verdict = Assessment.summarize health outcomes
-        let verdictStr =
-            match verdict with
-            | Verdict.Pass -> "Pass"
-            | Verdict.Fail -> "Fail"
-            | Verdict.Inconclusive -> "Inconclusive"
-            | Verdict.ToolFailure -> "ToolFailure"
-
-        let healthStr =
-            match health with
-            | EvidenceHealth.Complete -> "Complete"
-            | EvidenceHealth.Partial _ -> "Partial"
-            | EvidenceHealth.Broken _ -> "Broken"
-
         let ctx : ReceiptContext = {
             Instant = timestamp
             TimeProvenance = "System-Clock"
@@ -86,8 +73,12 @@ module PgsqlAssessor =
         let assessmentRecord : ComponentAssessmentRecord = {
             ComponentId = "CanonFlow.Profile.Pgsql"
             ComponentVersion = "1.0.0"
-            Health = healthStr
-            Compliance = verdictStr
+            Health = health
+            Compliance =
+                match verdict with
+                | Verdict.Pass -> Compliance.Conformant
+                | Verdict.Fail -> Compliance.NonConformant (NonEmpty.create { Description = "PostgreSQL differential assessment failed." } [])
+                | _ -> Compliance.NotEstablished
             ApplicableRules = outcomes.Length
             EvaluatedRules = outcomes.Length
             Evidence = []
@@ -96,11 +87,18 @@ module PgsqlAssessor =
         {
             SchemaVersion = "1.0"
             ReceiptType = "CanonFlowEvidenceReceipt"
-            Subject = { Root = evaluationId; Schema = "PostgreSQL"; SourceDirectories = [] }
+            ReplayIdentity = evaluationId
+            Subject = {
+                Root = evaluationId
+                Schema = "PostgreSQL"
+                SourceDirectories = []
+                ManifestDigest = None
+                Artifacts = []
+            }
             Evaluator = { EngineId = "CanonFlow.Evaluator"; EngineVersion = "1.0.0" }
             Context = ctx
             Assessments = [assessmentRecord]
-            Verdict = verdictStr
+            Verdict = verdict
             Seal = None
         }
 

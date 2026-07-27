@@ -113,7 +113,7 @@
       "canonflow.assurance.xp": {
         "type": "Project",
         "dependencies": {
-          "CanonFlow.Assurance": "[0.1.4-alpha, )",
+          "CanonFlow.Assurance": "[0.1.5-alpha, )",
           "FSharp.Core": "[9.0.300, )"
         }
       },

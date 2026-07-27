@@ -22,8 +22,8 @@ let ``Pipeline derives all four verdicts without collapsing assessment axes`` ()
         EvaluatedRules = evaluated
         Evidence = []
     }
-    let finding = NonEmpty.create { Description = "violation" } []
-    let gap = NonEmpty.create { Description = "missing evidence" } []
+    let finding : NonEmpty<Finding> = NonEmpty.create { Description = "violation" } []
+    let gap : NonEmpty<EvidenceRequirement> = NonEmpty.create { Description = "missing evidence" } []
     Assert.Equal(Verdict.Pass, CanonFlow.Evaluator.Pipeline.verdictOf (assessment EvidenceHealth.Complete Compliance.Conformant 1 1))
     Assert.Equal(Verdict.Fail, CanonFlow.Evaluator.Pipeline.verdictOf (assessment EvidenceHealth.Complete (Compliance.NonConformant finding) 1 1))
     Assert.Equal(Verdict.Inconclusive, CanonFlow.Evaluator.Pipeline.verdictOf (assessment (EvidenceHealth.Partial gap) Compliance.NotEstablished 1 0))
@@ -31,8 +31,8 @@ let ``Pipeline derives all four verdicts without collapsing assessment axes`` ()
 
 [<Fact>]
 let ``Every EvidenceHealth and Compliance product has explicit verdict semantics`` () =
-    let gap = NonEmpty.create { Description = "missing" } []
-    let finding = NonEmpty.create { Description = "violation" } []
+    let gap : NonEmpty<EvidenceRequirement> = NonEmpty.create { Description = "missing" } []
+    let finding : NonEmpty<Finding> = NonEmpty.create { Description = "violation" } []
     let healthCases = [
         EvidenceHealth.Complete
         EvidenceHealth.Partial gap
