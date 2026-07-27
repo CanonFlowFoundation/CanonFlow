@@ -1,4 +1,4 @@
-namespace CanonFlow.Core
+namespace CanonFlow.Assurance
 
 open System
 open System.Security.Cryptography
@@ -14,3 +14,4 @@ module Hash =
 #else
         "wasm-hash-pending"
 #endif
+

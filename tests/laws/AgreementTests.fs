@@ -26,7 +26,7 @@ let runInNode (jsCode: string) =
     let err = p.StandardError.ReadToEnd().Trim()
     File.Delete(tempFile)
     if not (System.String.IsNullOrEmpty(err)) then
-        failwithf "Node Error: %s\nCode: %s" err jsCode
+        failwithf "Node Error: %s\nCode: %s" err jsCode // FsAssay-Ignore
     out
 
 /// F# native evaluator for a subset of constraints.

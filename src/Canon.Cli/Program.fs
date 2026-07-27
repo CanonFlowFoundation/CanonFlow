@@ -6,7 +6,27 @@ open Canon.Core
 open Canon.Introspect.Postgres
 open Canon.Fable
 
+type EvaluatorArguments =
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Manifest of string
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Output of string
+
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
+        member s.Usage =
+            match s with
+            | Manifest _ -> "Path to the CanonFlow manifest."
+            | Output _ -> "Output directory for evaluation artifacts."
+
+type ReceiptArguments =
+    | [<CliPrefix(CliPrefix.DoubleDash)>] Receipt of string
+
+    interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
+        member s.Usage =
+            match s with
+            | Receipt _ -> "Path to the Canonical Evidence Receipt."
+
 type CliArguments =
+    | [<CliPrefix(CliPrefix.None)>] Evaluate of ParseResults<EvaluatorArguments>
+    | [<CliPrefix(CliPrefix.None)>] Receipt_Verify of ParseResults<ReceiptArguments>
     | [<CliPrefix(CliPrefix.DoubleDash)>] Pg of string
     | [<CliPrefix(CliPrefix.DoubleDash)>] Contracts
     | [<CliPrefix(CliPrefix.DoubleDash)>] ContractsKotlin
@@ -23,6 +43,8 @@ type CliArguments =
     interface IArgParserTemplate with // FsAssay-Ignore (Required by Argu framework)
         member s.Usage =
             match s with
+            | Evaluate _ -> "Evaluate a CanonFlow manifest in an isolated environment."
+            | Receipt_Verify _ -> "Verify a canonical evidence receipt offline."
             | Pg _ -> "Introspect a Postgres database using the provided connection string."
             | Contracts -> "Emit JSON Schema and TypeScript clients."
             | ContractsKotlin -> "Emit Kotlin validators."
@@ -44,7 +66,26 @@ module Program =
         
         let results = parser.ParseCommandLine(inputs = argv, raiseOnUsage = true)
         
-        if results.Contains(Pg) then
+        if results.Contains(Evaluate) then
+            let evalArgs : ParseResults<EvaluatorArguments> = results.GetResult(Evaluate)
+            let manifestPath = evalArgs.GetResult(Manifest)
+            let outputPath = evalArgs.GetResult(Output)
+            printfn $"[Evaluator] Running isolated assessment on {manifestPath} -> {outputPath}"
+            
+            // Evaluator orchestrator logic will be called here
+            System.IO.Directory.CreateDirectory(outputPath) |> ignore
+            System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, "assessment.cff"), "stub")
+            
+            0
+        elif results.Contains(Receipt_Verify) then
+            let receiptArgs : ParseResults<ReceiptArguments> = results.GetResult(Receipt_Verify)
+            let receiptPath = receiptArgs.GetResult(Receipt)
+            printfn $"[Evaluator] Verifying receipt at {receiptPath}..."
+            
+            // Receipt verification logic will be called here
+            printfn "Verification Failed (Stub)"
+            1
+        elif results.Contains(Pg) then
             let connStr = results.GetResult(Pg)
             printfn "[Stage 1: Parse] Introspecting Postgres Schema..."
             

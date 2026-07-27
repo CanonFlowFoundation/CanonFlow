@@ -1,20 +1,22 @@
 namespace CanonFlow.Assurance
 
+[<RequireQualifiedAccess>]
 type Verdict =
     | Pass
-    | Fail
     | Inconclusive
+    | Fail
     | ToolFailure
 
 module Verdict =
-    
-    // XR-3: The aggregate of no verdicts is Inconclusive, never Pass.
-    // Folding the empty list yields the identity for the empty set.
-    let aggregate (verdicts: Verdict list) =
-        match verdicts with
-        | [] -> Inconclusive
-        | vs ->
-            if vs |> List.contains ToolFailure then ToolFailure
-            elif vs |> List.contains Fail then Fail
-            elif vs |> List.contains Inconclusive then Inconclusive
-            else Pass
+
+    /// Normative severity table.
+    let rank v =
+        match v with
+        | Verdict.Pass         -> 0
+        | Verdict.Inconclusive -> 1
+        | Verdict.Fail         -> 2
+        | Verdict.ToolFailure  -> 3
+
+    /// Bounded join-semilattice operator
+    let join a b = 
+        if rank a >= rank b then a else b

@@ -121,13 +121,15 @@ Read the full ethos in the [MANIFESTO](MANIFESTO.md) and our [GOVERNANCE](GOVERN
 
 The solution follows a strict pipeline:
 
-1. **`Canon.Core`**: The pure mathematical kernel. Contains the `Lattice<'Leaf>` algebra (True, False, Range, MaxLength, etc.) and `Refined<'T, 'P>` logic.
+1. **CanonFlow.Assurance**: The pure evidence and verdict mathematical kernel.. Contains the `Lattice<'Leaf>` algebra (True, False, Range, MaxLength, etc.) and `Refined<'T, 'P>` logic.
 2. **`Canon.PgPrism`**: The 2-way boundary enforcement engine. Uses `PgSqlParser` (the `.NET` wrapper for `libpg_query`) to deterministically parse PostgreSQL DDL into `Lattice<Constraint>`, and flawlessly round-trip emit it back into F# and SQL DDL.
 3. **`Canon.Introspect`**: The brownfield data extractor. Harvests `information_schema` and `pg_constraint` into F# `TableDef` structures.
 4. **`Canon.Emit`**: The greenfield generator. Translates `TableDef` schemas out to DDL and OpenSearch index mappings.
 5. **`Canon.Fable`**: The transpiler bridge. Walks the F# Lattice and generates isomorphic TypeScript/JavaScript validation functions.
 6. **`Canon.Contracts`**: The semantic output layer. Emits OpenMetadata JSON and OKF markdown catalogs to empower AI Agents.
-7. **`Canon.Cli`**: The entry orchestrator. Run `dotnet run --project src/Canon.Cli/Canon.Cli.fsproj -- --help`.
+7. **Canon.Cli**: The entry orchestrator.
+8. **CanonFlow.Evaluator**: The orchestrated deterministic engine for offline scanning.
+9. **CanonFlow.Reports**: Verifiable view projectors for CanonFlow execution. Run `dotnet run --project src/Canon.Cli/Canon.Cli.fsproj -- --help`.
 
 ## Execution Plan & Decisions
 All architectural decisions and phase milestones are documented in the [CanonFlow Execution Plan](docs/CanonFlow_Execution_Plan.md). We actively drew inspiration from the capabilities of *Symphony* (for OKF / Expression algebra) and *Helios* (for Semantic Capability-typed cataloging).

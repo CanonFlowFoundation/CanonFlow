@@ -1,4 +1,4 @@
-namespace CanonFlow.Assurance
+namespace CanonFlow.Assurance.Xp
 
 open System
 

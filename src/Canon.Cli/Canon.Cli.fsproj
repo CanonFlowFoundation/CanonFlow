@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Argu" Version="6.2.5" />
+    <PackageReference Include="Argu"  />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +26,9 @@
     <ProjectReference Include="..\Canon.Fable\Canon.Fable.fsproj" />
     <ProjectReference Include="..\Canon.Core\Canon.Core.fsproj" />
     <ProjectReference Include="..\Canon.Contracts\Canon.Contracts.fsproj" />
+    <ProjectReference Include="..\CanonFlow.Evaluator\CanonFlow.Evaluator.fsproj" />
+    <ProjectReference Include="..\CanonFlow.Reports\CanonFlow.Reports.fsproj" />
+    <ProjectReference Include="..\CanonFlow.Assurance\CanonFlow.Assurance.fsproj" />
   </ItemGroup>
 
 </Project>

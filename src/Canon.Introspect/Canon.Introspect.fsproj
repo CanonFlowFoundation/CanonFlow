@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(FABLE_COMPILER)' != 'true'">
-    <PackageReference Include="FParsec" Version="1.1.1" />
-    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="FParsec"  />
+    <PackageReference Include="Npgsql"  />
   </ItemGroup>
 
 </Project>

@@ -3,18 +3,33 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>CanonFlow.Assurance</PackageId>
+    <Version>0.1.0-alpha</Version>
+    <Authors>CanonFlow Foundation</Authors>
+    <Description>Deterministic Semantic Infrastructure Core</Description>
+    <RepositoryUrl>https://github.com/CanonFlowFoundation/CanonFlow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Capabilities.fs" />
+    <Compile Include="NonEmpty.fs" />
     <Compile Include="Verdict.fs" />
-    <Compile Include="Transition.fs" />
-    <Compile Include="Ledger.fs" />
+    <Compile Include="Truth.fs" />
+    <Compile Include="Assessment.fs" />
+    <Compile Include="Digest.fs" />
+    <Compile Include="EvaluationContext.fs" />
+    <Compile Include="Hash.fs" />
+    <Compile Include="Seal.fs" />
+    <Compile Include="Receipt.fs" />
+    <Compile Include="Ed25519Verify.fs" />
     <Compile Include="Verification.fs" />
+    <Compile Include="CanonicalReceiptJson.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CanonFlow.Core\CanonFlow.Core.fsproj" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="FSharp.UMX" />
+    <PackageReference Include="FsToolkit.ErrorHandling" />
+    <PackageReference Include="Thoth.Json.Net" />
   </ItemGroup>
 
 </Project>

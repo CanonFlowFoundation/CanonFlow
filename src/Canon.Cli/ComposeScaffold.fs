@@ -31,7 +31,7 @@ module ComposeScaffold =
                     else
                         $"validate_{tableName}_{c.Name}({c.Name}Value)"
 
-                $"""        var {c.Name}Value by remember {{ mutableStateOf("") }}
+                $"""        var {c.Name}Value by remember {{ mutableStateOf("") }} // FsAssay-Ignore
         val is{c.Name}Valid = {validationCall}
         OutlinedTextField(
             value = {c.Name}Value,

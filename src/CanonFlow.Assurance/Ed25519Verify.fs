@@ -1,4 +1,4 @@
-namespace CanonFlow.Core.Verification
+namespace CanonFlow.Assurance.Verification
 
 open System
 open Org.BouncyCastle.Crypto.Parameters

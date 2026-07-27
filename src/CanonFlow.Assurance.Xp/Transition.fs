@@ -1,4 +1,4 @@
-namespace CanonFlow.Assurance
+namespace CanonFlow.Assurance.Xp
 
 type NonEmptyList<'T> = private { Head: 'T; Tail: 'T list }
 module NonEmptyList =

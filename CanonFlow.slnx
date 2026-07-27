@@ -13,6 +13,8 @@
     <Project Path="src/Canon.PgPrism/Canon.PgPrism.fsproj" />
     <Project Path="src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj" />
     <Project Path="src/CanonFlow.Assurance/CanonFlow.Assurance.fsproj" />
+    <Project Path="src/CanonFlow.Evaluator/CanonFlow.Evaluator.fsproj" />
+    <Project Path="src/CanonFlow.Reports/CanonFlow.Reports.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CanonFlow.Assurance.Tests/CanonFlow.Assurance.Tests.fsproj" />

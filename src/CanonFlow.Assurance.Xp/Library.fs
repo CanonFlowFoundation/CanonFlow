@@ -1,4 +1,4 @@
-﻿namespace CanonFlow.Assurance.Xp
+namespace CanonFlow.Assurance.Xp
 
 module Say =
     let hello name =

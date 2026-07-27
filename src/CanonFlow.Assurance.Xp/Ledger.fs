@@ -1,8 +1,8 @@
-namespace CanonFlow.Assurance
+namespace CanonFlow.Assurance.Xp
 
 open System
-open CanonFlow.Core
-open CanonFlow.Core.Verification
+open CanonFlow.Assurance
+open CanonFlow.Assurance.Verification
 
 type Digest = Digest of string
 
@@ -47,7 +47,7 @@ module Ledger =
             "event", eventJson
         ]
 
-        let serialized = CanonicalJson.serialize framed
+        let serialized = CanonicalReceiptJson.serialize framed
         Digest (Hash.computeSha256 serialized)
 
     let createGenesis workflowId workItemDigest policyDigest =
