@@ -26,4 +26,5 @@
   <Folder Name="/tests/laws/">
     <Project Path="tests/laws/Canon.Core.Tests.fsproj" />
   </Folder>
+  <Project Path="src\CanonFlow.Profile.Pgsql\CanonFlow.Profile.Pgsql.fsproj" />
 </Solution>

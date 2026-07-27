@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  postgres_sidecar:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: evaluator
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: differential_db
+    networks:
+      - isolated_network
+    restart: "no"
+
+  evaluator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PG_HOST: postgres_sidecar
+      PG_USER: evaluator
+      PG_PASSWORD: pass
+      PG_DB: differential_db
+    networks:
+      - isolated_network
+    depends_on:
+      - postgres_sidecar
+
+networks:
+  isolated_network:
+    internal: true
+
