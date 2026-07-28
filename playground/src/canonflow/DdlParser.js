@@ -5,7 +5,7 @@ import { startsWith, split } from "./fable_modules/fable-library-js.5.6.0/String
 import { indexOf, setItem, item } from "./fable_modules/fable-library-js.5.6.0/Array.js";
 import { tryFind, toList } from "./fable_modules/fable-library-js.5.6.0/Seq.js";
 import { singleton, append, empty } from "./fable_modules/fable-library-js.5.6.0/List.js";
-import { TableDef, TableType, ColumnDef } from "./Canon.Introspect/ISchemaProvider.js";
+import { TableDef, TableType, ColumnDef } from "./Canon.Introspect/SchemaProvider.js";
 
 export function parseSql(sql) {
     const tables = [];

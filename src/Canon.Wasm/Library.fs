@@ -60,9 +60,9 @@ module CanonCompiler =
                         // Populate ParsedConstraints for FsCheckEmitter
                         let cNew = { c with ParsedConstraints = [lattice] }
                         
-                        let tsCode, _ = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
-                        let ktCode, _ = KotlinTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
-                        let swCode, _ = SwiftTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable
+                        let tsCode, _ = Transpiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable None
+                        let ktCode, _ = KotlinTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable None
+                        let swCode, _ = SwiftTranspiler.emitValidator $"{t.Name}_{c.Name}" lattice c.IsNullable None
                         tsSb.AppendLine(tsCode) |> ignore
                         ktSb.AppendLine(ktCode) |> ignore
                         swSb.AppendLine(swCode) |> ignore
@@ -81,9 +81,9 @@ module CanonCompiler =
             let fscheckCode = FsCheckEmitter.emitGenerators updatedTables
 
             {| 
-                typescript = tsSb.ToString()
-                kotlin = ktSb.ToString()
-                swift = swSb.ToString()
+                typescript = string tsSb
+                kotlin = string ktSb
+                swift = string swSb
                 fscheck = fscheckCode
                 diagnostics = diagnostics.ToArray()
                 error = null

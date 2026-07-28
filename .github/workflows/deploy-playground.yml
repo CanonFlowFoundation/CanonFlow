@@ -38,11 +38,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Fable
-        run: dotnet tool install -g fable
+      - name: Restore pinned tools
+        run: dotnet tool restore
 
       - name: Build Fable Wasm
-        run: fable clean --yes && fable --outDir ../../playground/src/canonflow --noCache
+        run: dotnet fable clean ../../playground/src/canonflow --yes && dotnet fable --outDir ../../playground/src/canonflow --noCache
         working-directory: ./src/Canon.Wasm
 
       - name: Install Playground Dependencies

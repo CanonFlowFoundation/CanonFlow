@@ -1,5 +1,5 @@
 
-import { FidelityModule_combine, Fidelity } from "../Canon.Core/Lineage.js";
+import { Divergence, FidelityModule_combine, Fidelity } from "../Canon.Core/Lineage.js";
 import { printf, toText, join, concat } from "../fable_modules/fable-library-js.5.6.0/String.js";
 import { map } from "../fable_modules/fable-library-js.5.6.0/List.js";
 import { Lattice$1 } from "../Canon.Core/Lattice.js";
@@ -27,117 +27,129 @@ export function toOpenApiSchema(predicate) {
             const c = predicate.fields[0];
             let matchResult, v, v_1, v_2, v_3, len, items, items_1, colA, colB, op, raw, field, inner_1;
             switch (c.tag) {
+                case 11: {
+                    matchResult = 1;
+                    break;
+                }
+                case 0: {
+                    if (c.fields[0] == null) {
+                        if (c.fields[1] != null) {
+                            if (c.fields[1].tag === 0) {
+                                matchResult = 5;
+                                v_3 = c.fields[1].fields[0];
+                            }
+                            else {
+                                matchResult = 3;
+                                v_1 = c.fields[1].fields[0];
+                            }
+                        }
+                        else {
+                            matchResult = 6;
+                        }
+                    }
+                    else if (c.fields[0].tag === 0) {
+                        if (c.fields[1] == null) {
+                            matchResult = 4;
+                            v_2 = c.fields[0].fields[0];
+                        }
+                        else {
+                            matchResult = 6;
+                        }
+                    }
+                    else if (c.fields[1] == null) {
+                        matchResult = 2;
+                        v = c.fields[0].fields[0];
+                    }
+                    else {
+                        matchResult = 6;
+                    }
+                    break;
+                }
                 case 1: {
-                    matchResult = 5;
+                    matchResult = 7;
                     break;
                 }
                 case 2: {
-                    matchResult = 6;
+                    matchResult = 8;
                     break;
                 }
                 case 3: {
-                    matchResult = 7;
+                    matchResult = 9;
                     len = c.fields[0];
                     break;
                 }
                 case 4: {
-                    matchResult = 8;
+                    matchResult = 10;
                     items = c.fields[0];
                     break;
                 }
                 case 5: {
-                    matchResult = 9;
+                    matchResult = 11;
                     items_1 = c.fields[0];
                     break;
                 }
                 case 6: {
-                    matchResult = 10;
+                    matchResult = 12;
                     colA = c.fields[0];
                     colB = c.fields[2];
                     op = c.fields[1];
                     break;
                 }
                 case 8: {
-                    matchResult = 11;
+                    matchResult = 13;
                     break;
                 }
                 case 7: {
-                    matchResult = 12;
+                    matchResult = 14;
                     break;
                 }
                 case 9: {
-                    matchResult = 13;
+                    matchResult = 15;
                     raw = c.fields[0];
                     break;
                 }
-                case 10: {
-                    matchResult = 14;
+                case 12: {
+                    matchResult = 16;
                     field = c.fields[0];
                     inner_1 = c.fields[1];
                     break;
                 }
                 default:
-                    if (c.fields[0] == null) {
-                        if (c.fields[1] != null) {
-                            if (c.fields[1].tag === 0) {
-                                matchResult = 3;
-                                v_3 = c.fields[1].fields[0];
-                            }
-                            else {
-                                matchResult = 1;
-                                v_1 = c.fields[1].fields[0];
-                            }
-                        }
-                        else {
-                            matchResult = 4;
-                        }
-                    }
-                    else if (c.fields[0].tag === 0) {
-                        if (c.fields[1] == null) {
-                            matchResult = 2;
-                            v_2 = c.fields[0].fields[0];
-                        }
-                        else {
-                            matchResult = 4;
-                        }
-                    }
-                    else if (c.fields[1] == null) {
-                        matchResult = 0;
-                        v = c.fields[0].fields[0];
-                    }
-                    else {
-                        matchResult = 4;
-                    }
+                    matchResult = 0;
             }
             switch (matchResult) {
                 case 0:
-                    return [`{"exclusiveMinimum": true, "minimum": ${v}}`, new Fidelity(0, [])];
+                    return ["{\"type\": \"null\"}", new Fidelity(0, [])];
                 case 1:
-                    return [`{"exclusiveMaximum": true, "maximum": ${v_1}}`, new Fidelity(0, [])];
+                    return ["{}", new Fidelity(0, [])];
                 case 2:
-                    return [`{"minimum": ${v_2}}`, new Fidelity(0, [])];
+                    return [`{"exclusiveMinimum": ${v}}`, new Fidelity(0, [])];
                 case 3:
-                    return [`{"maximum": ${v_3}}`, new Fidelity(0, [])];
+                    return [`{"exclusiveMaximum": ${v_1}}`, new Fidelity(0, [])];
                 case 4:
-                    return ["{}", new Fidelity(1, ["Complex range bounds not fully implemented in OpenAPI schema"])];
+                    return [`{"minimum": ${v_2}}`, new Fidelity(0, [])];
                 case 5:
-                    return ["{\"type\": \"integer\"}", new Fidelity(1, ["Int range requires precision bounds"])];
+                    return [`{"maximum": ${v_3}}`, new Fidelity(0, [])];
                 case 6:
-                    return ["{}", new Fidelity(1, ["String range collation may differ and cannot be represented in OpenAPI"])];
+                    return ["{}", new Fidelity(2, [new Divergence(1, ["Complex range bounds not fully implemented in OpenAPI schema"])])];
                 case 7:
-                    return [`{"maxLength": ${len}}`, new Fidelity(0, [])];
+                    return ["{\"type\": \"integer\"}", new Fidelity(2, [new Divergence(1, ["Int range requires precision bounds"])])];
                 case 8:
-                    return [concat("{\"enum\": [", join(", ", map((clo = toText(printf("\"%s\"")), clo), items)), "]}"), new Fidelity(0, [])];
+                    return ["{}", new Fidelity(2, [new Divergence(1, ["String range collation may differ and cannot be represented in OpenAPI"])])];
                 case 9:
-                    return [concat("{\"enum\": [", join(", ", map((clo_1 = toText(printf("\"%s\"")), clo_1), items_1)), "]}"), new Fidelity(0, [])];
+                    return [`{"maxLength": ${len}}`, new Fidelity(0, [])];
                 case 10:
-                    return ["{}", new Fidelity(2, [`OpenAPI does not support cross-field validation (${colA} ${op} ${colB})`])];
+                    return [concat("{\"enum\": [", join(", ", map((clo = toText(printf("\"%s\"")), clo), items)), "]}"), new Fidelity(0, [])];
                 case 11:
-                    return ["{}", new Fidelity(2, ["PrimaryKey concept does not exist in OpenAPI validators"])];
+                    return [concat("{\"enum\": [", join(", ", map((clo_1 = toText(printf("\"%s\"")), clo_1), items_1)), "]}"), new Fidelity(0, [])];
                 case 12:
-                    return ["{\"minLength\": 1}", new Fidelity(0, [])];
+                    return [`{"description": "Requires ${colA} ${op} ${colB}"}`, new Fidelity(2, [new Divergence(1, ["OpenAPI maps cross-field validation to description strings"])])];
                 case 13:
-                    return ["{}", new Fidelity(2, [concat("Cannot transpile raw SQL to OpenAPI: ", raw)])];
+                    return ["{}", new Fidelity(5, ["PrimaryKey concept does not exist in OpenAPI validators"])];
+                case 14:
+                    return ["{\"minLength\": 1}", new Fidelity(0, [])];
+                case 15:
+                    return ["{}", new Fidelity(5, [concat("Cannot transpile raw SQL to OpenAPI: ", raw)])];
                 default: {
                     const patternInput_5 = toOpenApiSchema(new Lattice$1(2, [inner_1]));
                     return [`{"properties": {"${field}": ${patternInput_5[0]}}`, patternInput_5[1]];

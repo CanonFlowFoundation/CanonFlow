@@ -1,7 +1,7 @@
 
 import { Record, Union } from "../fable_modules/fable-library-js.5.6.0/Types.js";
 import { record_type, string_type, union_type } from "../fable_modules/fable-library-js.5.6.0/Reflection.js";
-import { concat } from "../fable_modules/fable-library-js.5.6.0/String.js";
+import { printf, toText, join, concat } from "../fable_modules/fable-library-js.5.6.0/String.js";
 import { choose } from "../fable_modules/fable-library-js.5.6.0/List.js";
 import { equals } from "../fable_modules/fable-library-js.5.6.0/Util.js";
 import { Lattice$1, SemanticOptimizer_simplify } from "./Lattice.js";
@@ -44,13 +44,52 @@ export function DriftViolation_$reflection() {
 }
 
 export function DriftEngine_analyzeFidelity(field, targetSystem, fidelity, dbConstraintStr) {
+    let matchResult, reason, reason_1, a, reason_2;
     switch (fidelity.tag) {
-        case 1:
-            return new DriftViolation(field, targetSystem, dbConstraintStr, "Approximate", new DriftSeverity(1, []), concat("Review frontend validator bounds. Reason: ", fidelity.fields[0]));
-        case 2:
-            return new DriftViolation(field, targetSystem, dbConstraintStr, "Missing / Unsupported", new DriftSeverity(2, []), concat("Implement custom backend middleware guard. Reason: ", fidelity.fields[0]));
+        case 3:
+        case 4: {
+            matchResult = 4;
+            break;
+        }
+        case 2: {
+            if (fidelity.fields[0].tag === 1) {
+                matchResult = 2;
+                reason_1 = fidelity.fields[0].fields[0];
+            }
+            else {
+                matchResult = 1;
+                reason = fidelity.fields[0].fields[0];
+            }
+            break;
+        }
+        case 1: {
+            matchResult = 3;
+            a = fidelity.fields[0];
+            break;
+        }
+        case 5: {
+            matchResult = 5;
+            reason_2 = fidelity.fields[0];
+            break;
+        }
         default:
+            matchResult = 0;
+    }
+    switch (matchResult) {
+        case 0:
             return undefined;
+        case 1:
+            return new DriftViolation(field, targetSystem, dbConstraintStr, "Approximate (Stronger)", new DriftSeverity(1, []), concat("Review frontend validator bounds. Reason: ", reason));
+        case 2:
+            return new DriftViolation(field, targetSystem, dbConstraintStr, "Approximate (Weaker)", new DriftSeverity(2, []), concat("Target admits invalid writes. Reason: ", reason_1));
+        case 3: {
+            const str = join(", ", a);
+            return new DriftViolation(field, targetSystem, dbConstraintStr, "Conditional", new DriftSeverity(0, []), toText(printf("Ensure runtime assumptions hold: %s"))(str));
+        }
+        case 4:
+            return undefined;
+        default:
+            return new DriftViolation(field, targetSystem, dbConstraintStr, "Missing / Unsupported", new DriftSeverity(2, []), concat("Implement custom backend middleware guard. Reason: ", reason_2));
     }
 }
 
@@ -68,12 +107,12 @@ export class DriftEngine_SemanticDriftStatus extends Union {
         this.fields = fields;
     }
     cases() {
-        return ["Aligned", "StrictTarget", "LooseTarget", "Disjoint"];
+        return ["Aligned", "StrictTarget", "LooseTarget", "Disjoint", "Unknown"];
     }
 }
 
 export function DriftEngine_SemanticDriftStatus_$reflection() {
-    return union_type("Canon.Core.DriftEngine.SemanticDriftStatus", [], DriftEngine_SemanticDriftStatus, () => [[], [], [], []]);
+    return union_type("Canon.Core.DriftEngine.SemanticDriftStatus", [], DriftEngine_SemanticDriftStatus, () => [[], [], [], [], []]);
 }
 
 function DriftEngine_structuralEquals(a_mut, b_mut) {
@@ -210,7 +249,7 @@ export function DriftEngine_calculateSemanticDrift(source, target) {
         return new DriftEngine_SemanticDriftStatus(2, []);
     }
     else {
-        return new DriftEngine_SemanticDriftStatus(3, []);
+        return new DriftEngine_SemanticDriftStatus(4, []);
     }
 }
 

@@ -64,4 +64,4 @@ module OkfEmitter =
             add $"    referencesTable: {fk.RefTable}"
             add $"    referencesColumn: {fk.RefColumn}"
             
-        sb.ToString()
+        string sb

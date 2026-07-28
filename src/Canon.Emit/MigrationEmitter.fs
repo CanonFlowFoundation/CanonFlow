@@ -66,4 +66,4 @@ module MigrationEmitter =
 
         sb.AppendLine() |> ignore
         sb.AppendLine("COMMIT;") |> ignore
-        sb.ToString()
+        string sb

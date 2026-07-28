@@ -6,10 +6,10 @@ import { item } from "./fable_modules/fable-library-js.5.6.0/Array.js";
 import { toString, FSharpRef } from "./fable_modules/fable-library-js.5.6.0/Types.js";
 import { SemanticOptimizer_simplify, Lattice$1, Constraint, Bound$1 } from "./Canon.Core/Lattice.js";
 import { parseSql } from "./DdlParser.js";
-import { defaultOf, equals, disposeSafe, getEnumerator } from "./fable_modules/fable-library-js.5.6.0/Util.js";
+import { equals, disposeSafe, getEnumerator } from "./fable_modules/fable-library-js.5.6.0/Util.js";
 import { singleton, isEmpty, map, reduce, length } from "./fable_modules/fable-library-js.5.6.0/List.js";
 import { StringBuilder__AppendLine_Z721C83C5, StringBuilder_$ctor } from "./fable_modules/fable-library-js.5.6.0/System.Text.js";
-import { TableDef, ColumnDef } from "./Canon.Introspect/ISchemaProvider.js";
+import { TableDef, ColumnDef } from "./Canon.Introspect/SchemaProvider.js";
 import { emitValidator } from "./Canon.Fable/Transpiler.js";
 import { emitValidator as emitValidator_1 } from "./Canon.Fable/KotlinTranspiler.js";
 import { emitValidator as emitValidator_2 } from "./Canon.Fable/SwiftTranspiler.js";
@@ -92,9 +92,9 @@ export function transpile(sqlText) {
                         if (!isEmpty(c_1.CheckConstraints)) {
                             const lattice_1 = reduce((a_1, b_1) => (new Lattice$1(4, [a_1, b_1])), map(parseConstraintStr, c_1.CheckConstraints));
                             const cNew = new ColumnDef(c_1.Name, c_1.DataType, c_1.IsNullable, c_1.IsPrimaryKey, c_1.DefaultValue, c_1.IsGenerated, c_1.Description, c_1.MaxLength, c_1.CheckConstraints, singleton(lattice_1), c_1.Semantics);
-                            const patternInput = emitValidator(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable);
-                            const patternInput_1 = emitValidator_1(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable);
-                            const patternInput_2 = emitValidator_2(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable);
+                            const patternInput = emitValidator(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable, undefined);
+                            const patternInput_1 = emitValidator_1(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable, undefined);
+                            const patternInput_2 = emitValidator_2(concat(t_1.Name, "_", c_1.Name), lattice_1, c_1.IsNullable, undefined);
                             StringBuilder__AppendLine_Z721C83C5(tsSb, patternInput[0]);
                             StringBuilder__AppendLine_Z721C83C5(ktSb, patternInput_1[0]);
                             StringBuilder__AppendLine_Z721C83C5(swSb, patternInput_2[0]);
@@ -122,7 +122,7 @@ export function transpile(sqlText) {
         const swift = toString(swSb);
         return {
             diagnostics: diagnostics.slice(),
-            error: defaultOf(),
+            error: null,
             fscheck: fscheckCode,
             kotlin: kotlin,
             swift: swift,

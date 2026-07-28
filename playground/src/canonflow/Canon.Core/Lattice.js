@@ -5,6 +5,115 @@ import { equals, compare } from "../fable_modules/fable-library-js.5.6.0/Decimal
 import { equals as equals_1 } from "../fable_modules/fable-library-js.5.6.0/Util.js";
 
 /**
+ * Three-valued logic for autonomous evaluation
+ */
+export class LatticeOutcome extends Union {
+    constructor(tag, fields) {
+        super();
+        this.tag = tag;
+        this.fields = fields;
+    }
+    cases() {
+        return ["Satisfied", "Violated", "Unknown"];
+    }
+}
+
+export function LatticeOutcome_$reflection() {
+    return union_type("Canon.Core.LatticeOutcome", [], LatticeOutcome, () => [[], [], []]);
+}
+
+export function LatticeOutcome__Not(this$) {
+    switch (this$.tag) {
+        case 1:
+            return new LatticeOutcome(0, []);
+        case 2:
+            return new LatticeOutcome(2, []);
+        default:
+            return new LatticeOutcome(1, []);
+    }
+}
+
+export function LatticeOutcome__And_Z16C1C285(this$, other) {
+    let matchResult;
+    switch (this$.tag) {
+        case 0: {
+            switch (other.tag) {
+                case 0: {
+                    matchResult = 0;
+                    break;
+                }
+                case 1: {
+                    matchResult = 1;
+                    break;
+                }
+                default:
+                    matchResult = 2;
+            }
+            break;
+        }
+        case 1: {
+            matchResult = 1;
+            break;
+        }
+        default:
+            if (other.tag === 1) {
+                matchResult = 1;
+            }
+            else {
+                matchResult = 2;
+            }
+    }
+    switch (matchResult) {
+        case 0:
+            return new LatticeOutcome(0, []);
+        case 1:
+            return new LatticeOutcome(1, []);
+        default:
+            return new LatticeOutcome(2, []);
+    }
+}
+
+export function LatticeOutcome__Or_Z16C1C285(this$, other) {
+    let matchResult;
+    switch (this$.tag) {
+        case 1: {
+            switch (other.tag) {
+                case 1: {
+                    matchResult = 0;
+                    break;
+                }
+                case 0: {
+                    matchResult = 1;
+                    break;
+                }
+                default:
+                    matchResult = 2;
+            }
+            break;
+        }
+        case 0: {
+            matchResult = 1;
+            break;
+        }
+        default:
+            if (other.tag === 0) {
+                matchResult = 1;
+            }
+            else {
+                matchResult = 2;
+            }
+    }
+    switch (matchResult) {
+        case 0:
+            return new LatticeOutcome(1, []);
+        case 1:
+            return new LatticeOutcome(0, []);
+        default:
+            return new LatticeOutcome(2, []);
+    }
+}
+
+/**
  * Represents Helios capability-typed field kinds for semantic indexing.
  */
 export class FieldKind extends Union {
@@ -50,12 +159,12 @@ export class Constraint extends Union {
         this.fields = fields;
     }
     cases() {
-        return ["Range", "IntRange", "StringRange", "MaxLength", "InList", "InSet", "RelativeBound", "NonEmpty", "PrimaryKey", "Opaque", "FieldBound"];
+        return ["Range", "IntRange", "StringRange", "MaxLength", "InList", "InSet", "RelativeBound", "NonEmpty", "PrimaryKey", "Opaque", "IsNull", "IsNotNull", "FieldBound"];
     }
 }
 
 export function Constraint_$reflection() {
-    return union_type("Canon.Core.Constraint", [], Constraint, () => [[["lo", option_type(Bound$1_$reflection(decimal_type))], ["hi", option_type(Bound$1_$reflection(decimal_type))]], [["lo", option_type(Bound$1_$reflection(int64_type))], ["hi", option_type(Bound$1_$reflection(int64_type))]], [["lo", option_type(Bound$1_$reflection(string_type))], ["hi", option_type(Bound$1_$reflection(string_type))]], [["Item", int32_type]], [["Item", list_type(string_type)]], [["Item", list_type(string_type)]], [["colA", string_type], ["op", string_type], ["colB", string_type]], [], [], [["Item", string_type]], [["Item1", string_type], ["Item2", Constraint_$reflection()]]]);
+    return union_type("Canon.Core.Constraint", [], Constraint, () => [[["lo", option_type(Bound$1_$reflection(decimal_type))], ["hi", option_type(Bound$1_$reflection(decimal_type))]], [["lo", option_type(Bound$1_$reflection(int64_type))], ["hi", option_type(Bound$1_$reflection(int64_type))]], [["lo", option_type(Bound$1_$reflection(string_type))], ["hi", option_type(Bound$1_$reflection(string_type))]], [["Item", int32_type]], [["Item", list_type(string_type)]], [["Item", list_type(string_type)]], [["colA", string_type], ["op", string_type], ["colB", string_type]], [], [], [["Item", string_type]], [], [], [["Item1", string_type], ["Item2", Constraint_$reflection()]]]);
 }
 
 /**
@@ -223,6 +332,23 @@ export function Lattice_toNNF(l_mut) {
     }
 }
 
+export function Lattice_eval3(evalLeaf, l) {
+    switch (l.tag) {
+        case 1:
+            return new LatticeOutcome(1, []);
+        case 2:
+            return evalLeaf(l.fields[0]);
+        case 3:
+            return LatticeOutcome__Not(Lattice_eval3(evalLeaf, l.fields[0]));
+        case 4:
+            return LatticeOutcome__And_Z16C1C285(Lattice_eval3(evalLeaf, l.fields[0]), Lattice_eval3(evalLeaf, l.fields[1]));
+        case 5:
+            return LatticeOutcome__Or_Z16C1C285(Lattice_eval3(evalLeaf, l.fields[0]), Lattice_eval3(evalLeaf, l.fields[1]));
+        default:
+            return new LatticeOutcome(0, []);
+    }
+}
+
 export function Lattice_eval(evalLeaf_mut, l_mut) {
     Lattice_eval:
     while (true) {
@@ -355,9 +481,9 @@ export function SemanticOptimizer_simplify(l_mut) {
                             x_2 = l.fields[0].fields[0];
                             y_2 = l.fields[1].fields[0];
                         }
-                        else if (l.fields[1].fields[0].tag === 10) {
+                        else if (l.fields[1].fields[0].tag === 12) {
                             if (l.fields[1].fields[0].fields[1].tag === 0) {
-                                if (l.fields[0].fields[0].tag === 10) {
+                                if (l.fields[0].fields[0].tag === 12) {
                                     if (l.fields[0].fields[0].fields[1].tag === 0) {
                                         if (l.fields[0].fields[0].fields[0] === l.fields[1].fields[0].fields[0]) {
                                             matchResult = 2;
@@ -455,7 +581,7 @@ export function SemanticOptimizer_simplify(l_mut) {
                 const newMin = SemanticOptimizer_intersectBounds(min1_1, min2_1, false);
                 const newMax = SemanticOptimizer_intersectBounds(max1_1, max2_1, true);
                 if ((newMin != null) ? ((newMax != null) ? ((maxB = newMax, (minB = newMin, (minV = ((minB.tag === 1) ? minB.fields[0] : minB.fields[0]), (maxV = ((maxB.tag === 1) ? maxB.fields[0] : maxB.fields[0]), (compare(minV, maxV) > 0) ? false : (equals(minV, maxV) ? ((minB.tag === 0) && (maxB.tag === 0)) : true)))))) : true) : true) {
-                    return new Lattice$1(2, [new Constraint(10, [f1_1, new Constraint(0, [newMin, newMax])])]);
+                    return new Lattice$1(2, [new Constraint(12, [f1_1, new Constraint(0, [newMin, newMax])])]);
                 }
                 else {
                     return new Lattice$1(1, []);
@@ -479,10 +605,10 @@ export function SemanticOptimizer_simplify(l_mut) {
                 else {
                     let matchResult_1, f1_3, f2_3, max1_3, max2_3, min1_3, min2_3;
                     if (sa.tag === 2) {
-                        if (sa.fields[0].tag === 10) {
+                        if (sa.fields[0].tag === 12) {
                             if (sa.fields[0].fields[1].tag === 0) {
                                 if (sb.tag === 2) {
-                                    if (sb.fields[0].tag === 10) {
+                                    if (sb.fields[0].tag === 12) {
                                         if (sb.fields[0].fields[1].tag === 0) {
                                             if (sa.fields[0].fields[0] === sb.fields[0].fields[0]) {
                                                 matchResult_1 = 0;

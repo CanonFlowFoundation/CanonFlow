@@ -15,7 +15,7 @@ function formatLattice(l) {
         }
         case 2: {
             switch (l.fields[0].tag) {
-                case 10: {
+                case 12: {
                     if (l.fields[0].fields[1].tag === 0) {
                         if (l.fields[0].fields[1].fields[0] == null) {
                             if (l.fields[0].fields[1].fields[1] != null) {

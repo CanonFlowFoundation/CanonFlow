@@ -1,5 +1,5 @@
 
-import { FidelityModule_combine, Fidelity } from "../Canon.Core/Lineage.js";
+import { Divergence, FidelityModule_combine, Fidelity } from "../Canon.Core/Lineage.js";
 import { replace, printf, toText, join, concat } from "../fable_modules/fable-library-js.5.6.0/String.js";
 import { map } from "../fable_modules/fable-library-js.5.6.0/List.js";
 import { isDigit } from "../fable_modules/fable-library-js.5.6.0/Char.js";
@@ -28,147 +28,159 @@ export function toKotlin(predicate) {
             const c = predicate.fields[0];
             let matchResult, v, v_1, v_2, v_3, v_4, v_5, v_6, v_7, len, items, items_1, colA, colB, op, field, inner_1;
             switch (c.tag) {
+                case 11: {
+                    matchResult = 1;
+                    break;
+                }
+                case 0: {
+                    if (c.fields[0] == null) {
+                        if (c.fields[1] != null) {
+                            if (c.fields[1].tag === 0) {
+                                matchResult = 5;
+                                v_3 = c.fields[1].fields[0];
+                            }
+                            else {
+                                matchResult = 3;
+                                v_1 = c.fields[1].fields[0];
+                            }
+                        }
+                        else {
+                            matchResult = 6;
+                        }
+                    }
+                    else if (c.fields[0].tag === 0) {
+                        if (c.fields[1] == null) {
+                            matchResult = 4;
+                            v_2 = c.fields[0].fields[0];
+                        }
+                        else {
+                            matchResult = 6;
+                        }
+                    }
+                    else if (c.fields[1] == null) {
+                        matchResult = 2;
+                        v = c.fields[0].fields[0];
+                    }
+                    else {
+                        matchResult = 6;
+                    }
+                    break;
+                }
                 case 1: {
-                    matchResult = 5;
+                    matchResult = 7;
                     break;
                 }
                 case 2: {
                     if (c.fields[0] == null) {
                         if (c.fields[1] != null) {
                             if (c.fields[1].tag === 0) {
-                                matchResult = 9;
+                                matchResult = 11;
                                 v_7 = c.fields[1].fields[0];
                             }
                             else {
-                                matchResult = 7;
+                                matchResult = 9;
                                 v_5 = c.fields[1].fields[0];
                             }
                         }
                         else {
-                            matchResult = 10;
+                            matchResult = 12;
                         }
                     }
                     else if (c.fields[0].tag === 0) {
                         if (c.fields[1] == null) {
-                            matchResult = 8;
+                            matchResult = 10;
                             v_6 = c.fields[0].fields[0];
                         }
                         else {
-                            matchResult = 10;
+                            matchResult = 12;
                         }
                     }
                     else if (c.fields[1] == null) {
-                        matchResult = 6;
+                        matchResult = 8;
                         v_4 = c.fields[0].fields[0];
                     }
                     else {
-                        matchResult = 10;
+                        matchResult = 12;
                     }
                     break;
                 }
                 case 3: {
-                    matchResult = 11;
+                    matchResult = 13;
                     len = c.fields[0];
                     break;
                 }
                 case 4: {
-                    matchResult = 12;
+                    matchResult = 14;
                     items = c.fields[0];
                     break;
                 }
                 case 5: {
-                    matchResult = 13;
+                    matchResult = 15;
                     items_1 = c.fields[0];
                     break;
                 }
                 case 6: {
-                    matchResult = 14;
+                    matchResult = 16;
                     colA = c.fields[0];
                     colB = c.fields[2];
                     op = c.fields[1];
                     break;
                 }
                 case 8: {
-                    matchResult = 15;
-                    break;
-                }
-                case 7: {
-                    matchResult = 16;
-                    break;
-                }
-                case 9: {
                     matchResult = 17;
                     break;
                 }
-                case 10: {
+                case 7: {
                     matchResult = 18;
+                    break;
+                }
+                case 9: {
+                    matchResult = 19;
+                    break;
+                }
+                case 12: {
+                    matchResult = 20;
                     field = c.fields[0];
                     inner_1 = c.fields[1];
                     break;
                 }
                 default:
-                    if (c.fields[0] == null) {
-                        if (c.fields[1] != null) {
-                            if (c.fields[1].tag === 0) {
-                                matchResult = 3;
-                                v_3 = c.fields[1].fields[0];
-                            }
-                            else {
-                                matchResult = 1;
-                                v_1 = c.fields[1].fields[0];
-                            }
-                        }
-                        else {
-                            matchResult = 4;
-                        }
-                    }
-                    else if (c.fields[0].tag === 0) {
-                        if (c.fields[1] == null) {
-                            matchResult = 2;
-                            v_2 = c.fields[0].fields[0];
-                        }
-                        else {
-                            matchResult = 4;
-                        }
-                    }
-                    else if (c.fields[1] == null) {
-                        matchResult = 0;
-                        v = c.fields[0].fields[0];
-                    }
-                    else {
-                        matchResult = 4;
-                    }
+                    matchResult = 0;
             }
             switch (matchResult) {
                 case 0:
-                    return [`value > java.math.BigDecimal("${v}")`, new Fidelity(0, [])];
+                    return ["value == null", new Fidelity(0, [])];
                 case 1:
-                    return [`value < java.math.BigDecimal("${v_1}")`, new Fidelity(0, [])];
+                    return ["value != null", new Fidelity(0, [])];
                 case 2:
-                    return [`value >= java.math.BigDecimal("${v_2}")`, new Fidelity(0, [])];
+                    return [`value > java.math.BigDecimal("${v}")`, new Fidelity(0, [])];
                 case 3:
-                    return [`value <= java.math.BigDecimal("${v_3}")`, new Fidelity(0, [])];
+                    return [`value < java.math.BigDecimal("${v_1}")`, new Fidelity(0, [])];
                 case 4:
-                    return ["true", new Fidelity(1, ["Complex range bounds not fully implemented in Kotlin"])];
+                    return [`value >= java.math.BigDecimal("${v_2}")`, new Fidelity(0, [])];
                 case 5:
-                    return ["true", new Fidelity(1, ["Int range requires precision bounds"])];
+                    return [`value <= java.math.BigDecimal("${v_3}")`, new Fidelity(0, [])];
                 case 6:
-                    return [concat("value > \"", v_4, "\""), new Fidelity(1, ["String range collation may differ"])];
+                    return ["true", new Fidelity(2, [new Divergence(1, ["Complex range bounds not fully implemented in Kotlin"])])];
                 case 7:
-                    return [concat("value < \"", v_5, "\""), new Fidelity(1, ["String range collation may differ"])];
+                    return ["true", new Fidelity(2, [new Divergence(1, ["Int range requires precision bounds"])])];
                 case 8:
-                    return [concat("value >= \"", v_6, "\""), new Fidelity(1, ["String range collation may differ"])];
+                    return [concat("value > \"", v_4, "\""), new Fidelity(2, [new Divergence(1, ["String range collation may differ"])])];
                 case 9:
-                    return [concat("value <= \"", v_7, "\""), new Fidelity(1, ["String range collation may differ"])];
+                    return [concat("value < \"", v_5, "\""), new Fidelity(2, [new Divergence(1, ["String range collation may differ"])])];
                 case 10:
-                    return ["true", new Fidelity(1, ["Complex string range bounds not fully implemented in Kotlin"])];
+                    return [concat("value >= \"", v_6, "\""), new Fidelity(2, [new Divergence(1, ["String range collation may differ"])])];
                 case 11:
-                    return [`value.length <= ${len}`, new Fidelity(0, [])];
+                    return [concat("value <= \"", v_7, "\""), new Fidelity(2, [new Divergence(1, ["String range collation may differ"])])];
                 case 12:
-                    return [concat("listOf(", join(", ", map((clo = toText(printf("\"%s\"")), clo), items)), ").contains(value)"), new Fidelity(0, [])];
+                    return ["true", new Fidelity(2, [new Divergence(1, ["Complex string range bounds not fully implemented in Kotlin"])])];
                 case 13:
+                    return [`value.length <= ${len}`, new Fidelity(0, [])];
+                case 14:
+                    return [concat("listOf(", join(", ", map((clo = toText(printf("\"%s\"")), clo), items)), ").contains(value)"), new Fidelity(0, [])];
+                case 15:
                     return [concat("setOf(", join(", ", map((clo_1 = toText(printf("\"%s\"")), clo_1), items_1)), ").contains(value)"), new Fidelity(0, [])];
-                case 14: {
+                case 16: {
                     const isLiteral = (s) => {
                         if (s.length > 0) {
                             if (((s[0] === "\"") ? true : (s[0] === "\'")) ? true : isDigit(s[0])) {
@@ -184,12 +196,12 @@ export function toKotlin(predicate) {
                     };
                     return [`${isLiteral(colA) ? colA : concat("value.", colA)} ${op} ${isLiteral(colB) ? colB : concat("value.", colB)}`, new Fidelity(0, [])];
                 }
-                case 15:
-                    return ["true", new Fidelity(2, ["PrimaryKey concept does not exist in Kotlin validators"])];
-                case 16:
-                    return ["value.isNotEmpty()", new Fidelity(0, [])];
                 case 17:
-                    return ["true", new Fidelity(2, ["Cannot transpile raw SQL"])];
+                    return ["true", new Fidelity(5, ["PrimaryKey concept does not exist in Kotlin validators"])];
+                case 18:
+                    return ["value.isNotEmpty()", new Fidelity(0, [])];
+                case 19:
+                    return ["true", new Fidelity(5, ["Cannot transpile raw SQL"])];
                 default: {
                     const patternInput_5 = toKotlin(new Lattice$1(2, [inner_1]));
                     return [replace(patternInput_5[0], "value", concat("value.", field)), patternInput_5[1]];
@@ -204,9 +216,10 @@ export function toKotlin(predicate) {
 /**
  * Emits a full Kotlin validation function and its Fidelity grade.
  */
-export function emitValidator(name, predicate, isNullable) {
+export function emitValidator(name, predicate, isNullable, provenance) {
     const patternInput = toKotlin(predicate);
-    return [`fun validate_${name}(value: dynamic): Boolean {${isNullable ? "\n    if (value == null) return true" : ""}
+    const guard = isNullable ? "\n    if (value == null) return true" : "";
+    return [`${(provenance == null) ? "" : concat("// Provenance: ", provenance, "\n")}fun validate_${name}(value: dynamic): Boolean {${guard}
     return ${patternInput[0]}
 }`, patternInput[1]];
 }

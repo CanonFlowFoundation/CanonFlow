@@ -21,7 +21,7 @@ export function extractGenerators(lattice_mut) {
                 break;
             }
             case 2: {
-                if (lattice.fields[0].tag === 10) {
+                if (lattice.fields[0].tag === 12) {
                     switch (lattice.fields[0].fields[1].tag) {
                         case 0: {
                             matchResult = 1;

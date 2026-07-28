@@ -59,4 +59,4 @@ module FsCheckEmitter =
                             sb.AppendLine($"    let arb{c.Name} = Arb.fromGen gen{c.Name}") |> ignore
             sb.AppendLine("") |> ignore
             
-        sb.ToString()
+        string sb
