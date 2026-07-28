@@ -47,6 +47,11 @@ jobs:
         PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
         PGPASSWORD=password psql -h localhost -U postgres -d canonflow_test -f samples/sangam-credit.sql
         
-    - name: Run CanonFlow Strict Mode (Sangam Credit)
+    - name: Assert strict mode rejects unsupported Sangam constraints
       run: |
+        set +e
         dotnet run --project src/Canon.Cli/Canon.Cli.fsproj -- --pg "Host=localhost;Username=postgres;Password=password;Database=canonflow_test" --contracts --verify
+        verify_status=$?
+        set -e
+        test "$verify_status" -eq 1
+        grep -q "Unsupported (Manual Guard Required)" output/PROOF.md
