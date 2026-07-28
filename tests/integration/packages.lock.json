@@ -218,6 +218,16 @@
           "Thoth.Json.Net": "[12.0.0, )"
         }
       },
+      "canonflow.profile.pgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Canon.Core": "[1.0.0, )",
+          "Canon.Introspect": "[1.0.0, )",
+          "CanonFlow.Assurance": "[0.1.5-alpha, )",
+          "FSharp.Core": "[9.0.300, )",
+          "Npgsql": "[9.0.2, )"
+        }
+      },
       "BouncyCastle.Cryptography": {
         "type": "CentralTransitive",
         "requested": "[2.6.2, )",

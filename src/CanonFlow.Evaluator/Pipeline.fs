@@ -8,7 +8,7 @@ open CanonFlow.Assurance.Signing
 open CanonFlow.Assurance.Verification
 
 type EvaluationRun = {
-    Receipt: CanonFlowEvidenceReceipt
+    Receipt: CanonFlowEvidenceReceiptV11
     CanonicalReceipt: string
     ReceiptDigest: string
     ExitCode: int
@@ -31,11 +31,17 @@ module Pipeline =
             | [] -> Verdict.Inconclusive
             | head :: tail -> tail |> List.fold Verdict.join head
 
-    let exitCode = function
-        | Verdict.Pass -> 0
-        | Verdict.Fail -> 1
-        | Verdict.Inconclusive -> 2
-        | Verdict.ToolFailure -> 3
+    let aggregateAll assessments constructiveAssessments =
+        let verificationVerdict = aggregate assessments
+        let constructiveVerdict =
+            ConstructiveAssessment.aggregate constructiveAssessments
+        match assessments, constructiveAssessments with
+        | [], [] -> Verdict.Inconclusive
+        | [], _ -> constructiveVerdict
+        | _, [] -> verificationVerdict
+        | _ -> Verdict.join verificationVerdict constructiveVerdict
+
+    let exitCode = ExitCode.ofVerdict
 
     let private validateSubjectRoot root =
         let fullPath = Path.GetFullPath(root)
@@ -122,27 +128,34 @@ module Pipeline =
                     Subject = { manifest.Subject with Root = subjectRoot; Artifacts = artifacts }
             }
 
-            let! assessments =
+            let! assessments, constructiveAssessments =
                 manifest.Profiles
                 |> List.map (fun profile ->
                     match profile with
                     | "fsassay-production-v1" ->
                         FsAssayRunner.run componentManifest budget
                         |> Async.RunSynchronously
+                        |> fun assessment -> [assessment], []
                         |> Ok
                     | "ondc-retail-1.2.0-preview" ->
                         OndcRunner.run componentManifest budget
+                        |> Result.map (fun assessment -> [assessment], [])
+                    | profile when profile = ConstructiveRunner.ProfileId ->
+                        ConstructiveRunner.run componentManifest budget
+                        |> Result.map (fun constructive -> [], constructive)
                     | unknown ->
                         Error $"Profile is not installed: {unknown}")
                 |> List.fold (fun state next ->
                     match state, next with
-                    | Ok accumulated, Ok assessment -> Ok (assessment :: accumulated)
-                    | Error error, _ | _, Error error -> Error error) (Ok [])
-                |> Result.map List.rev
+                    | Ok (verification, constructive), Ok (nextVerification, nextConstructive) ->
+                        Ok (
+                            verification @ nextVerification,
+                            constructive @ nextConstructive)
+                    | Error error, _ | _, Error error -> Error error) (Ok ([], []))
 
-            let verdict = aggregate assessments
+            let verdict = aggregateAll assessments constructiveAssessments
             let unsignedReceipt = {
-                SchemaVersion = "1.0"
+                SchemaVersion = "1.1"
                 ReceiptType = "CanonFlowEvidenceReceipt"
                 ReplayIdentity = replayIdentity
                 Subject = {
@@ -160,6 +173,7 @@ module Pipeline =
                     NetworkPolicy = manifest.EvaluationContext.Network
                 }
                 Assessments = assessments
+                ConstructiveAssessments = constructiveAssessments
                 Verdict = verdict
                 Seal = Some (Seal.createUnsigned ())
             }

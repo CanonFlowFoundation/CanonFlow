@@ -1,0 +1,1 @@
+CHECK (email IS NOT NULL OR phone IS NOT NULL)

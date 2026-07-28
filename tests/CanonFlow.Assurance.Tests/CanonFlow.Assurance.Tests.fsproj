@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="HashTests.fs" />
+    <Compile Include="ObligationManifestTests.fs" />
+    <Compile Include="ConstructiveEvidenceTests.fs" />
     <Compile Include="KernelTests.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>

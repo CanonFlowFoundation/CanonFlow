@@ -12,9 +12,9 @@ open System.Text.Json.Nodes
 
 module KernelTests =
 
-    let private sampleReceipt verdict =
+    let private sampleReceipt verdict : CanonFlowEvidenceReceiptV11 =
         {
-            SchemaVersion = "1.0"
+            SchemaVersion = "1.1"
             ReceiptType = "CanonFlowEvidenceReceipt"
             ReplayIdentity = "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
             Subject = {
@@ -38,6 +38,7 @@ module KernelTests =
                 EvaluatedRules = 1
                 Evidence = []
             }]
+            ConstructiveAssessments = []
             Verdict = verdict
             Seal = None
         }
@@ -79,6 +80,42 @@ module KernelTests =
     let ``Assessment summarize of empty list with Broken health is ToolFailure`` () =
         let result = Assessment.summarize (EvidenceHealth.Broken {Description="err"}) []
         Assert.Equal(Verdict.ToolFailure, result)
+
+    [<Fact>]
+    let ``Constructive modelling is dormant without weakening verification`` () =
+        Assert.Equal(ConstructiveMode.Dormant, ClaimPolicy.defaultConstructiveMode)
+        Assert.False(ClaimPolicy.canEmitConstructiveProjection ClaimPolicy.defaultConstructiveMode)
+        let verdict =
+            Assessment.summarize
+                EvidenceHealth.Complete
+                [ Truth.Clear ClearOutcome.Conformant ]
+        Assert.Equal(Verdict.Pass, verdict)
+
+    [<Fact>]
+    let ``Pass envelope with no assessments is rejected`` () =
+        let receipt =
+            { sampleReceipt Verdict.Pass with Assessments = [] }
+            |> CanonicalReceiptJson.serializeReceipt
+        Assert.True(
+            ReceiptVerifier.verifyEnvelopeJson receipt None true
+            |> Result.isError)
+
+    [<Fact>]
+    let ``Pass envelope with zero applicable rules is rejected`` () =
+        let receipt =
+            {
+                sampleReceipt Verdict.Pass with
+                    Assessments =
+                        [{
+                            (sampleReceipt Verdict.Pass).Assessments.Head with
+                                ApplicableRules = 0
+                                EvaluatedRules = 0
+                        }]
+            }
+            |> CanonicalReceiptJson.serializeReceipt
+        Assert.True(
+            ReceiptVerifier.verifyEnvelopeJson receipt None true
+            |> Result.isError)
 
     [<Fact>]
     let ``Signed receipt verifies and a signed-field mutation fails`` () =

@@ -12,6 +12,8 @@ type SubjectManifest = {
 type ConfigurationManifest = {
     OndcProfileRef: string option
     FsassayRulePack: string option
+    ObligationManifestPath: string option
+    ConstructiveEvidencePath: string option
     SealKeyPath: string option
     SealKeyId: string option
 }
@@ -46,6 +48,8 @@ module ManifestParser =
         Decode.object (fun get ->
             { OndcProfileRef = get.Optional.Field "ondcProfileRef" Decode.string
               FsassayRulePack = get.Optional.Field "fsassayRulePack" Decode.string
+              ObligationManifestPath = get.Optional.Field "obligationManifestPath" Decode.string
+              ConstructiveEvidencePath = get.Optional.Field "constructiveEvidencePath" Decode.string
               SealKeyPath = get.Optional.Field "sealKeyPath" Decode.string
               SealKeyId = get.Optional.Field "sealKeyId" Decode.string }
         )
@@ -104,7 +108,18 @@ module ManifestParser =
                 do! exactObject "evaluationContext" ["instant"; "timeProvenance"; "network"; "locale"] (root.GetProperty("evaluationContext"))
                 let hasConfiguration, configuration = root.TryGetProperty("configuration")
                 if hasConfiguration then
-                    do! exactObject "configuration" ["ondcProfileRef"; "fsassayRulePack"; "sealKeyPath"; "sealKeyId"] configuration
+                    do!
+                        exactObject
+                            "configuration"
+                            [
+                                "ondcProfileRef"
+                                "fsassayRulePack"
+                                "obligationManifestPath"
+                                "constructiveEvidencePath"
+                                "sealKeyPath"
+                                "sealKeyId"
+                            ]
+                            configuration
                 let hasBudget, budget = root.TryGetProperty("budget")
                 if hasBudget then
                     do!

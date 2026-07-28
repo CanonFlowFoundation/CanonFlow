@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0",
+  "admissionId": "cff:admission:fsassay-required-contact-preservation-v1",
+  "status": "ProductionAdmitted",
+  "scope": {
+    "obligationId": "cff:lab:required-contact",
+    "generatedArtifact": "examples/required-contact-lab-generated.fs",
+    "profile": "profiles/fsassay-canonflow-obligation-v1/profile.json",
+    "profileDigest": "sha256:2e26382f42cd38c128036c22d72aba6f7ec20a4a54cd3d55d80aa30c982f20a0"
+  },
+  "toolchain": {
+    "engine": "FsAssay.Cli",
+    "engineVersion": "1.0.4",
+    "plugin": "FsAssay.CanonFlow.Plugin",
+    "pluginVersion": "1.0.0",
+    "sdk": "FSharp.Analyzers.SDK",
+    "sdkVersion": "0.37.2",
+    "compilerServiceVersion": "43.12.201"
+  },
+  "rules": [
+    {
+      "id": "CFF-OBL001",
+      "disposition": "Blocking",
+      "purpose": "source, manifest, generated artifact, audit and obligation binding integrity"
+    },
+    {
+      "id": "CFF-OBL002",
+      "disposition": "Blocking",
+      "purpose": "required union cases, payloads and private wrapper representation"
+    },
+    {
+      "id": "CFF-OBL003",
+      "disposition": "Blocking",
+      "purpose": "required encode/decode typed-symbol and signature preservation"
+    },
+    {
+      "id": "CFF-OBL004",
+      "disposition": "Blocking",
+      "purpose": "wildcard reporting in the obligated generated artifact"
+    },
+    {
+      "id": "CFF-OBL005",
+      "disposition": "Blocking",
+      "purpose": "unaudited obligation-finding suppression"
+    },
+    {
+      "id": "CFF-OBL006",
+      "disposition": "Inconclusive",
+      "purpose": "missing typed-tree evidence"
+    }
+  ],
+  "behavioralEvidence": {
+    "suite": "FsAssay.Tests/ObligationPluginTests.fs",
+    "positiveSpecimens": 2,
+    "hostileSpecimens": 7,
+    "compilerFailureExpectedExit": 2,
+    "pluginLoadFailureExpectedExit": 3
+  },
+  "claimBoundary": {
+    "structuralPreservationOnly": true,
+    "semanticOracle": false,
+    "businessOracleAgreement": false,
+    "regulatoryAuthority": "none"
+  }
+}

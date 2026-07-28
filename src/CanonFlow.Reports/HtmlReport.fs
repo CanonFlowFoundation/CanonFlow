@@ -14,7 +14,7 @@ module HtmlReport =
                 $"<li><strong>{WebUtility.HtmlEncode(owner)}</strong>: {WebUtility.HtmlEncode(description)}</li>")
             |> String.concat ""
 
-    let generate (receipt: CanonFlowEvidenceReceipt) =
+    let generate (receipt: CanonFlowEvidenceReceiptV11) =
         let verdict = receipt.Verdict |> ReceiptText.verdict |> WebUtility.HtmlEncode
         let assessments =
             receipt.Assessments
@@ -23,6 +23,14 @@ module HtmlReport =
                 let health = WebUtility.HtmlEncode(ReceiptText.health assessment.Health)
                 let compliance = WebUtility.HtmlEncode(ReceiptText.compliance assessment.Compliance)
                 $"<li><strong>{componentName}</strong>: health={health}; compliance={compliance}; rules={assessment.EvaluatedRules}/{assessment.ApplicableRules}</li>")
+            |> String.concat ""
+        let constructiveAssessments =
+            receipt.ConstructiveAssessments
+            |> List.map (fun assessment ->
+                let obligation = WebUtility.HtmlEncode(assessment.ObligationId)
+                let state = WebUtility.HtmlEncode(assessment.ProjectionState)
+                let verdict = WebUtility.HtmlEncode(ReceiptText.verdict assessment.Verdict)
+                $"<li><strong>{obligation}</strong>: projection={state}; verdict={verdict}; gates={assessment.EvaluatedGates}/{assessment.RequiredGates}</li>")
             |> String.concat ""
         let evidence =
             receipt.Assessments
@@ -47,6 +55,8 @@ module HtmlReport =
     <p class="warning">Derived view only. This report is not a certificate; verify assessment.cff independently.</p>
     <h2>Components</h2>
     <ul>{assessments}</ul>
+    <h2>Constructive components</h2>
+    <ul>{constructiveAssessments}</ul>
     <h2>Findings</h2>
     <ul>{listItems "No proven violations." (ReportCommon.findings receipt)}</ul>
     <h2>Missing evidence and unsupported checks</h2>

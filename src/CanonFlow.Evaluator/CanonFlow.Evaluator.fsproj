@@ -15,6 +15,7 @@
     <Compile Include="ComponentRunner.fs" />
     <Compile Include="FsAssayRunner.fs" />
     <Compile Include="OndcRunner.fs" />
+    <Compile Include="ConstructiveRunner.fs" />
     <Compile Include="Policy.fs" />
     <Compile Include="Pipeline.fs" />
   </ItemGroup>

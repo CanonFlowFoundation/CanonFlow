@@ -31,7 +31,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "canonflow_introspect_schema",
         description:
-          "Introspects a PostgreSQL database to extract strict mathematical bounds and constraints, emitting TypeScript validators and a mathematical proof of the schema.",
+          "Introspects a PostgreSQL database to extract constraints, emitting TypeScript validators and a scoped constraint-fidelity evidence report.",
         inputSchema: {
           type: "object",
           properties: {
@@ -72,7 +72,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       if (fs.existsSync(proofPath)) {
-        responseText += `=== MATHEMATICAL PROOF ===\n${fs.readFileSync(proofPath, "utf-8")}\n`;
+        responseText += `=== CONSTRAINT FIDELITY EVIDENCE ===\n${fs.readFileSync(proofPath, "utf-8")}\n`;
       }
 
       return {

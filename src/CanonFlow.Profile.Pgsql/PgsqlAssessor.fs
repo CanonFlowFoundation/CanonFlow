@@ -101,4 +101,3 @@ module PgsqlAssessor =
             Verdict = verdict
             Seal = None
         }
-

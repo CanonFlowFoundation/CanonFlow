@@ -66,6 +66,42 @@ run_fixture() {
     done
 }
 
+run_constructive_fixture() {
+    manifest_name="$1"
+    expected_exit="$2"
+    output_name="$3"
+    output_dir="$test_root/$output_name"
+    mkdir -p "$output_dir"
+    chmod 0777 "$output_dir"
+
+    set +e
+    docker run --rm \
+        --network none \
+        --read-only \
+        --cap-drop ALL \
+        --security-opt no-new-privileges \
+        --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+        --mount "type=bind,src=$repository_root/examples,dst=/input,readonly" \
+        --mount "type=bind,src=$output_dir,dst=/output" \
+        "$image_name" \
+        evaluate \
+        --manifest "/input/constructive-cm4/$manifest_name" \
+        --output /output
+    actual_exit=$?
+    set -e
+
+    if test "$actual_exit" -ne "$expected_exit"; then
+        echo "$manifest_name returned $actual_exit; expected $expected_exit." >&2
+        exit 1
+    fi
+    for artifact in assessment.cff VERDICT.json REPORT.html EVIDENCE.md LOSS.md findings.sarif; do
+        test -s "$output_dir/$artifact" || {
+            echo "$manifest_name did not produce $artifact." >&2
+            exit 1
+        }
+    done
+}
+
 run_fixture fsassay-clean 0 pass-first
 run_fixture fsassay-clean 0 pass-second
 cmp "$test_root/pass-first/assessment.cff" "$test_root/pass-second/assessment.cff"
@@ -79,6 +115,35 @@ grep -q '"kind":"ScannedFileCount".*"value":"2"' "$test_root/mixed/assessment.cf
 
 run_fixture ondc-preview 2 inconclusive
 run_fixture fsassay-clean 3 tool-failure /missing/fsassay
+
+run_constructive_fixture canonflow-evaluation.json 0 constructive-pass
+grep -q '"assessments":\[\]' "$test_root/constructive-pass/assessment.cff"
+grep -q '"constructiveAssessments":\[' "$test_root/constructive-pass/assessment.cff"
+grep -q '"projectionState":"Admitted"' "$test_root/constructive-pass/assessment.cff"
+grep -q '"evaluatedGates":4' "$test_root/constructive-pass/assessment.cff"
+
+run_constructive_fixture canonflow-evaluation.fail.json 1 constructive-fail
+grep -q '"verdict":"Fail"' "$test_root/constructive-fail/assessment.cff"
+
+run_constructive_fixture canonflow-evaluation.missing.json 2 constructive-missing
+grep -q '"evaluatedGates":0' "$test_root/constructive-missing/assessment.cff"
+grep -q '"missingGateIds":\[' "$test_root/constructive-missing/assessment.cff"
+
+docker run --rm \
+    --pull=never \
+    --network none \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --tmpfs /tmp:rw,noexec,nosuid,nodev,size=16m \
+    -i \
+    "$image_name" \
+    receipt verify \
+    --receipt - \
+    --public-key-hex d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a \
+    < "$test_root/constructive-pass/assessment.cff" \
+    > "$test_root/constructive-verification.json"
+grep -q '"valid":true' "$test_root/constructive-verification.json"
 
 sdk_result="$test_root/ondc-sdk-result.json"
 set +e
@@ -157,6 +222,12 @@ docker run --rm \
     capabilities --json \
     > "$test_root/sdk-capabilities.json"
 grep -q '"authority":"none"' "$test_root/sdk-capabilities.json"
+grep -q '"status":"dormant"' "$test_root/sdk-capabilities.json"
+grep -q '"productionEmission":false' "$test_root/sdk-capabilities.json"
+grep -q '"ConstructivelyProjected"' "$test_root/sdk-capabilities.json"
+grep -q '"manifestType":"CanonFlowObligationManifest"' "$test_root/sdk-capabilities.json"
+grep -q '"schemaVersion":"1.0"' "$test_root/sdk-capabilities.json"
+grep -q '"id":"required-contact-postgres-v1-lab"' "$test_root/sdk-capabilities.json"
 
 set +e
 docker run --rm \

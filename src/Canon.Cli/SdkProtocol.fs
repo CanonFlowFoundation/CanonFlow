@@ -5,6 +5,7 @@ open System.IO
 open System.Text
 open System.Text.Json
 open Argu
+open CanonFlow.Assurance
 open CanonFlow.Assurance.Verification
 
 type OndcEvaluateSdkArguments =
@@ -281,6 +282,45 @@ module SdkProtocol =
                                 version = ProtocolVersion
                                 commands = [| "ondc evaluate"; "receipt verify"; "capabilities" |]
                             |}
+                        claims =
+                            {|
+                                vocabulary =
+                                    [|
+                                        "Verified"
+                                        "ConstructivelyProjected"
+                                        "Inconclusive"
+                                        "Unsupported"
+                                        "Experimental"
+                                    |]
+                                verifiedMeans = "admitted-rules-and-evidence-only"
+                            |}
+                        constructiveModelling =
+                            {|
+                                status = "dormant"
+                                productionEmission = false
+                                laboratoryProfiles =
+                                    [|
+                                        {|
+                                            id = "required-contact-postgres-v1-lab"
+                                            status = "experimental"
+                                            sourceDigest = "sha256:8a71fd4510146dbd2bf2822eef5b7934bfef70612b3fa1ad97d69d5938c2bded"
+                                            projectionState = "Admitted"
+                                            derivation =
+                                                {|
+                                                    kind = "Admitted"
+                                                    admissionId = "cff:admission:cm2-required-contact-lab"
+                                                |}
+                                            obligationId = "cff:lab:required-contact"
+                                            receiptProfile = "required-contact-constructive-v1"
+                                            productionEmission = false
+                                        |}
+                                    |]
+                            |}
+                        obligationManifest =
+                            {|
+                                manifestType = ObligationManifest.ManifestType
+                                schemaVersion = ObligationManifest.SchemaVersion
+                            |}
                         profiles =
                             [|
                                 {|
@@ -294,11 +334,14 @@ module SdkProtocol =
                             |]
                         receipt =
                             {|
-                                schemaVersion = "1.0"
+                                schemaVersion = "1.1"
                                 typeName = "CanonFlowEvidenceReceipt"
+                                verificationField = "assessments"
+                                constructiveField = "constructiveAssessments"
                             |}
                     |})
         else
             Console.Out.WriteLine("CanonFlow SDK protocol 1.0")
+            Console.Out.WriteLine("Constructive modelling: dormant (production emission disabled)")
             Console.Out.WriteLine($"Installed profile: {PreviewProfile} (experimental; not ONDC certification)")
         0

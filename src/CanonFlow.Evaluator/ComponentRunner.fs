@@ -14,11 +14,9 @@ type ComponentExecutionResult = {
 module ComponentRunner =
 
     let mapExitCodeToVerdict (exitCode: int) =
-        match exitCode with
-        | 0 -> Verdict.Pass
-        | 1 -> Verdict.Fail
-        | 2 -> Verdict.Inconclusive
-        | _ -> Verdict.ToolFailure
+        exitCode
+        |> ExitCode.tryVerdict
+        |> Option.defaultValue Verdict.ToolFailure
 
     let runComponentAsync (executablePath: string) (args: string list) (budget: EvaluationBudget) =
         async {

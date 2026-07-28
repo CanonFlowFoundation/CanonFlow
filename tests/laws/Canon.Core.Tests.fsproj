@@ -12,6 +12,8 @@
     <Compile Include="SoundnessLaws.fs" />
     <Compile Include="SemanticOptimizerTests.fs" />
     <Compile Include="DriftEngineTests.fs" />
+    <Compile Include="..\..\examples\required-contact-lab-generated.fs" Link="RequiredContact.Generated.fs" />
+    <Compile Include="RequiredContactLabTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -32,6 +34,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Canon.Core\Canon.Core.fsproj" />
     <ProjectReference Include="..\..\src\Canon.Fable\Canon.Fable.fsproj" />
+    <ProjectReference Include="..\..\src\Canon.Introspect\Canon.Introspect.fsproj" />
+    <ProjectReference Include="..\..\src\CanonFlow.Assurance\CanonFlow.Assurance.fsproj" />
+    <ProjectReference Include="..\..\src\CanonFlow.Profile.Pgsql\CanonFlow.Profile.Pgsql.fsproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@
 ## The Problem
 As AI agents gain autonomous capabilities to write database records and spin up endpoints, we face a massive crisis: LLM hallucination in data schemas. If an LLM-generated form submits `age: 150` because it didn't know about a Postgres `CHECK (age <= 120)` constraint, your data integrity collapses.
 
-Most ORMs approach this by generating TypeScript or C# from the database, but this is a one-way street with no mathematical proof of equivalence.
+Most ORMs approach this by generating TypeScript or C# from the database, but this is a one-way street without machine-verifiable evidence of total semantic equivalence.
 
 ## Enter CanonFlow
 We built CanonFlow, an F#-native engine that elevates database constraints into a mathematical Lattice. 

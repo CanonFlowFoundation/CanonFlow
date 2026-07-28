@@ -1,0 +1,23 @@
+{
+  "$schema": "https://canonflow.dev/schemas/evaluation-manifest-v1.json",
+  "subject": {
+    "root": "..",
+    "artifacts": [
+      "required-contact-lab-obligation-manifest.json"
+    ]
+  },
+  "evaluationContext": {
+    "instant": "2026-07-28T00:00:00Z",
+    "timeProvenance": "Declared",
+    "network": "Forbidden",
+    "locale": "invariant"
+  },
+  "configuration": {
+    "obligationManifestPath": "required-contact-lab-obligation-manifest.json",
+    "sealKeyPath": "../ondc-preview/test-receipt-private-key.hex",
+    "sealKeyId": "rfc8032:test-vector-1"
+  },
+  "profiles": [
+    "required-contact-constructive-v1"
+  ]
+}

@@ -9,6 +9,7 @@
     <Compile Include="FieldClass.fs" />
     <Compile Include="Sanitizer.fs" />
     <Compile Include="Lattice.fs" />
+    <Compile Include="RowConstraint.fs" />
     <Compile Include="SqlTruth.fs" />
     <Compile Include="Lineage.fs" />
     <Compile Include="Drift.fs" />
@@ -17,7 +18,7 @@
   
   <ItemGroup>
     <Content Include="..\..\build\Canon.Core.targets" PackagePath="build\" />
-    <Content Include="..\..\build-tools\fsassay.fsx" PackagePath="build\" />
+    <Content Include="..\..\build-tools\canonflow-lexical-guard.fsx" PackagePath="build\" />
   </ItemGroup>
 
 </Project>

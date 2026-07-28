@@ -396,17 +396,17 @@ module Program =
                     printfn "Swift validators generated in 'client/ios/validators/Validators.swift'."
 
                 if results.Contains(Contracts) || results.Contains(ContractsKotlin) || results.Contains(ContractsSwift) then
-                    // Generate the Mathematical Proof Report
+                    // Generate the constraint-fidelity evidence report.
                     let proofReport, totalApprox, totalUnsupported = Canon.Cli.ProofEmitter.emitProofReport tables
                     System.IO.File.WriteAllText("output/PROOF.md", proofReport)
-                    printfn "\n[Stage 4: Verify] Mathematical Proof Engine: Signed certification generated at 'output/PROOF.md'."
+                    printfn "\n[Stage 4: Verify] Constraint fidelity evidence generated at 'output/PROOF.md' (not a certificate)."
                     
                     if results.Contains(Verify) then
                         if totalUnsupported > 0 || totalApprox > 0 then
                             printfn $"\n[CI/CD CHECK FAILED] Found {totalUnsupported} unsupported and {totalApprox} approximate bounds!"
                             Environment.Exit(1)
                         else
-                            printfn "\n[CI/CD CHECK PASSED] 100%% exact mathematical fidelity achieved!"
+                            printfn "\n[CI/CD CHECK PASSED] No approximate or unsupported translation was observed in the assessed set. Review PROOF.md for scope and assumptions."
                 
                 // Scaffold React Forms
                 if results.Contains(ScaffoldForms) then

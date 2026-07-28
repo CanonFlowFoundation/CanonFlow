@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0",
+  "positive": [
+    "email IS NOT NULL OR phone IS NOT NULL",
+    "(phone IS NOT NULL OR email IS NOT NULL)"
+  ],
+  "negative": [
+    "email IS NOT NULL AND phone IS NOT NULL",
+    "email IS NULL OR phone IS NOT NULL",
+    "email IS NOT NULL OR email IS NOT NULL",
+    "email IS NOT NULL OR phone IS NOT NULL OR fax IS NOT NULL"
+  ],
+  "hostile": [
+    "COALESCE(email, phone) IS NOT NULL",
+    "email IS NOT NULL OR mystery(phone)",
+    "email IS NOT NULL /* hidden OR phone IS NOT NULL */"
+  ],
+  "truthTable": [
+    {
+      "email": null,
+      "phone": null,
+      "admitted": false
+    },
+    {
+      "email": "a@example.test",
+      "phone": null,
+      "admitted": true
+    },
+    {
+      "email": null,
+      "phone": "+91-555-0100",
+      "admitted": true
+    },
+    {
+      "email": "a@example.test",
+      "phone": "+91-555-0100",
+      "admitted": true
+    }
+  ]
+}

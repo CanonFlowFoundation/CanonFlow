@@ -43,6 +43,21 @@
         "resolved": "13.0.1",
         "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
+      "canon.core": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "[9.0.300, )"
+        }
+      },
+      "canon.introspect": {
+        "type": "Project",
+        "dependencies": {
+          "Canon.Core": "[1.0.0, )",
+          "FParsec": "[1.1.1, )",
+          "FSharp.Core": "[9.0.300, )",
+          "Npgsql": "[9.0.2, )"
+        }
+      },
       "canonflow.assurance": {
         "type": "Project",
         "dependencies": {
@@ -58,6 +73,15 @@
         "requested": "[2.6.2, )",
         "resolved": "2.6.2",
         "contentHash": "7oWOcvnntmMKNzDLsdxAYqApt+AjpRpP2CShjMfIa3umZ42UQMvH0tl1qAliYPNYO6vTdcGMqnRrCPmsfzTI1w=="
+      },
+      "FParsec": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.1, )",
+        "resolved": "1.1.1",
+        "contentHash": "Wdjf/gCNLEwd+0nUCDh9jAIIcKGwfhRramySTnTcVVgNC6i4Vp5aJklUJJfvFkEZMYNZEDGcI8pCa36/TmwmSg==",
+        "dependencies": {
+          "FSharp.Core": "4.3.4"
+        }
       },
       "FSharp.UMX": {
         "type": "CentralTransitive",

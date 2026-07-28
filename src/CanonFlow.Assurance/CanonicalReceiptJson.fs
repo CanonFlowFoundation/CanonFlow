@@ -106,7 +106,51 @@ module CanonicalReceiptJson =
             "evidence", JArray (a.Evidence |> List.map encodeEvidenceRef)
         ]
 
-    let encodeReceipt (r: CanonFlowEvidenceReceipt) =
+    let encodeConstructiveEvidence (e: ConstructiveEvidenceReference) =
+        JObject [
+            "digest", JString e.Digest
+            "kind", JString e.Kind
+            "path", JString e.Path
+            "provenance", (e.Provenance |> Option.map JString |> Option.defaultValue JNull)
+        ]
+
+    let encodeConstructiveGate (gate: ConstructiveGateAssessmentRecord) =
+        JObject [
+            "evidence",
+                gate.Evidence
+                |> List.map encodeConstructiveEvidence
+                |> JArray
+            "gateId", JString gate.GateId
+            "gateVersion", JString gate.GateVersion
+            "implementationDigest", JString gate.ImplementationDigest
+            "verdict", JString (ReceiptText.verdict gate.Verdict)
+        ]
+
+    let encodeConstructiveAssessment (assessment: ConstructiveAssessmentRecord) =
+        JObject [
+            "derivationKind", JString assessment.DerivationKind
+            "derivationReference",
+                assessment.DerivationReference
+                |> Option.map JString
+                |> Option.defaultValue JNull
+            "evaluatedGates", JNumber assessment.EvaluatedGates
+            "gates",
+                assessment.Gates
+                |> List.map encodeConstructiveGate
+                |> JArray
+            "manifestDigest", JString assessment.ManifestDigest
+            "missingGateIds",
+                assessment.MissingGateIds
+                |> List.map JString
+                |> JArray
+            "obligationId", JString assessment.ObligationId
+            "projectionState", JString assessment.ProjectionState
+            "requiredGates", JNumber assessment.RequiredGates
+            "sourceDigest", JString assessment.SourceDigest
+            "verdict", JString (ReceiptText.verdict assessment.Verdict)
+        ]
+
+    let encodeReceipt (r: CanonFlowEvidenceReceiptV11) =
         JObject [
             "schemaVersion", JString r.SchemaVersion
             "receiptType", JString r.ReceiptType
@@ -115,10 +159,14 @@ module CanonicalReceiptJson =
             "evaluator", encodeEvaluator r.Evaluator
             "context", encodeContext r.Context
             "assessments", JArray (r.Assessments |> List.map encodeAssessment)
+            "constructiveAssessments",
+                JArray (
+                    r.ConstructiveAssessments
+                    |> List.map encodeConstructiveAssessment)
             "verdict", JString (ReceiptText.verdict r.Verdict)
         ]
 
-    let serializeReceipt (env: CanonFlowEvidenceReceipt) =
+    let serializeReceipt (env: CanonFlowEvidenceReceiptV11) =
         serialize (encodeReceipt env)
 
     let private encodeSeal seal =

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0",
+  "manifestDigest": "sha256:f3cdf9cd115654f0a63b449261962f7b59f4b11cfe4a43e48046d7c7c3cdb47e",
+  "observations": [
+    {
+      "obligationId": "cff:lab:required-contact",
+      "gateId": "cff:gate:mutation-corpus",
+      "gateVersion": "v1",
+      "implementationDigest": "sha256:e334a8155b7fce69bfeedbc13565b024447a85a94c0efae3177f423f7bd34ec7",
+      "verdict": "Fail",
+      "evidence": [
+        {
+          "kind": "MutationCorpus",
+          "path": "required-contact-lab-corpus.json",
+          "digest": "sha256:2be7b4ef3ac56d59fd01ae3bc854d54c13d61c9c2cbd064b382a7cd1f427bb7b",
+          "provenance": "CM4 hostile failed-gate witness"
+        }
+      ]
+    },
+    {
+      "obligationId": "cff:lab:required-contact",
+      "gateId": "cff:gate:parser-certainty",
+      "gateVersion": "v1",
+      "implementationDigest": "sha256:5d65f040e0359a93d7113435f1fd1b1e44240c2cfebcf14b4ddadd70d71c9462",
+      "verdict": "Pass",
+      "evidence": [
+        {
+          "kind": "AuthoritativeSourceFragment",
+          "path": "required-contact-lab-source.sql",
+          "digest": "sha256:e5af43373f34ce4c3a0c416b3f055a48b6fc02b34197e275240730abc2f81960",
+          "provenance": "CM2 parser-certainty gate"
+        }
+      ]
+    },
+    {
+      "obligationId": "cff:lab:required-contact",
+      "gateId": "cff:gate:postgres-truth-table",
+      "gateVersion": "v1",
+      "implementationDigest": "sha256:dacb0445161bf1b6cbcc657588866e8cbf72ba15f006258d38885b65bbe7fbf7",
+      "verdict": "Pass",
+      "evidence": [
+        {
+          "kind": "FidelityReport",
+          "path": "required-contact-lab-fidelity.md",
+          "digest": "sha256:faee73516deb0ecd8d0423b9f3ac8f085eb97f88d2d4edb07f585763f097cdab",
+          "provenance": "CM2 PostgreSQL four-row oracle"
+        }
+      ]
+    },
+    {
+      "obligationId": "cff:lab:required-contact",
+      "gateId": "cff:gate:round-trip",
+      "gateVersion": "v1",
+      "implementationDigest": "sha256:650c1f8a5ed3038b87c8811cdc9472cd6516fbb1c4930f457188653ead74c2a5",
+      "verdict": "Pass",
+      "evidence": [
+        {
+          "kind": "GeneratedModel",
+          "path": "required-contact-lab-generated.fs",
+          "digest": "sha256:e12e74dd9aa3e6adea74d6d614b8f87bdbf03fc148d71dac024b1cb29065b842",
+          "provenance": "CM2 round-trip law and CM3 preservation profile"
+        }
+      ]
+    }
+  ]
+}

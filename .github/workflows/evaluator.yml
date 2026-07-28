@@ -25,14 +25,32 @@ jobs:
           repository: CanonFlowFoundation/Ondcflow
           path: ONDCFlow
 
+      - name: Checkout FsAssay
+        uses: actions/checkout@v4
+        with:
+          repository: CanonFlowFoundation/FSharpAssay
+          path: FSharpAssay
+
       - name: Install exact .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.301
 
-      - name: Cross-repository locked build and tests
+      - name: Enforce CM0 ownership and public-claim boundaries
         working-directory: CanonFlow
-        run: bash build-tools/build-integration.sh
+        run: bash build-tools/test-cm0-boundaries.sh
+
+      - name: Enforce CM1 obligation schema invariants
+        working-directory: CanonFlow
+        run: bash build-tools/test-cm1-contract.sh
+
+      - name: Enforce CM3 obligation preservation
+        working-directory: CanonFlow
+        run: bash build-tools/test-cm3-obligation.sh
+
+      - name: Cross-repository locked build and tests twice
+        working-directory: CanonFlow
+        run: bash build-tools/build-integration-twice.sh
 
       - name: Build pinned evaluator image
         working-directory: CanonFlow

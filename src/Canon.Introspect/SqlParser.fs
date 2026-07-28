@@ -72,10 +72,10 @@ module SqlParser =
             (fun colA op colB -> Lattice.Leaf (RelativeBound(colA, op, colB)))
 
     let pIsNull = 
-        pipe2 (pField .>> ws) (pstring "IS NULL") (fun f _ -> Lattice.Leaf (Constraint.Opaque(sprintf "%s IS NULL" f)))
+        pipe2 (pField .>> ws) (pstring "IS NULL") (fun f _ -> Lattice.Leaf (FieldBound(f, Constraint.IsNull)))
 
     let pIsNotNull = 
-        pipe2 (pField .>> ws) (pstring "IS NOT NULL") (fun f _ -> Lattice.Leaf (Constraint.Opaque(sprintf "%s IS NOT NULL" f)))
+        pipe2 (pField .>> ws) (pstring "IS NOT NULL") (fun f _ -> Lattice.Leaf (FieldBound(f, Constraint.IsNotNull)))
 
     let pCondition = 
         attempt (pipe2 (pField .>> ws) pAnyArray (fun ident inset -> Lattice.Leaf (FieldBound(ident, inset)))) <|>
@@ -86,7 +86,9 @@ module SqlParser =
 
     let opp = new OperatorPrecedenceParser<Lattice<Constraint>, unit, unit>()
     let pExpr = opp.ExpressionParser
-    opp.TermParser <- attempt pCondition <|> between (pstring "(" >>. ws) (pstring ")" >>. ws) pExpr
+    opp.TermParser <-
+        attempt (pCondition .>> ws)
+        <|> between (pstring "(" >>. ws) (pstring ")" >>. ws) pExpr
 
     opp.AddOperator(InfixOperator("AND", ws, 2, Associativity.Left, Lattice.and'))
     opp.AddOperator(InfixOperator("OR", ws, 1, Associativity.Left, Lattice.or'))
@@ -119,3 +121,6 @@ module SqlParser =
         match run (ws >>. pExpr .>> eof) cleanSql with
         | Success(result, _, _) -> result
         | Failure(_, _, _) -> Lattice.Leaf(Constraint.Opaque sql)
+
+    let parseRowConstraint sql =
+        sql |> parseConstraint |> RowConstraint.create

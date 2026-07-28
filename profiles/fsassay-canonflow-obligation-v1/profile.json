@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "profileId": "cff:fsassay:required-contact:v1",
+  "obligationId": "cff:lab:required-contact",
+  "sourcePath": "../../examples/required-contact-lab-source.sql",
+  "sourceDigest": "sha256:e5af43373f34ce4c3a0c416b3f055a48b6fc02b34197e275240730abc2f81960",
+  "manifestPath": "../../examples/required-contact-lab-obligation-manifest.json",
+  "manifestDigest": "sha256:f3cdf9cd115654f0a63b449261962f7b59f4b11cfe4a43e48046d7c7c3cdb47e",
+  "generatedPath": "../../examples/required-contact-lab-generated.fs",
+  "generatedDigest": "sha256:e12e74dd9aa3e6adea74d6d614b8f87bdbf03fc148d71dac024b1cb29065b842",
+  "suppressionAuditPath": "../../examples/required-contact-lab-suppression-audit.json",
+  "suppressionAuditDigest": "sha256:7a0b7943ccd293821e69c3413abdfebf3d74e3d9a2a92c2f362a7fcbab72f8b3",
+  "requiredPrivateType": "RequiredContact.Generated.ContactText",
+  "requiredType": {
+    "fullName": "RequiredContact.Generated.Contact",
+    "cases": [
+      {
+        "name": "EmailOnly",
+        "payloadTypes": [
+          "RequiredContact.Generated.ContactText"
+        ]
+      },
+      {
+        "name": "PhoneOnly",
+        "payloadTypes": [
+          "RequiredContact.Generated.ContactText"
+        ]
+      },
+      {
+        "name": "Both",
+        "payloadTypes": [
+          "RequiredContact.Generated.ContactText",
+          "RequiredContact.Generated.ContactText"
+        ]
+      }
+    ]
+  },
+  "requiredMappings": [
+    {
+      "fullName": "RequiredContact.Generated.encode",
+      "inputType": "RequiredContact.Generated.Contact",
+      "outputContainsTypes": [
+        "RequiredContact.Generated.ContactDto"
+      ]
+    },
+    {
+      "fullName": "RequiredContact.Generated.decode",
+      "inputType": "RequiredContact.Generated.ContactDto",
+      "outputContainsTypes": [
+        "RequiredContact.Generated.Contact"
+      ]
+    }
+  ],
+  "forbidWildcardPatterns": true,
+  "semanticOracle": false
+}

@@ -14,15 +14,19 @@
     <Compile Include="NonEmpty.fs" />
     <Compile Include="Verdict.fs" />
     <Compile Include="Truth.fs" />
+    <Compile Include="ClaimPolicy.fs" />
     <Compile Include="Assessment.fs" />
-    <Compile Include="Digest.fs" />
-    <Compile Include="EvaluationContext.fs" />
     <Compile Include="Hash.fs" />
+    <Compile Include="Digest.fs" />
+    <Compile Include="Obligation.fs" />
+    <Compile Include="EvaluationContext.fs" />
     <Compile Include="Seal.fs" />
     <Compile Include="Receipt.fs" />
+    <Compile Include="ConstructiveEvidence.fs" />
     <Compile Include="Ed25519Verify.fs" />
     <Compile Include="Ed25519Sign.fs" />
     <Compile Include="CanonicalReceiptJson.fs" />
+    <Compile Include="ObligationManifest.fs" />
     <Compile Include="Verification.fs" />
   </ItemGroup>
 

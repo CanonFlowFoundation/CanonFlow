@@ -12,8 +12,8 @@ module MarkdownReports =
             |> List.map (fun (owner, description) -> $"- {owner}: {description}")
             |> String.concat "\n"
 
-    let generateEvidence (receipt: CanonFlowEvidenceReceipt) =
-        let evidence =
+    let generateEvidence (receipt: CanonFlowEvidenceReceiptV11) =
+        let verificationEvidence =
             receipt.Assessments
             |> List.collect (fun assessment ->
                 assessment.Evidence
@@ -22,6 +22,17 @@ module MarkdownReports =
                     let provenance = item.Provenance |> Option.defaultValue "not supplied"
                     assessment.ComponentId,
                     $"{item.Kind}; path={item.Path}; value={value}; provenance={provenance}"))
+        let constructiveEvidence =
+            receipt.ConstructiveAssessments
+            |> List.collect (fun assessment ->
+                assessment.Gates
+                |> List.collect (fun gate ->
+                    gate.Evidence
+                    |> List.map (fun item ->
+                        let provenance = item.Provenance |> Option.defaultValue "not supplied"
+                        assessment.ObligationId,
+                        $"{gate.GateId}; {item.Kind}; path={item.Path}; digest={item.Digest}; provenance={provenance}")))
+        let evidence = verificationEvidence @ constructiveEvidence
         $"""# EVIDENCE
 
 This document summarizes the evidence presented in the receipt.
@@ -31,7 +42,7 @@ Receipt digest: {ReportCommon.receiptDigest receipt}
 {lines "No evidence references." evidence}
 """
 
-    let generateLoss (receipt: CanonFlowEvidenceReceipt) =
+    let generateLoss (receipt: CanonFlowEvidenceReceiptV11) =
         let incompleteCoverage =
             receipt.Assessments
             |> List.choose (fun assessment ->
@@ -40,6 +51,13 @@ Receipt digest: {ReportCommon.receiptDigest receipt}
                         assessment.ComponentId,
                         $"{assessment.ApplicableRules - assessment.EvaluatedRules} applicable rules were not evaluated.")
                 else None)
+        let incompleteConstruction =
+            receipt.ConstructiveAssessments
+            |> List.collect (fun assessment ->
+                assessment.MissingGateIds
+                |> List.map (fun gateId ->
+                    assessment.ObligationId,
+                    $"required gate {gateId} has no admitted evidence."))
         $"""# LOSS
 
 This document names evidence gaps, unsupported checks, tool failures, and proven violations. It is not a coverage score.
@@ -50,7 +68,7 @@ This document names evidence gaps, unsupported checks, tool failures, and proven
 
 ## Unevaluated rules
 
-{lines "No unevaluated applicable rules." incompleteCoverage}
+{lines "No unevaluated applicable rules." (incompleteCoverage @ incompleteConstruction)}
 
 ## Tool failures
 

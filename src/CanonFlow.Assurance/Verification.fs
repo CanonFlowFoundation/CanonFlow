@@ -104,11 +104,234 @@ module ReceiptVerifier =
             do! validateArray $"{label}.evidence" validateEvidence (element.GetProperty("evidence"))
         }
 
+    let private verdictRank = function
+        | "Pass" -> Ok 0
+        | "Inconclusive" -> Ok 1
+        | "Fail" -> Ok 2
+        | "ToolFailure" -> Ok 3
+        | value -> Error $"Unsupported verdict '{value}'."
+
+    let private joinVerdictText values =
+        values
+        |> List.fold (fun state value ->
+            result {
+                let! currentRank, currentText = state
+                let! nextRank = verdictRank value
+                return
+                    if nextRank > currentRank then nextRank, value
+                    else currentRank, currentText
+            }) (Ok (0, "Pass"))
+        |> Result.map snd
+
+    let private validateConstructiveEvidence label (element: JsonElement) =
+        result {
+            do! validateObject label ["digest"; "kind"; "path"; "provenance"] element
+            do! validateDigest $"{label}.digest" (element.GetProperty("digest"))
+            do! validateString $"{label}.kind" (element.GetProperty("kind"))
+            do! validateString $"{label}.path" (element.GetProperty("path"))
+            do! validateOptionalString $"{label}.provenance" (element.GetProperty("provenance"))
+        }
+
+    let private validateConstructiveGate label (element: JsonElement) =
+        result {
+            do!
+                validateObject label [
+                    "evidence"
+                    "gateId"
+                    "gateVersion"
+                    "implementationDigest"
+                    "verdict"
+                ] element
+            do! validateString $"{label}.gateId" (element.GetProperty("gateId"))
+            do! validateString $"{label}.gateVersion" (element.GetProperty("gateVersion"))
+            do! validateDigest $"{label}.implementationDigest" (element.GetProperty("implementationDigest"))
+            do!
+                validateEnum
+                    $"{label}.verdict"
+                    ["Pass"; "Inconclusive"; "Fail"; "ToolFailure"]
+                    (element.GetProperty("verdict"))
+            let evidence = element.GetProperty("evidence")
+            do! validateArray $"{label}.evidence" validateConstructiveEvidence evidence
+            if evidence.GetArrayLength() = 0
+               && element.GetProperty("verdict").GetString() = "Pass" then
+                return! Error $"{label} cannot Pass without evidence."
+        }
+
+    let private validateConstructiveAssessment label (element: JsonElement) =
+        result {
+            do!
+                validateObject label [
+                    "derivationKind"
+                    "derivationReference"
+                    "evaluatedGates"
+                    "gates"
+                    "manifestDigest"
+                    "missingGateIds"
+                    "obligationId"
+                    "projectionState"
+                    "requiredGates"
+                    "sourceDigest"
+                    "verdict"
+                ] element
+            do! validateString $"{label}.obligationId" (element.GetProperty("obligationId"))
+            do!
+                validateEnum
+                    $"{label}.projectionState"
+                    ["Dormant"; "CandidateRequiringApproval"; "Admitted"; "Unsupported"]
+                    (element.GetProperty("projectionState"))
+            do!
+                validateEnum
+                    $"{label}.derivationKind"
+                    ["None"; "Candidate"; "Admitted"; "Unsupported"]
+                    (element.GetProperty("derivationKind"))
+            do!
+                validateOptionalString
+                    $"{label}.derivationReference"
+                    (element.GetProperty("derivationReference"))
+            do! validateDigest $"{label}.sourceDigest" (element.GetProperty("sourceDigest"))
+            do! validateDigest $"{label}.manifestDigest" (element.GetProperty("manifestDigest"))
+            do!
+                validateEnum
+                    $"{label}.verdict"
+                    ["Pass"; "Inconclusive"; "Fail"; "ToolFailure"]
+                    (element.GetProperty("verdict"))
+
+            let required = element.GetProperty("requiredGates")
+            let evaluated = element.GetProperty("evaluatedGates")
+            let! requiredGates, evaluatedGates =
+                match required.TryGetInt32(), evaluated.TryGetInt32() with
+                | (true, requiredCount), (true, evaluatedCount)
+                    when requiredCount > 0
+                         && evaluatedCount >= 0
+                         && evaluatedCount <= requiredCount ->
+                    Ok (requiredCount, evaluatedCount)
+                | _ ->
+                    Error $"{label} gate counts must satisfy requiredGates > 0 and 0 <= evaluatedGates <= requiredGates."
+
+            let gates = element.GetProperty("gates")
+            let missing = element.GetProperty("missingGateIds")
+            do! validateArray $"{label}.gates" validateConstructiveGate gates
+            do!
+                validateArray
+                    $"{label}.missingGateIds"
+                    (fun itemLabel value -> validateString itemLabel value)
+                    missing
+
+            let gateItems = gates.EnumerateArray() |> Seq.toList
+            let gateIds =
+                gateItems
+                |> List.map (fun gate -> gate.GetProperty("gateId").GetString())
+            let missingIds =
+                missing.EnumerateArray()
+                |> Seq.map _.GetString()
+                |> Seq.toList
+            if gateIds.Length <> (gateIds |> Set.ofList |> Set.count) then
+                return! Error $"{label} contains duplicate gate records."
+            if missingIds.Length <> (missingIds |> Set.ofList |> Set.count) then
+                return! Error $"{label} contains duplicate missing gate identifiers."
+            let allRequiredIds = Set.union (Set.ofList gateIds) (Set.ofList missingIds)
+            if allRequiredIds.Count <> requiredGates then
+                return! Error $"{label} requiredGates does not match its gate and missing-evidence ledger."
+            let observedCount =
+                gateItems
+                |> List.filter (fun gate ->
+                    gate.GetProperty("evidence").GetArrayLength() > 0)
+                |> List.length
+            if observedCount <> evaluatedGates then
+                return! Error $"{label} evaluatedGates does not match evidence-bearing gate records."
+
+            let baseVerdict =
+                if element.GetProperty("projectionState").GetString() = "Admitted"
+                   && missingIds.IsEmpty then "Pass"
+                else "Inconclusive"
+            let! expectedVerdict =
+                baseVerdict
+                :: (gateItems
+                    |> List.map (fun gate ->
+                        gate.GetProperty("verdict").GetString()))
+                |> joinVerdictText
+            let declaredVerdict = element.GetProperty("verdict").GetString()
+            if declaredVerdict <> expectedVerdict then
+                return!
+                    Error $"{label}.verdict is '{declaredVerdict}' but its cumulative gate ledger requires '{expectedVerdict}'."
+            if declaredVerdict = "Pass"
+               && (element.GetProperty("projectionState").GetString() <> "Admitted"
+                   || not missingIds.IsEmpty
+                   || evaluatedGates <> requiredGates) then
+                return! Error $"{label} is not promotable despite declaring Pass."
+        }
+
+    let private assessmentVerdict (assessment: JsonElement) =
+        let health = assessment.GetProperty("health").GetString()
+        let compliance = assessment.GetProperty("compliance").GetString()
+        let applicable = assessment.GetProperty("applicableRules").GetInt32()
+        let evaluated = assessment.GetProperty("evaluatedRules").GetInt32()
+        if health = "Broken" then "ToolFailure"
+        elif compliance = "NonConformant" then "Fail"
+        elif health = "Complete"
+             && compliance = "Conformant"
+             && applicable > 0
+             && evaluated = applicable then "Pass"
+        else "Inconclusive"
+
+    let private validateVerdictCoherence (root: JsonElement) =
+        let verificationVerdicts =
+            root.GetProperty("assessments").EnumerateArray()
+            |> Seq.map assessmentVerdict
+            |> Seq.toList
+        let constructiveVerdicts =
+            root.GetProperty("constructiveAssessments").EnumerateArray()
+            |> Seq.map (fun assessment ->
+                assessment.GetProperty("verdict").GetString())
+            |> Seq.toList
+        let allVerdicts = verificationVerdicts @ constructiveVerdicts
+        let expected =
+            match allVerdicts with
+            | [] -> Ok "Inconclusive"
+            | values -> joinVerdictText values
+        expected
+        |> Result.bind (fun expectedVerdict ->
+            let declared = root.GetProperty("verdict").GetString()
+            if declared = expectedVerdict then Ok ()
+            else
+                Error $"Receipt verdict is '{declared}' but assessment components require '{expectedVerdict}'.")
+
+    let private validatePassCoherence (root: JsonElement) =
+        if root.GetProperty("verdict").GetString() <> "Pass" then
+            Ok ()
+        else
+            let assessments = root.GetProperty("assessments")
+            let constructive = root.GetProperty("constructiveAssessments")
+            if assessments.GetArrayLength() + constructive.GetArrayLength() = 0 then
+                Error "A Pass receipt must contain at least one assessment component."
+            else
+                assessments.EnumerateArray()
+                |> Seq.mapi (fun index assessment ->
+                    let applicableRules = assessment.GetProperty("applicableRules").GetInt32()
+                    let evaluatedRules = assessment.GetProperty("evaluatedRules").GetInt32()
+                    let health = assessment.GetProperty("health").GetString()
+                    let compliance = assessment.GetProperty("compliance").GetString()
+                    if applicableRules <= 0 then
+                        Error $"assessments[{index}] cannot support Pass with zero applicable rules."
+                    elif evaluatedRules <> applicableRules then
+                        Error $"assessments[{index}] cannot support Pass unless every applicable rule was evaluated."
+                    elif health <> "Complete" then
+                        Error $"assessments[{index}] cannot support Pass without Complete evidence health."
+                    elif compliance <> "Conformant" then
+                        Error $"assessments[{index}] cannot support Pass without Conformant compliance."
+                    else
+                        Ok ())
+                |> Seq.fold (fun state next ->
+                    match state, next with
+                    | Ok (), Ok () -> Ok ()
+                    | Error error, _ | _, Error error -> Error error) (Ok ())
+
     let private validateEnvelopeSchema (root: JsonElement) =
         result {
             do!
                 validateObject "receipt" [
                     "assessments"
+                    "constructiveAssessments"
                     "context"
                     "evaluator"
                     "receiptType"
@@ -118,7 +341,7 @@ module ReceiptVerifier =
                     "subject"
                     "verdict"
                 ] root
-            do! validateEnum "schemaVersion" ["1.0"] (root.GetProperty("schemaVersion"))
+            do! validateEnum "schemaVersion" ["1.1"] (root.GetProperty("schemaVersion"))
             do! validateEnum "receiptType" ["CanonFlowEvidenceReceipt"] (root.GetProperty("receiptType"))
             do! validateDigest "replayIdentity" (root.GetProperty("replayIdentity"))
             do! validateEnum "verdict" ["Pass"; "Inconclusive"; "Fail"; "ToolFailure"] (root.GetProperty("verdict"))
@@ -159,6 +382,13 @@ module ReceiptVerifier =
             do! validateString "context.timeProvenance" (context.GetProperty("timeProvenance"))
 
             do! validateArray "assessments" validateAssessment (root.GetProperty("assessments"))
+            do!
+                validateArray
+                    "constructiveAssessments"
+                    validateConstructiveAssessment
+                    (root.GetProperty("constructiveAssessments"))
+            do! validateVerdictCoherence root
+            do! validatePassCoherence root
 
             let seal = root.GetProperty("seal")
             if seal.ValueKind = JsonValueKind.Null then
@@ -281,13 +511,13 @@ module ReceiptVerifier =
         with ex ->
             Error $"Receipt envelope parsing failed: {ex.Message}"
 
-    let canonicalDigest (receipt: CanonFlowEvidenceReceipt) =
+    let canonicalDigest (receipt: CanonFlowEvidenceReceiptV11) =
         receipt
         |> CanonicalReceiptJson.serializeReceipt
         |> Hash.computeSha256
         |> fun hash -> "sha256:" + hash
 
-    let signReceipt keyId privateKey (receipt: CanonFlowEvidenceReceipt) =
+    let signReceipt keyId privateKey (receipt: CanonFlowEvidenceReceiptV11) =
         let presealed = {
             receipt with
                 Seal = Some {
@@ -301,7 +531,7 @@ module ReceiptVerifier =
         let signature = Ed25519Sign.sign privateKey payload |> Convert.ToBase64String
         { presealed with Seal = Some (Seal.createSigned keyId signature) }
 
-    let verifyReceipt pubKeyBytes (receipt: CanonFlowEvidenceReceipt) =
+    let verifyReceipt pubKeyBytes (receipt: CanonFlowEvidenceReceiptV11) =
         match receipt.Seal with
         | Some seal when seal.Status = SealStatus.Signed ->
             match seal.Algorithm, seal.Signature with

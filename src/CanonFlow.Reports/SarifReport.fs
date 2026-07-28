@@ -28,7 +28,7 @@ module SarifReport =
                 else None)
         code, location
 
-    let generate (receipt: CanonFlowEvidenceReceipt) =
+    let generate (receipt: CanonFlowEvidenceReceiptV11) =
         let results =
             receipt.Assessments
             |> List.collect (fun assessment ->

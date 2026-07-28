@@ -1,5 +1,5 @@
 <Project>
-  <Target Name="CanonFlowAssayConsumer" BeforeTargets="CoreCompile">
-    <Exec Command="dotnet fsi &quot;$(MSBuildThisFileDirectory)fsassay.fsx&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
+  <Target Name="CanonFlowLexicalGuardConsumer" BeforeTargets="CoreCompile">
+    <Exec Command="dotnet fsi &quot;$(MSBuildThisFileDirectory)canonflow-lexical-guard.fsx&quot; &quot;$(MSBuildProjectDirectory)&quot;" />
   </Target>
 </Project>

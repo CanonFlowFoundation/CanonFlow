@@ -6,13 +6,8 @@ open CanonFlow.Assurance
 module VerdictView =
     open Thoth.Json.Net
 
-    let generate (receipt: CanonFlowEvidenceReceipt) =
-        let exitCode =
-            match receipt.Verdict with
-            | Verdict.Pass -> 0
-            | Verdict.Fail -> 1
-            | Verdict.Inconclusive -> 2
-            | Verdict.ToolFailure -> 3
+    let generate (receipt: CanonFlowEvidenceReceiptV11) =
+        let exitCode = ExitCode.ofVerdict receipt.Verdict
         let components =
             receipt.Assessments
             |> List.map (fun assessment ->
@@ -39,6 +34,27 @@ module VerdictView =
                     "description", Encode.string description
                 ])
             |> Encode.list
+        let constructiveComponents =
+            receipt.ConstructiveAssessments
+            |> List.map (fun assessment ->
+                Encode.object [
+                    "obligationId", Encode.string assessment.ObligationId
+                    "projectionState", Encode.string assessment.ProjectionState
+                    "derivationKind", Encode.string assessment.DerivationKind
+                    "derivationReference",
+                        assessment.DerivationReference
+                        |> Option.map Encode.string
+                        |> Option.defaultValue Encode.nil
+                    "sourceDigest", Encode.string assessment.SourceDigest
+                    "manifestDigest", Encode.string assessment.ManifestDigest
+                    "verdict", Encode.string (ReceiptText.verdict assessment.Verdict)
+                    "requiredGates", Encode.int assessment.RequiredGates
+                    "evaluatedGates", Encode.int assessment.EvaluatedGates
+                    "missingGateIds",
+                        assessment.MissingGateIds
+                        |> List.map Encode.string
+                        |> Encode.list
+                ])
         let subjectDigests =
             receipt.Assessments
             |> List.collect (fun assessment -> assessment.Evidence)
@@ -54,6 +70,7 @@ module VerdictView =
             "exitCode", Encode.int exitCode
             "receiptDigest", Encode.string (ReportCommon.receiptDigest receipt)
             "components", Encode.list components
+            "constructiveComponents", Encode.list constructiveComponents
             "findings", ReportCommon.findings receipt |> pairs
             "missingEvidence", ReportCommon.gaps receipt |> pairs
             "toolFailures", ReportCommon.toolFailures receipt |> pairs

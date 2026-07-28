@@ -1,0 +1,184 @@
+{
+  "$id": "https://canonflow.dev/schemas/canonflow-obligation-manifest-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "manifestType": {
+      "const": "CanonFlowObligationManifest"
+    },
+    "obligations": {
+      "items": {
+        "$ref": "#/$defs/obligation"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "policyDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "protectedDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "schemaVersion": {
+      "const": "1.0"
+    }
+  },
+  "required": [
+    "manifestType",
+    "obligations",
+    "policyDigest",
+    "protectedDigest",
+    "schemaVersion"
+  ],
+  "title": "CanonFlow Obligation Manifest 1.0",
+  "type": "object",
+  "$defs": {
+    "canonicalId": {
+      "maxLength": 160,
+      "pattern": "^[a-z][a-z0-9._:-]*$",
+      "type": "string"
+    },
+    "derivation": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "None"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "assumptionIds": {
+              "items": {
+                "$ref": "#/$defs/canonicalId"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "kind": {
+              "const": "Candidate"
+            }
+          },
+          "required": [
+            "assumptionIds",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "admissionId": {
+              "$ref": "#/$defs/canonicalId"
+            },
+            "kind": {
+              "const": "Admitted"
+            }
+          },
+          "required": [
+            "admissionId",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "Unsupported"
+            },
+            "reasonId": {
+              "$ref": "#/$defs/canonicalId"
+            }
+          },
+          "required": [
+            "kind",
+            "reasonId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "gate": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/canonicalId"
+        },
+        "implementationDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "version": {
+          "$ref": "#/$defs/canonicalId"
+        }
+      },
+      "required": [
+        "id",
+        "implementationDigest",
+        "version"
+      ],
+      "type": "object"
+    },
+    "obligation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/canonicalId"
+        },
+        "normalizedPredicateDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "projection": {
+          "additionalProperties": false,
+          "properties": {
+            "derivation": {
+              "$ref": "#/$defs/derivation"
+            },
+            "state": {
+              "enum": [
+                "Dormant",
+                "CandidateRequiringApproval",
+                "Admitted",
+                "Unsupported"
+              ]
+            }
+          },
+          "required": [
+            "derivation",
+            "state"
+          ],
+          "type": "object"
+        },
+        "requiredGates": {
+          "items": {
+            "$ref": "#/$defs/gate"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "required": [
+        "id",
+        "normalizedPredicateDigest",
+        "projection",
+        "requiredGates",
+        "sourceDigest"
+      ],
+      "type": "object"
+    }
+  }
+}
