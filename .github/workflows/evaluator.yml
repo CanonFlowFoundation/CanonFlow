@@ -32,7 +32,7 @@ jobs:
 
       - name: Cross-repository locked build and tests
         working-directory: CanonFlow
-        run: build-tools/build-integration.sh
+        run: bash build-tools/build-integration.sh
 
       - name: Build pinned evaluator image
         working-directory: CanonFlow
@@ -40,11 +40,11 @@ jobs:
 
       - name: Run hardened four-verdict and FsAssay gates
         working-directory: CanonFlow
-        run: build-tools/test-container-hardening.sh
+        run: bash build-tools/test-container-hardening.sh
 
       - name: Install pinned supply-chain tools
         working-directory: CanonFlow
-        run: build-tools/install-supply-chain-tools.sh "$RUNNER_TEMP/canonflow-tools"
+        run: bash build-tools/install-supply-chain-tools.sh "$RUNNER_TEMP/canonflow-tools"
 
       - name: Build and verify signed air-gap bundle
         working-directory: CanonFlow
@@ -57,5 +57,5 @@ jobs:
           cosign generate-key-pair --output-key-prefix "$RUNNER_TEMP/ci-release"
           export COSIGN_KEY="$RUNNER_TEMP/ci-release.key"
           export BUNDLE_DIR="$RUNNER_TEMP/canonflow-evaluator-airgap-ci"
-          ./build-airgap.sh
+          bash ./build-airgap.sh
           "$BUNDLE_DIR/verify-airgap.sh"
