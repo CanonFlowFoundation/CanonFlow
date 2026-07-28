@@ -18,7 +18,7 @@ COPY src/ ./src/
 RUN dotnet tool install FsAssay.Cli \
     --tool-path /tools \
     --add-source /src/.nuget/offline \
-    --version 1.0.1
+    --version 1.0.4
 
 RUN dotnet restore src/Canon.Cli/Canon.Cli.fsproj --locked-mode
 

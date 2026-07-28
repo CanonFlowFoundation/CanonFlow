@@ -119,8 +119,8 @@
           "CanonFlow.Assurance": "[0.1.5-alpha, )",
           "FSharp.Core": "[9.0.300, )",
           "FsToolkit.ErrorHandling": "[5.2.0, )",
-          "ONDCFlow.Core": "[0.1.4-alpha, )",
-          "ONDCFlow.Profile.Retail": "[0.1.4-alpha, )",
+          "ONDCFlow.Core": "[0.1.5-alpha, )",
+          "ONDCFlow.Profile.Retail": "[0.1.5-alpha, )",
           "Thoth.Json.Net": "[12.0.0, )"
         }
       },
@@ -176,9 +176,9 @@
       },
       "ONDCFlow.Core": {
         "type": "CentralTransitive",
-        "requested": "[0.1.4-alpha, )",
-        "resolved": "0.1.4-alpha",
-        "contentHash": "+Z15MH+2BtfZJwf826VGgmzCHsXrfKTzh05txRqLYuTtYq/SGIdYlB+zbNyHvLKTmdjih+qPDLsKJy19YsBrlA==",
+        "requested": "[0.1.5-alpha, )",
+        "resolved": "0.1.5-alpha",
+        "contentHash": "zMinUfsSEZL33PISUeyCAW8n5p0r207HlxJSLOaqjz9oZdwVt8zIwTHifDLhqmJK2NUgho8oITT28UrcOXy5Eg==",
         "dependencies": {
           "CanonFlow.Assurance": "0.1.5-alpha",
           "FSharp.Core": "9.0.300",
@@ -188,12 +188,12 @@
       },
       "ONDCFlow.Profile.Retail": {
         "type": "CentralTransitive",
-        "requested": "[0.1.4-alpha, )",
-        "resolved": "0.1.4-alpha",
-        "contentHash": "SuiLE9AxzRNUn/b2ilPrgPSpVoov7shEX1cCuZiWA88c9jyWCUuIxK5kVxFeSRIYpov3wrK69kbxgyxF2zH+7Q==",
+        "requested": "[0.1.5-alpha, )",
+        "resolved": "0.1.5-alpha",
+        "contentHash": "lVIZga2VjSfIooxLkaTdEatu4etwGYmn6cI33QtRdCCvbdIArSgFcBfkbQ/67HAQQxrllnzZauHr77YEvH3KXA==",
         "dependencies": {
           "FSharp.Core": "9.0.300",
-          "ONDCFlow.Core": "0.1.4-alpha"
+          "ONDCFlow.Core": "0.1.5-alpha"
         }
       },
       "Thoth.Json.Net": {

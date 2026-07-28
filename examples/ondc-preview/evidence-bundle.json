@@ -1,6 +1,6 @@
 {
   "source_lock": {
-    "digest": "sha256:06f777b4a3ad5716a3e05dd33c3d1b38909b91987f956e16cf50a0e5ed87d8bd",
+    "digest": "sha256:25d5105f88140c6c72e1b258b277c49ce5e072ad55ef715c24ca15ffd70f7b19",
     "protocol": "ONDC",
     "protocol_version": "1.2.0"
   },

@@ -10,6 +10,7 @@ open FsToolkit.ErrorHandling
 module OndcRunner =
     let private rulePack : OndcRulePack = {
         Id = "ondc-retail-order-formation-preview-v2"
+        Digest = AdmittedSource.retailRulePackDigestText
         ApplicableRules = 10
         Evaluate = fun input ->
             Rules.evaluateEvidence input

@@ -6,9 +6,9 @@ obj/
 # Immutable offline packages required by clean evaluator/container restores.
 .nuget/offline/*.nupkg
 !.nuget/offline/CanonFlow.Assurance.0.1.5-alpha.nupkg
-!.nuget/offline/FsAssay.Cli.1.0.1.nupkg
-!.nuget/offline/ONDCFlow.Core.0.1.4-alpha.nupkg
-!.nuget/offline/ONDCFlow.Profile.Retail.0.1.4-alpha.nupkg
+!.nuget/offline/FsAssay.Cli.1.0.4.nupkg
+!.nuget/offline/ONDCFlow.Core.0.1.5-alpha.nupkg
+!.nuget/offline/ONDCFlow.Profile.Retail.0.1.5-alpha.nupkg
 
 # Output
 output/

@@ -13,22 +13,23 @@ open System.Diagnostics
 let runInNode (jsCode: string) =
     let tempFile = Path.Combine(__SOURCE_DIRECTORY__, Guid.NewGuid().ToString() + ".js")
     File.WriteAllText(tempFile, jsCode)
-    
-    let psi = ProcessStartInfo("node", tempFile)
-    psi.WorkingDirectory <- __SOURCE_DIRECTORY__
-    psi.RedirectStandardOutput <- true
-    psi.RedirectStandardError <- true
-    psi.UseShellExecute <- false
-    
-    use p = Process.Start(psi)
-    if isNull p then failwith "Failed to start Node process" // FsAssay-Ignore
-    p.WaitForExit()
-    let out = p.StandardOutput.ReadToEnd().Trim()
-    let err = p.StandardError.ReadToEnd().Trim()
-    File.Delete(tempFile)
-    if not (System.String.IsNullOrEmpty(err)) then
-        failwithf "Node Error: %s\nCode: %s" err jsCode // FsAssay-Ignore
-    out
+    try
+        let psi = ProcessStartInfo("node", tempFile)
+        psi.WorkingDirectory <- __SOURCE_DIRECTORY__
+        psi.RedirectStandardOutput <- true
+        psi.RedirectStandardError <- true
+        psi.UseShellExecute <- false
+
+        use p = Process.Start(psi)
+        if isNull p then failwith "Failed to start Node process" // FsAssay-Ignore
+        p.WaitForExit()
+        let out = p.StandardOutput.ReadToEnd().Trim()
+        let err = p.StandardError.ReadToEnd().Trim()
+        if not (System.String.IsNullOrEmpty(err)) then
+            failwithf "Node Error: %s\nCode: %s" err jsCode // FsAssay-Ignore
+        out
+    finally
+        if File.Exists(tempFile) then File.Delete(tempFile)
 
 /// F# native evaluator for a subset of constraints.
 let rec evalConstraint (c: Constraint) (value: int) : bool =

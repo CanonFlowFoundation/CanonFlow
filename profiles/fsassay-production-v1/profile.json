@@ -1,15 +1,40 @@
 {
   "id": "fsassay-production-v1",
   "tool": "FsAssay.Cli",
-  "tool_version": "1.0.1",
+  "tool_version": "1.0.4",
   "domain_profile": "core",
+  "admitted_rule_count": 21,
+  "admitted_rules": [
+    "FSA2022",
+    "FSA2017",
+    "FSA-AI01",
+    "FSA-AI12",
+    "FSA-AI13",
+    "FSA-AI15",
+    "FSA-AI16",
+    "FSA-C02",
+    "FSA-C05",
+    "FSA-P01",
+    "FSA-P02",
+    "FSA-P03",
+    "FSA-P04",
+    "FSA-P05",
+    "FSA-SEC08",
+    "FSA-SEC11",
+    "FSA-SEC12",
+    "FSA-SEC13",
+    "FSA-TDD01",
+    "FSA-TDD02",
+    "FSA-TDD03"
+  ],
   "outputs": [
     "json",
     "sarif"
   ],
   "policy": {
     "violation_exit_code": 1,
-    "tool_failure_exit_code": 64,
+    "inconclusive_exit_code": 2,
+    "tool_failure_exit_codes": [3, 64],
     "violation_verdict": "Fail",
     "tool_failure_verdict": "ToolFailure",
     "negative_sentinel": "FSA-C02"

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://canonflow.dev/schemas/evaluation-manifest-v1.json",
+  "subject": {
+    "root": ".",
+    "artifacts": ["Clean.fs", "Bad.fs"]
+  },
+  "evaluationContext": {
+    "instant": "2026-07-28T00:00:00Z",
+    "timeProvenance": "Declared",
+    "network": "Forbidden",
+    "locale": "invariant"
+  },
+  "profiles": ["fsassay-production-v1"]
+}

@@ -73,6 +73,10 @@ cmp "$test_root/pass-first/assessment.cff" "$test_root/pass-second/assessment.cf
 run_fixture fsassay-failing 1 fail
 grep -q 'FSA-C02' "$test_root/fail/assessment.cff"
 
+run_fixture fsassay-mixed 1 mixed
+grep -q 'FSA-C02' "$test_root/mixed/assessment.cff"
+grep -q '"kind":"ScannedFileCount".*"value":"2"' "$test_root/mixed/assessment.cff"
+
 run_fixture ondc-preview 2 inconclusive
 run_fixture fsassay-clean 3 tool-failure /missing/fsassay
 

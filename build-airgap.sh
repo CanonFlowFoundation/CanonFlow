@@ -64,7 +64,18 @@ if test -d schemas; then
     cp -R schemas/. "$bundle_dir/schemas/"
 fi
 if test -d examples; then
-    cp -R examples/. "$bundle_dir/examples/"
+    (
+        cd examples
+        tar \
+            --exclude='*/bin' \
+            --exclude='*/bin/*' \
+            --exclude='*/obj' \
+            --exclude='*/obj/*' \
+            -cf - .
+    ) | (
+        cd "$bundle_dir/examples"
+        tar -xf -
+    )
     if test -f "$bundle_dir/examples/ondc-preview/canonflow-evaluation.unsigned.json"; then
         cp \
             "$bundle_dir/examples/ondc-preview/canonflow-evaluation.unsigned.json" \
