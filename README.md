@@ -144,6 +144,30 @@ dotnet run -- --pg "Host=localhost;Database=mydb;Username=user;Password=pass" --
 ```
 Check the `output/` folder for the generated `openmetadata` JSON and `catalog.md` files, and `client/src/validators.ts` for your native TypeScript validation logic!
 
+### ONDC SDK protocol
+
+The evaluator exposes a versioned, stdin/stdout contract for thin language
+SDKs:
+
+```bash
+canonflow capabilities --json
+
+canonflow ondc evaluate \
+  --input evidence-bundle.json \
+  --output result.json \
+  --profile ondc-retail-1.2.0-preview \
+  --instant 2026-07-27T10:30:00Z
+
+canonflow receipt verify \
+  --receipt assessment.cff \
+  --allow-unsigned
+```
+
+`ondc evaluate` returns actionable diagnostics together with the exact
+canonical receipt. The only installed ONDC profile is experimental and carries
+no ONDC certification authority. Authoritative use requires an immutable OCI
+image digest and an externally governed signing and admission process.
+
 ## 🌐 Foundation
 
 Learn more about the underlying philosophy and mathematical model at the [CanonFlow Foundation](https://canonflowfoundation.github.io).

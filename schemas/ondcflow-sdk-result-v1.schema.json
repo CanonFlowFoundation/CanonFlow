@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canonflow.dev/schemas/ondcflow-sdk-result-v1.json",
+  "title": "ONDCFlow SDK Evaluation Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profile", "result", "receipt"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "profile": { "const": "ondc-retail-1.2.0-preview" },
+    "receipt": {
+      "description": "Exact canonical CanonFlow evidence-receipt envelope.",
+      "type": "string",
+      "minLength": 2
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "exitCode",
+        "receiptDigest",
+        "components",
+        "findings",
+        "missingEvidence",
+        "toolFailures",
+        "subjectDigests"
+      ],
+      "properties": {
+        "verdict": {
+          "enum": ["Pass", "Inconclusive", "Fail", "ToolFailure"]
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "receiptDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "version",
+              "health",
+              "compliance",
+              "applicableRules",
+              "evaluatedRules",
+              "evidence"
+            ],
+            "properties": {
+              "id": { "type": "string" },
+              "version": { "type": "string" },
+              "health": { "enum": ["Complete", "Partial", "Broken"] },
+              "compliance": {
+                "enum": ["Conformant", "NonConformant", "NotEstablished"]
+              },
+              "applicableRules": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "evaluatedRules": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["path", "kind", "value", "provenance"],
+                  "properties": {
+                    "path": { "type": "string" },
+                    "kind": { "type": "string" },
+                    "value": { "type": ["string", "null"] },
+                    "provenance": { "type": ["string", "null"] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "findings": { "$ref": "#/$defs/messages" },
+        "missingEvidence": { "$ref": "#/$defs/messages" },
+        "toolFailures": { "$ref": "#/$defs/messages" },
+        "subjectDigests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "kind", "value"],
+            "properties": {
+              "path": { "type": "string" },
+              "kind": { "type": "string" },
+              "value": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component", "description"],
+        "properties": {
+          "component": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}

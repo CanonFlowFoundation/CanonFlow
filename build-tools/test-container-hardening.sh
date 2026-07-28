@@ -80,6 +80,112 @@ grep -q '"kind":"ScannedFileCount".*"value":"2"' "$test_root/mixed/assessment.cf
 run_fixture ondc-preview 2 inconclusive
 run_fixture fsassay-clean 3 tool-failure /missing/fsassay
 
+sdk_result="$test_root/ondc-sdk-result.json"
+set +e
+docker run --rm \
+    --pull=never \
+    --network none \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --pids-limit 128 \
+    --memory 512m \
+    --cpus 1 \
+    --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+    -i \
+    "$image_name" \
+    ondc evaluate \
+    --input - \
+    --output - \
+    --profile ondc-retail-1.2.0-preview \
+    --instant 2026-07-27T10:30:00Z \
+    < "$repository_root/examples/ondc-preview/evidence-bundle.json" \
+    > "$sdk_result"
+sdk_exit=$?
+set -e
+if test "$sdk_exit" -ne 2; then
+    echo "ONDC SDK facade returned $sdk_exit; expected Inconclusive exit 2." >&2
+    exit 1
+fi
+
+python3 - "$sdk_result" "$test_root/sdk-assessment.cff" <<'PY'
+import json
+import pathlib
+import sys
+
+result_path = pathlib.Path(sys.argv[1])
+receipt_path = pathlib.Path(sys.argv[2])
+value = json.loads(result_path.read_text(encoding="utf-8"))
+assert value["schemaVersion"] == "1.0"
+assert value["profile"] == "ondc-retail-1.2.0-preview"
+assert value["result"]["verdict"] == "Inconclusive"
+assert value["result"]["exitCode"] == 2
+assert value["result"]["missingEvidence"]
+receipt_path.write_text(value["receipt"], encoding="utf-8")
+PY
+
+docker run --rm \
+    --pull=never \
+    --network none \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --pids-limit 128 \
+    --memory 512m \
+    --cpus 1 \
+    --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+    -i \
+    "$image_name" \
+    receipt verify \
+    --receipt - \
+    --allow-unsigned \
+    < "$test_root/sdk-assessment.cff" \
+    > "$test_root/sdk-verification.json"
+grep -q '"valid":true' "$test_root/sdk-verification.json"
+
+docker run --rm \
+    --pull=never \
+    --network none \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --pids-limit 128 \
+    --memory 512m \
+    --cpus 1 \
+    --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+    "$image_name" \
+    capabilities --json \
+    > "$test_root/sdk-capabilities.json"
+grep -q '"authority":"none"' "$test_root/sdk-capabilities.json"
+
+set +e
+docker run --rm \
+    --pull=never \
+    --network none \
+    --read-only \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --pids-limit 128 \
+    --memory 512m \
+    --cpus 1 \
+    --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+    -i \
+    "$image_name" \
+    ondc evaluate \
+    --input - \
+    --output - \
+    --profile ondc-retail-1.2.0-preview \
+    --instant 2026-07-27T16:00:00+05:30 \
+    < "$repository_root/examples/ondc-preview/evidence-bundle.json" \
+    > "$test_root/sdk-invalid-instant.json"
+invalid_instant_exit=$?
+set -e
+if test "$invalid_instant_exit" -ne 64; then
+    echo "ONDC SDK invalid instant returned $invalid_instant_exit; expected usage exit 64." >&2
+    exit 1
+fi
+grep -q '"code":"INVALID_INSTANT"' "$test_root/sdk-invalid-instant.json"
+
 self_test_dir="$test_root/self-test"
 mkdir -p "$self_test_dir"
 chmod 0777 "$self_test_dir"

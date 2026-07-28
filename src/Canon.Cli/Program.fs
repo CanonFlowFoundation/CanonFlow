@@ -101,8 +101,7 @@ type CliArguments =
             | FsCheck -> "Generate FsCheck Arbitraries for property-based testing."
 
 module Program =
-    [<EntryPoint>]
-    let main argv =
+    let private runLegacy argv =
         let errorHandler = ProcessExiter(colorizer = function ErrorCode.HelpText -> None | _ -> Some ConsoleColor.Red)
         let parser = ArgumentParser.Create<CliArguments>(programName = "canonflow", errorHandler = errorHandler)
         
@@ -540,3 +539,14 @@ module Program =
         else
             printfn "%s" (parser.PrintUsage())
             0
+
+    [<EntryPoint>]
+    let main argv =
+        if argv.Length >= 2 && argv[0] = "ondc" && argv[1] = "evaluate" then
+            SdkProtocol.runOndcEvaluate argv[2..]
+        elif argv.Length >= 2 && argv[0] = "receipt" && argv[1] = "verify" then
+            SdkProtocol.runReceiptVerify argv[2..]
+        elif argv.Length >= 1 && argv[0] = "capabilities" then
+            SdkProtocol.runCapabilities (argv |> Array.contains "--json")
+        else
+            runLegacy argv
