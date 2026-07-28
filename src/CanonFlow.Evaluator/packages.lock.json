@@ -19,9 +19,9 @@
       },
       "ONDCFlow.Core": {
         "type": "Direct",
-        "requested": "[0.1.5-alpha, )",
-        "resolved": "0.1.5-alpha",
-        "contentHash": "zMinUfsSEZL33PISUeyCAW8n5p0r207HlxJSLOaqjz9oZdwVt8zIwTHifDLhqmJK2NUgho8oITT28UrcOXy5Eg==",
+        "requested": "[0.1.6-alpha, )",
+        "resolved": "0.1.6-alpha",
+        "contentHash": "fI7y25o4bzcn87Bh3LKIZX1i0us/szk4yam21qsZ+gLiX5LvvSiTK1dlGLarINs1IhLY4v4HRFEqYpp2klgoxw==",
         "dependencies": {
           "CanonFlow.Assurance": "0.1.5-alpha",
           "FSharp.Core": "9.0.300",
@@ -31,12 +31,12 @@
       },
       "ONDCFlow.Profile.Retail": {
         "type": "Direct",
-        "requested": "[0.1.5-alpha, )",
-        "resolved": "0.1.5-alpha",
-        "contentHash": "lVIZga2VjSfIooxLkaTdEatu4etwGYmn6cI33QtRdCCvbdIArSgFcBfkbQ/67HAQQxrllnzZauHr77YEvH3KXA==",
+        "requested": "[0.1.6-alpha, )",
+        "resolved": "0.1.6-alpha",
+        "contentHash": "HobqcDvxaDKc3UTuptBP/XYYmAuR3njjXRT0qhA4owYvMMBxuqHMYo1zw2l5ZCJrBnD0cn47C/DaRayAIvy/WA==",
         "dependencies": {
           "FSharp.Core": "9.0.300",
-          "ONDCFlow.Core": "0.1.5-alpha"
+          "ONDCFlow.Core": "0.1.6-alpha"
         }
       },
       "Thoth.Json.Net": {
