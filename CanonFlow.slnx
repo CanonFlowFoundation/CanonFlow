@@ -13,12 +13,16 @@
     <Project Path="src/Canon.PgPrism/Canon.PgPrism.fsproj" />
     <Project Path="src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj" />
     <Project Path="src/CanonFlow.Assurance/CanonFlow.Assurance.fsproj" />
+    <Project Path="src/CanonFlow.Assurance.Contracts/CanonFlow.Assurance.Contracts.fsproj" />
     <Project Path="src/CanonFlow.Evaluator/CanonFlow.Evaluator.fsproj" />
     <Project Path="src/CanonFlow.Reports/CanonFlow.Reports.fsproj" />
+    <Project Path="src/Cff.Harness/Cff.Harness.fsproj" />
+    <Project Path="src/Cff.Runner/Cff.Runner.fsproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CanonFlow.Assurance.Tests/CanonFlow.Assurance.Tests.fsproj" />
     <Project Path="tests/CanonFlow.Assurance.Xp.Tests/CanonFlow.Assurance.Xp.Tests.fsproj" />
+    <Project Path="tests/Cff.Harness.Tests/Cff.Harness.Tests.fsproj" />
   </Folder>
   <Folder Name="/tests/integration/">
     <Project Path="tests/integration/Canon.IntegrationTests.fsproj" />

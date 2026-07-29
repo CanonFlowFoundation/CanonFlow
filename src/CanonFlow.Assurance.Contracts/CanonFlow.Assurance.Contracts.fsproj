@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>CanonFlow.Assurance.Contracts</PackageId>
+    <Version>0.1.0-alpha.1</Version>
+    <Authors>CanonFlow Foundation</Authors>
+    <Description>Pure cross-repository assurance contracts for CanonFlow evaluators.</Description>
+    <RepositoryUrl>https://github.com/CanonFlowFoundation/CanonFlow</RepositoryUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <DeterministicTimestamp>2026-07-29T00:00:00Z</DeterministicTimestamp>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Portable-PDB PE records vary with workspace path length under the
+         .NET 10 F# compiler. Release packages omit that non-semantic input so
+         independent clean workspaces produce byte-identical assemblies. -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Contracts.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <Target Name="CanonicalizeNuGetPackage" AfterTargets="Pack">
+    <PropertyGroup>
+      <_DotNetHost>$([System.IO.Path]::GetFullPath('$(MSBuildBinPath)\..\..\dotnet.exe'))</_DotNetHost>
+      <_Canonicalizer>$(MSBuildProjectDirectory)\..\..\build-tools\CanonicalizeNuGetPackage.fsx</_Canonicalizer>
+      <_PackagePath>$([System.IO.Path]::Combine('$(PackageOutputPath)', '$(PackageId).$(PackageVersion).nupkg'))</_PackagePath>
+    </PropertyGroup>
+    <Exec Command="&quot;$(_DotNetHost)&quot; fsi &quot;$(_Canonicalizer)&quot; &quot;$(_PackagePath)&quot;" />
+  </Target>
+</Project>

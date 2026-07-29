@@ -49,6 +49,20 @@ let rec evalConstraint (c: Constraint) (value: int) : bool =
 let evalLattice (l: Lattice<Constraint>) (value: int) : bool =
     Lattice.eval (fun c -> evalConstraint c value) l
 
+type InputDomain =
+    | Scalar
+    | AgeRecord
+
+let rec inputDomains lattice =
+    match lattice with
+    | True
+    | False -> Set.empty
+    | Leaf (FieldBound("age", _)) -> Set.singleton AgeRecord
+    | Leaf _ -> Set.singleton Scalar
+    | Not inner -> inputDomains inner
+    | And(left, right)
+    | Or(left, right) -> Set.union (inputDomains left) (inputDomains right)
+
 type ConstraintGen =
     static member Constraint() =
         Gen.oneof [
@@ -120,9 +134,13 @@ module AgreementProperties =
 
         // 2. Transpile to TS/JS
         let tsCode, fidelity = Canon.Fable.Transpiler.emitValidator "test" l false None
+        let domains = inputDomains l
         
-        // Skip if not exact (e.g., unsupported constraints)
-        if not nodeAvailable || fidelity <> Fidelity.Exact then
+        // A scalar and an object are different validator input domains. Mixed
+        // lattices cannot be compared by evaluating two candidates with OR,
+        // especially for conjunctions, so this agreement property covers only
+        // predicates with one unambiguous input domain.
+        if not nodeAvailable || fidelity <> Fidelity.Exact || domains.Count <> 1 then
             true
         else
             // Strip TypeScript syntax so Node can run it directly as a script
@@ -134,8 +152,14 @@ module AgreementProperties =
                     .Replace(": boolean", "")
                     .Replace("import { z } from \"zod\";", "const { z } = require('zod');")
             
-            // Append execution and print result
-            let executionCode = sprintf "%s\nlet val1 = %d; let val2 = { age: %d }; console.log(validate_test(val1) || validate_test(val2));" jsScript value value
+            // Append one execution in the same input domain as the predicate.
+            let candidate =
+                if domains.Contains AgeRecord then
+                    sprintf "{ age: %d }" value
+                else
+                    string value
+            let executionCode =
+                sprintf "%s\nconst candidate = %s; console.log(validate_test(candidate));" jsScript candidate
             
             // 3. Execute in Node.js
             let nodeOutput = runInNode executionCode
