@@ -1,0 +1,137 @@
+name: Publish CanonFlow Assurance Contracts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-canonflow-assurance-contracts-0.1.0-alpha.1
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: contracts-v0.1.0-alpha.1
+  RELEASE_COMMIT: d333c5bf36d2855a4014144f20071c610a9b26fe
+  PACKAGE_ID: CanonFlow.Assurance.Contracts
+  PACKAGE_VERSION: 0.1.0-alpha.1
+  PACKAGE_SHA256: 8673eb4f2807e3f174afeaa4f058d2377c37183f29a002901a1352d72e0031d5
+  PROJECT_PATH: src/CanonFlow.Assurance.Contracts/CanonFlow.Assurance.Contracts.fsproj
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+
+jobs:
+  publish:
+    name: Verify and publish the authorized package
+    runs-on: windows-latest
+    environment: nuget-production
+
+    steps:
+      - name: Check out the immutable release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+
+      - name: Verify tag and commit identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $headCommit = (git rev-parse HEAD).Trim().ToLowerInvariant()
+          $tagCommit = (git rev-list -n 1 "refs/tags/$env:RELEASE_TAG").Trim().ToLowerInvariant()
+          $expectedCommit = $env:RELEASE_COMMIT.ToLowerInvariant()
+
+          if ($headCommit -ne $expectedCommit) {
+            throw "Checked-out commit '$headCommit' does not match authorized commit '$expectedCommit'."
+          }
+
+          if ($tagCommit -ne $expectedCommit) {
+            throw "Tag '$env:RELEASE_TAG' resolves to '$tagCommit', not '$expectedCommit'."
+          }
+
+          if (git status --porcelain) {
+            throw 'The checked-out release tree is not clean.'
+          }
+
+      - name: Install the exact .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 10.0.301
+
+      - name: Restore locked dependencies
+        shell: pwsh
+        run: >
+          dotnet restore $env:PROJECT_PATH
+          --locked-mode
+          --source $env:NUGET_SOURCE
+
+      - name: Build the canonical package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageDirectory = Join-Path $env:RUNNER_TEMP 'canonflow-contracts-package'
+
+          dotnet pack $env:PROJECT_PATH `
+            --configuration Release `
+            --no-restore `
+            --output $packageDirectory `
+            -p:RepositoryCommit=$env:RELEASE_COMMIT `
+            -p:RepositoryBranch=main
+
+          $packages = @(Get-ChildItem -Path $packageDirectory -Filter '*.nupkg' -File)
+          if ($packages.Count -ne 1) {
+            throw "Expected exactly one .nupkg, found $($packages.Count)."
+          }
+
+          $expectedName = "$env:PACKAGE_ID.$env:PACKAGE_VERSION.nupkg"
+          if ($packages[0].Name -cne $expectedName) {
+            throw "Produced package '$($packages[0].Name)' does not match '$expectedName'."
+          }
+
+          "PACKAGE_PATH=$($packages[0].FullName)" |
+            Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Verify the authorized package digest
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $observedDigest = (Get-FileHash -Path $env:PACKAGE_PATH -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expectedDigest = $env:PACKAGE_SHA256.ToLowerInvariant()
+
+          if ($observedDigest -ne $expectedDigest) {
+            throw "Package SHA-256 '$observedDigest' does not match authorized digest '$expectedDigest'."
+          }
+
+          "Verified package SHA-256: ``$observedDigest``" |
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY
+
+      - name: Exchange GitHub OIDC token for a temporary NuGet credential
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: arun6202
+
+      - name: Publish the verified contracts package
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: >
+          dotnet nuget push $env:PACKAGE_PATH
+          --api-key $env:NUGET_API_KEY
+          --source $env:NUGET_SOURCE
+
+      - name: Record publication identity
+        shell: pwsh
+        run: |
+          @"
+          ### Published package
+
+          - Package: ``$env:PACKAGE_ID``
+          - Version: ``$env:PACKAGE_VERSION``
+          - Commit: ``$env:RELEASE_COMMIT``
+          - Tag: ``$env:RELEASE_TAG``
+          - SHA-256: ``$env:PACKAGE_SHA256``
+          - Authentication: NuGet Trusted Publishing via GitHub OIDC
+          - Signing: unsigned alpha
+          - Disclosure: NU3004
+          "@ | Add-Content -Path $env:GITHUB_STEP_SUMMARY
