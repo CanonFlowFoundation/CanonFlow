@@ -22,6 +22,7 @@ This permission is limited to the alpha release. An external paid pilot or stabl
 - `NU3004` is a disclosed release condition, not an ignored warning.
 - The alpha package must not be published from an uncommitted tree or an unmerged feature branch.
 - A digest match does not replace commit identity, locked restore, reproducibility, or receipt binding; all controls are conjunctive.
+- Release packaging omits portable-PDB and symbol-package output because the .NET 10 F# compiler's PE debug-record padding varies with workspace path length. Debug builds remain available for development; the released assembly and XML documentation remain deterministic.
 - Failure of any control blocks publication.
 
 ## Release boundary

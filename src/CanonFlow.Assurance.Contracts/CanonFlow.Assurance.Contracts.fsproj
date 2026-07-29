@@ -15,6 +15,14 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Portable-PDB PE records vary with workspace path length under the
+         .NET 10 F# compiler. Release packages omit that non-semantic input so
+         independent clean workspaces produce byte-identical assemblies. -->
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Contracts.fs" />
   </ItemGroup>
