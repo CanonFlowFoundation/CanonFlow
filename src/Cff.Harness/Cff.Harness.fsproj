@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>Cff.Harness</PackageId>
+    <Version>0.1.0-alpha</Version>
+    <Description>Fail-closed serial obligation and work-evidence harness.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="HarnessDomain.fs" />
+    <Compile Include="Canonical.fs" />
+    <Compile Include="Engine.fs" />
+    <Compile Include="QuoteContinuity.fs" />
+    <Compile Include="Receipts.fs" />
+    <Compile Include="Work.fs" />
+    <Compile Include="Demo.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CanonFlow.Assurance.Contracts\CanonFlow.Assurance.Contracts.fsproj" />
+    <ProjectReference Include="..\CanonFlow.Assurance\CanonFlow.Assurance.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle.Cryptography" />
+  </ItemGroup>
+</Project>
