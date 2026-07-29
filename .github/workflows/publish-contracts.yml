@@ -17,6 +17,7 @@ env:
   PACKAGE_ID: CanonFlow.Assurance.Contracts
   PACKAGE_VERSION: 0.1.0-alpha.1
   PACKAGE_SHA256: 8673eb4f2807e3f174afeaa4f058d2377c37183f29a002901a1352d72e0031d5
+  README_SHA256: 23fe6fc1bf81e5353f2638a49de657d8169004a33f788c1819369c1c3f074732
   PROJECT_PATH: src/CanonFlow.Assurance.Contracts/CanonFlow.Assurance.Contracts.fsproj
   NUGET_SOURCE: https://api.nuget.org/v3/index.json
 
@@ -51,6 +52,22 @@ jobs:
 
           if (git status --porcelain) {
             throw 'The checked-out release tree is not clean.'
+          }
+
+      - name: Normalize the packaged README
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $readmePath = Join-Path $PWD 'src/CanonFlow.Assurance.Contracts/README.md'
+          $utf8 = [System.Text.UTF8Encoding]::new($false, $true)
+          $readme = $utf8.GetString([System.IO.File]::ReadAllBytes($readmePath))
+          $normalized = $readme.Replace("`r`n", "`n").Replace("`r", "`n")
+          [System.IO.File]::WriteAllText($readmePath, $normalized, $utf8)
+
+          $observedDigest = (Get-FileHash -Path $readmePath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expectedDigest = $env:README_SHA256.ToLowerInvariant()
+          if ($observedDigest -ne $expectedDigest) {
+            throw "README SHA-256 '$observedDigest' does not match authorized digest '$expectedDigest'."
           }
 
       - name: Install the exact .NET SDK
