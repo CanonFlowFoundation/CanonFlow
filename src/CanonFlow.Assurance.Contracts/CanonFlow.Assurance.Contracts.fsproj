@@ -21,4 +21,12 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
+  <Target Name="CanonicalizeNuGetPackage" AfterTargets="Pack">
+    <PropertyGroup>
+      <_DotNetHost>$([System.IO.Path]::GetFullPath('$(MSBuildBinPath)\..\..\dotnet.exe'))</_DotNetHost>
+      <_Canonicalizer>$(MSBuildProjectDirectory)\..\..\build-tools\CanonicalizeNuGetPackage.fsx</_Canonicalizer>
+      <_PackagePath>$([System.IO.Path]::Combine('$(PackageOutputPath)', '$(PackageId).$(PackageVersion).nupkg'))</_PackagePath>
+    </PropertyGroup>
+    <Exec Command="&quot;$(_DotNetHost)&quot; fsi &quot;$(_Canonicalizer)&quot; &quot;$(_PackagePath)&quot;" />
+  </Target>
 </Project>
