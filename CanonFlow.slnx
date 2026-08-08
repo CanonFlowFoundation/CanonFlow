@@ -30,5 +30,8 @@
   <Folder Name="/tests/laws/">
     <Project Path="tests/laws/Canon.Core.Tests.fsproj" />
   </Folder>
+  <Folder Name="/examples/fsassay-clean/tests/">
+    <Project Path="examples/fsassay-clean/tests/Clean.Tests.fsproj" />
+  </Folder>
   <Project Path="src\CanonFlow.Profile.Pgsql\CanonFlow.Profile.Pgsql.fsproj" />
 </Solution>
