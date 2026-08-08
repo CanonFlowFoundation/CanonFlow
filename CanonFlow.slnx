@@ -11,7 +11,6 @@
     <Project Path="src/Canon.Introspect/Canon.Introspect.fsproj" />
     <Project Path="src/Canon.SqlHydra/Canon.SqlHydra.fsproj" />
     <Project Path="src/Canon.PgPrism/Canon.PgPrism.fsproj" />
-    <Project Path="src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj" />
     <Project Path="src/CanonFlow.Assurance/CanonFlow.Assurance.fsproj" />
     <Project Path="src/CanonFlow.Assurance.Contracts/CanonFlow.Assurance.Contracts.fsproj" />
     <Project Path="src/CanonFlow.Evaluator/CanonFlow.Evaluator.fsproj" />
@@ -21,7 +20,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CanonFlow.Assurance.Tests/CanonFlow.Assurance.Tests.fsproj" />
-    <Project Path="tests/CanonFlow.Assurance.Xp.Tests/CanonFlow.Assurance.Xp.Tests.fsproj" />
     <Project Path="tests/Cff.Harness.Tests/Cff.Harness.Tests.fsproj" />
   </Folder>
   <Folder Name="/tests/integration/">
