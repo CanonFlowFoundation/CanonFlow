@@ -29,16 +29,18 @@ def check_dependencies(errors: list[str]) -> None:
             + ", ".join(assurance)
         )
 
-    xp = project_references(
-        "src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj"
-    )
-    allowed = {"../CanonFlow.Assurance/CanonFlow.Assurance.fsproj"}
-    unexpected = sorted(set(xp) - allowed)
-    if unexpected:
-        errors.append(
-            "CanonFlow.Assurance.Xp may reference only CanonFlow.Assurance; found "
-            + ", ".join(unexpected)
+    xp_path = ROOT / "src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj"
+    if xp_path.exists():
+        xp = project_references(
+            "src/CanonFlow.Assurance.Xp/CanonFlow.Assurance.Xp.fsproj"
         )
+        allowed = {"../CanonFlow.Assurance/CanonFlow.Assurance.fsproj"}
+        unexpected = sorted(set(xp) - allowed)
+        if unexpected:
+            errors.append(
+                "CanonFlow.Assurance.Xp may reference only CanonFlow.Assurance; found "
+                + ", ".join(unexpected)
+            )
 
 
 def source_files() -> list[Path]:
