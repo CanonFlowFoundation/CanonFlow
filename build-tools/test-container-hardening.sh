@@ -102,9 +102,9 @@ run_constructive_fixture() {
     done
 }
 
-run_fixture fsassay-clean 0 pass-first
-run_fixture fsassay-clean 0 pass-second
-cmp "$test_root/pass-first/assessment.cff" "$test_root/pass-second/assessment.cff"
+run_constructive_fixture canonflow-evaluation.json 0 constructive-pass-first
+run_constructive_fixture canonflow-evaluation.json 0 constructive-pass-second
+cmp "$test_root/constructive-pass-first/assessment.cff" "$test_root/constructive-pass-second/assessment.cff"
 
 run_fixture fsassay-failing 1 fail
 grep -q 'FSA-C02' "$test_root/fail/assessment.cff"
@@ -114,13 +114,12 @@ grep -q 'FSA-C02' "$test_root/mixed/assessment.cff"
 grep -q '"kind":"ScannedFileCount".*"value":"2"' "$test_root/mixed/assessment.cff"
 
 run_fixture ondc-preview 2 inconclusive
-run_fixture fsassay-clean 3 tool-failure /missing/fsassay
+run_fixture fsassay-failing 3 tool-failure /missing/fsassay
 
-run_constructive_fixture canonflow-evaluation.json 0 constructive-pass
-grep -q '"assessments":\[\]' "$test_root/constructive-pass/assessment.cff"
-grep -q '"constructiveAssessments":\[' "$test_root/constructive-pass/assessment.cff"
-grep -q '"projectionState":"Admitted"' "$test_root/constructive-pass/assessment.cff"
-grep -q '"evaluatedGates":4' "$test_root/constructive-pass/assessment.cff"
+grep -q '"assessments":\[\]' "$test_root/constructive-pass-first/assessment.cff"
+grep -q '"constructiveAssessments":\[' "$test_root/constructive-pass-first/assessment.cff"
+grep -q '"projectionState":"Admitted"' "$test_root/constructive-pass-first/assessment.cff"
+grep -q '"evaluatedGates":4' "$test_root/constructive-pass-first/assessment.cff"
 
 run_constructive_fixture canonflow-evaluation.fail.json 1 constructive-fail
 grep -q '"verdict":"Fail"' "$test_root/constructive-fail/assessment.cff"
@@ -141,7 +140,7 @@ docker run --rm \
     receipt verify \
     --receipt - \
     --public-key-hex d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a \
-    < "$test_root/constructive-pass/assessment.cff" \
+    < "$test_root/constructive-pass-first/assessment.cff" \
     > "$test_root/constructive-verification.json"
 grep -q '"valid":true' "$test_root/constructive-verification.json"
 
